@@ -11,7 +11,7 @@ import {
 function RegMemViewer() {
   // Static Data,
   const registerValues = [
-    { name: "$zero", number: 0, value: "0x00000000",  },
+    { name: "$zero", number: 0, value: "0x00000000" },
     { name: "$at", number: 1, value: "0x00000001" },
     { name: "$v0", number: 2, value: "" },
     { name: "$v1", number: 3, value: "" },
@@ -43,9 +43,9 @@ function RegMemViewer() {
     { name: "$sp", number: 29, value: "" },
     { name: "$fp", number: 30, value: "" },
     { name: "$ra", number: 31, value: "" },
-    { name: "pc", value: "" },
-    { name: "hi", value: "" },
-    { name: "lo", value: "" },
+    { name: "pc", number: "", value: "" },
+    { name: "hi", number: "", value: "" },
+    { name: "lo", number: "", value: "" },
   ];
   //
   const memValues = [
@@ -55,7 +55,7 @@ function RegMemViewer() {
     },
   ];
 
-  type tableData = { titles: string[]; values: string[][] };
+  type tableData = { titles: string[]; values: (string | number)[][] };
   //   TODO: Make values writable, and updating Simulation.
 
   const MyTable = ({ titles, values }: tableData) => {
@@ -74,35 +74,33 @@ function RegMemViewer() {
         </TableHeader>
         <TableBody>
           {values.map((e, i) => (
-            <TableRow key={`row-${i}`} className={"odd:bg-gray-200"}>
+            <TableRow key={`row-${i}`} className={"odd:bg-gray-300"}>
               {e.map((t, j) => (
                 <TableCell key={`cell-${j}`}>{t}</TableCell>
               ))}
             </TableRow>
           ))}
         </TableBody>
-
         <TableBody></TableBody>
       </Table>
     );
   };
 
   return (
-    <div className="w-fit max-w-xl border-solid  border-2 h-fit">
-      <Tabs defaultValue="register" className="w-[400px]">
-        <div className="flex justify-center w-full h-fit my-3 ">
-          <TabsList>
+    <div className="w-fit max-w-xl h-screen overflow-y-auto border rounded-md ">
+      <Tabs defaultValue="register" className="w-[400px] ">
+        <div className="flex justify-center w-full sticky top-2 z-50 h-fit my-2 ">
+          <TabsList className="w-full">
             <TabsTrigger value="register">Register</TabsTrigger>
             <TabsTrigger value="memory">Memory</TabsTrigger>
           </TabsList>
         </div>
+
         <TabsContent value="register">
-          <div className="">
-            <MyTable
-              titles={Object.keys(registerValues[0])}
-              values={registerValues.map((e) => Object.values(e))}
-            />
-          </div>
+          <MyTable
+            titles={Object.keys(registerValues[0])}
+            values={registerValues.map((e) => Object.values(e))}
+          />
         </TabsContent>
 
         <TabsContent value="memory">
