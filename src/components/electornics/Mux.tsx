@@ -1,47 +1,48 @@
-import React from "react"
-import { type Node } from "@xyflow/react"
+import { intToHex } from "@/lib/utils"
+import type { Wire } from "@/simulation"
+import { type Node, type NodeProps } from "@xyflow/react"
+import { FaArrowRightLong } from "react-icons/fa6"
 
-export type MuxNodeData = {
+type MuxData = {
   label: string
+  inputs: {
+    id: string
+    visible: boolean
+    value: Wire | number
+  }[]
+  outputs?: { id: string; name: string; visible: boolean }[]
 }
 
-const Trapezoid = () => {
+export type MuxNode = Node<MuxData, "MuxNode">
+
+export const Mux = ({ data }: NodeProps<MuxNode>) => {
   return (
-    <svg width="200" height="120" viewBox="0 0 240 160">
-      <polygon
-        points="40,100 160,100 180,20 20,20"
-        fill="transparent"
-        stroke="black"
-        strokeWidth="2"
-        transform="rotate(-90 100 80)"
-      />
-      {/* Input */}
-      <text x={70} y={50} textAnchor="middle" alignmentBaseline="middle">
-        Input 1
-      </text>
-
-      <text x={70} y={120} textAnchor="middle" alignmentBaseline="middle">
-        Input 2
-      </text>
-
-      {/* Output */}
-
-      <text
-        x="90"
-        y="85"
-        textAnchor="middle"
-        alignmentBaseline="middle"
-        className="fill-black text-sm font-semibold"
-      >
-        Your Text
-      </text>
-    </svg>
+    <>
+      <div className="h-48 w-16 border-2 border-solid border-black rounded-3xl flex items-center  flex-row-reverse">
+        <span className="text-left">{data.label}</span>
+        <div>
+          {}
+          {data.inputs
+            .filter((e) => e.visible)
+            .map((e, i) => {
+              return (
+                <div className="w-8 h-8 relative">
+                  {typeof e.value === "number" ? (
+                    <div className="flex gap-1 absolute -left-11.5 justify-center items-center ">
+                      <div className="flex flex-row-reverse items-center justify-center gap-1">
+                        <FaArrowRightLong />
+                        {intToHex(e.value)}
+                      </div>
+                      <p className="ml-1">{i}</p>
+                    </div>
+                  ) : (
+                    <>Handle!</>
+                  )}
+                </div>
+              )
+            })}
+        </div>
+      </div>
+    </>
   )
 }
-
-export type BlackBoxNode = Node<MuxNodeData, "MuxNodeData">
-function Mux() {
-  return <Trapezoid />
-}
-
-export default Mux

@@ -1,23 +1,24 @@
-import { useState, useCallback } from "react"
-import {
-  ReactFlow,
-  applyNodeChanges,
-  applyEdgeChanges,
-  addEdge,
-  type NodeChange,
-  type EdgeChange,
-} from "@xyflow/react"
-import { BlackBoxHardwareNode } from "./components/electornics/BlackBoxHardwareNode"
+import { useState } from "react"
+import { ReactFlow } from "@xyflow/react"
+import { BlackBoxHardwareNode as RectangleNode } from "./components/electornics/BlackBoxHardwareNode"
 import "@xyflow/react/dist/style.css"
-import MuxNode from "./components/electornics/Mux"
-
+import { Mux as MuxNode } from "./components/electornics/Mux"
+import { Circle as CircleNode } from "./components/electornics/Circle"
+import AdderNode from "@/components/electornics/Adder"
 const nodeTypes = {
-  RegisterMemory: BlackBoxHardwareNode,
+  Rectangle: RectangleNode,
   Mux: MuxNode,
+  Circle: CircleNode,
+  Adder: AdderNode,
 }
 
 const initialNodes = [
-  // { id: 'n1', position: { x: 0, y: 0 }, data: { label: 'Node 1' }, type: 'Mux' },
+  {
+    id: "n1",
+    position: { x: 0, y: -350 },
+    type: "Adder",
+    data: { label: "YES" },
+  },
   {
     id: "n2",
     position: { x: 0, y: 100 },
@@ -34,71 +35,37 @@ const initialNodes = [
         { id: "", name: "Read RegData 2" },
       ],
     },
-    type: "RegisterMemory",
+    type: "Rectangle",
   },
   {
     id: "n3",
     position: { x: 50, y: 0 },
     data: {
       label: "Instruction Memory",
-      inputs: [{ id: "", name: "Read Address" }],
+      inputs: [
+        { id: "", name: "Read Address", visible: false },
+        { id: "", name: "abc", visible: false },
+      ],
       outputs: [{ id: "", name: "Instr[31-0]" }],
     },
-    type: "RegisterMemory",
+    type: "Circle",
   },
   {
     id: "n4",
-    position: { x: 65, y: 30 },
-    data: { label: "mux" },
+    position: { x: 500, y: 30 },
+    data: { label: "Mux", inputs: [{ id: "", value: 9, visible: true }] },
     type: "Mux",
   },
 ]
-const initialEdges = [{ id: "n1-n2", source: "n1", target: "n2" }]
 
 function App() {
-  const [nodes, setNodes] = useState(initialNodes)
-  const [edges, setEdges] = useState(initialEdges)
-
-  const onNodesChange = useCallback(
-    (
-      changes: NodeChange<{
-        id: string
-        position: { x: number; y: number }
-        data: {
-          label: string
-          inputs: { id: string; name: string }[]
-          outputs: { id: string; name: string }[]
-        }
-        type: string
-      }>[],
-    ) => setNodes((nodesSnapshot) => applyNodeChanges(changes, nodesSnapshot)),
-    [],
-  )
-  const onEdgesChange = useCallback(
-    (changes: EdgeChange<{ id: string; source: string; target: string }>[]) =>
-      setEdges((edgesSnapshot) => applyEdgeChanges(changes, edgesSnapshot)),
-    [],
-  )
-  const onConnect = useCallback(
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    (params: any) =>
-      setEdges((edgesSnapshot) => addEdge(params, edgesSnapshot)),
-    [],
-  )
+  const [nodes] = useState(initialNodes)
 
   return (
     <>
       {/* <ExecutionPanel/> */}
       <div style={{ width: "100vw", height: "100vh" }}>
-        <ReactFlow
-          nodes={nodes}
-          edges={edges}
-          nodeTypes={nodeTypes}
-          onNodesChange={onNodesChange}
-          onEdgesChange={onEdgesChange}
-          onConnect={onConnect}
-          fitView
-        />
+        <ReactFlow nodes={nodes} nodeTypes={nodeTypes} fitView />
       </div>
       {/* <ExecutionDisplay/> */}
     </>
