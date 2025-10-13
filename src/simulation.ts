@@ -3,20 +3,38 @@
  */
 export const MAX_REGISTERS = 32
 
+/**
+ * A change that a node may want to make to a simulation's state.
+ */
+export type SimulationChange =
+  | {
+      type: "regset"
+      /**
+       * The index of the register to change.
+       */
+      register: number
+      /**
+       * The new value of the register.
+       */
+      value: number
+    }
+  | {
+      type: "memset"
+      /**
+       * The memory address to change.
+       */
+      address: number
+      /**
+       * The new value at that address.
+       */
+      value: number
+    }
+
 // TODO figure out a way to statically type node input IDs and the `inputs` parameter in `execute`
 /**
  * An object describing a node - its inputs, outputs, behavior and style.
  */
 export type NodeType = {
-  /**
-   * The text that should be displayed as this node's label.
-   */
-  label: string
-  /**
-   * A string that decides what style this node should be rendered in.
-   */
-  style: string
-
   /**
    * An array of the inputs this node has.
    */
@@ -25,10 +43,6 @@ export type NodeType = {
      * A string that uniquely identifies this input in this node.
      */
     id: string
-    /**
-     * The display name of the input.
-     */
-    name: string
     /**
      * When the input changes, an update of the node will only trigger during this specified part of the clock cycle.
      * If it's not defined, it's assumed to be `"rising"`.
@@ -44,24 +58,19 @@ export type NodeType = {
      * A string that uniquely identifies this output in this node.
      */
     id: string
-    /**
-     * The display name of the output.
-     */
-    name: string
   }[]
 
   /**
    * This function is called during the rising part of the clock cycle.
-   * The simulation and inputs of the node are given. The outputs must be written to the `outputs` object.
+   * It receives a simulation and its inputs, and must return its outputs.
    * @param simulation The simulation that the node is in.
    * @param inputs An object containing the values of all inputs.
-   * @param outputs An object where the values of the node's outputs should be written to.
+   * @returns An object with the node's outputs.
    */
   executeRising: (
     simulation: Simulation,
     inputs: Record<string, number>,
-    outputs: Record<string, number>,
-  ) => void
+  ) => Record<string, number>
 
   /**
    * This function is called during the falling part of the clock cycle.
@@ -72,7 +81,7 @@ export type NodeType = {
   executeFalling?: (
     simulation: Simulation,
     inputs: Record<string, number>,
-  ) => void
+  ) => SimulationChange | undefined
 }
 
 /**
@@ -87,42 +96,22 @@ export type Node = {
    * This node's type.
    */
   type: NodeType
-}
-
-/**
- * A reference to an input within a node.
- */
-export type NodeInputRef = {
   /**
-   * The ID of the node.
+   * A map where the key is the node's output ID, and the value is the node and input ID that it's connected to.
    */
-  nodeId: string
-  /**
-   * The ID of the input within the node.
-   */
-  inputId: string
-}
-
-/**
- * A wire connects a node's output to one or more nodes' inputs.
- */
-export type Wire = {
-  /**
-   * The ID of the node that this wire gets its value from.
-   */
-  sourceNodeId: string
-  /**
-   * The ID of the output in the source node that this wire gets its value from.
-   */
-  sourceOutputId: string
-  /**
-   * An array of node inputs that receive this wire's value.
-   */
-  targetInputs: NodeInputRef[]
-  /**
-   * The current value that's on this wire.
-   */
-  value: string
+  connections: Record<
+    string,
+    {
+      /**
+       * The ID of the node.
+       */
+      nodeId: string
+      /**
+       * The ID of the input within the node.
+       */
+      inputId: string
+    }
+  >
 }
 
 /**
@@ -142,38 +131,101 @@ export type Simulation = {
    */
   memory: Record<number, number>
   /**
-   * A set of all the nodes in the simulation.
+   * A set of all the nodes in the simulation, where the key is the node ID and the value is the node.
    * They do not contain state.
    */
-  nodes: Node[]
+  nodes: Record<string, Node>
   /**
-   * A set of wires that connect between nodes.
-   * Each wire stores the value that's currently on it.
+   * A map of input values that are waiting to get accepted into a node.
+   *
+   * The key is a node ID, and the value is a map of which inputId received which value.
    */
-  wires: Wire[]
-  /**
-   * TODO maybe doesn't have to be a queue
-   * A queue(?) of signals that are going to be inputted into a node in the next step.
-   */
-  queue: (NodeInputRef & { value: number })[]
+  pendingInputs: Record<string, Record<string, number>>
+}
+
+/**
+ * Creates a "splitter" node type - a node that just forwards its input to all its outputs.
+ * @param numOutputs The number of outputs that the node will have.
+ */
+export function makeSplitter(numOutputs: number): NodeType {
+  const outputs: NodeType["outputs"] = []
+  for (let i = 0; i < numOutputs; i++) {
+    outputs.push({
+      id: "out" + i,
+    })
+  }
+
+  return {
+    inputs: [
+      {
+        id: "in",
+      },
+    ],
+    outputs,
+    executeRising: (_, inputs) => {
+      const values: Record<string, number> = {}
+      for (const o of outputs) {
+        values[o.id] = inputs.in
+      }
+      return values
+    },
+  }
 }
 
 /**
  * Creates a new simulation and returns it.
  */
-export function newSimulation(): Simulation {
+export function newSimulation(nodesList: Node[]): Simulation {
   const registers: number[] = []
 
   for (let i = 0; i < MAX_REGISTERS; i++) {
     registers.push(0)
   }
 
+  const nodes: Record<string, Node> = {}
+  for (const node of nodesList) {
+    nodes[node.id] = node
+  }
+
   return {
     pc: 0, // TODO what should be the initial PC?
     memory: {},
     registers,
-    nodes: [],
-    wires: [],
-    queue: [],
+    nodes,
+    pendingInputs: {},
+  }
+}
+
+export function simulationStep(simulation: Simulation): Simulation {
+  const newPendingInputs: typeof simulation.pendingInputs = {}
+  for (const nodeId in simulation.pendingInputs) {
+    const node = simulation.nodes[nodeId]
+    const pendingInputs = simulation.pendingInputs[nodeId]
+    const hasAllInputs = node.type.inputs.every(
+      (input) => input.id in pendingInputs,
+    )
+    if (hasAllInputs) {
+      // If a node has received values for all its inputs, we call its `execute` function
+      // and output its values.
+      const outputs = node.type.executeRising(simulation, pendingInputs)
+      for (const outputId in outputs) {
+        const target = node.connections[outputId]
+        const value = outputs[outputId]
+        newPendingInputs[target.nodeId] = {
+          ...newPendingInputs[target.nodeId],
+          [target.inputId]: value,
+        }
+      }
+    } else {
+      // If a node didn't yet receive values for all its inputs, the existing pending inputs will remain.
+      newPendingInputs[nodeId] = {
+        ...newPendingInputs[nodeId],
+        ...pendingInputs,
+      }
+    }
+  }
+  return {
+    ...simulation,
+    pendingInputs: newPendingInputs,
   }
 }
