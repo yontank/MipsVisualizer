@@ -25,7 +25,7 @@ export type SimulationChange =
        */
       address: number
       /**
-       * The new value at that address.
+       * The new value at the address.
        */
       value: number
     }
@@ -85,9 +85,9 @@ export type NodeType = {
 }
 
 /**
- * An instance of a node in a simulation.
+ * A definition of a node that will be in a simulation.
  */
-export type Node = {
+export type NodeDef = {
   /**
    * A string that uniquely identifies this node within the simulation.
    */
@@ -99,7 +99,7 @@ export type Node = {
   /**
    * A map where the key is the node's output ID, and the value is the node and input ID that it's connected to.
    */
-  connections: Record<
+  outputs: Record<
     string,
     {
       /**
@@ -110,6 +110,37 @@ export type Node = {
        * The ID of the input within the node.
        */
       inputId: string
+    }
+  >
+  /**
+   * Indicates whether this node is where a cycle ends.
+   *
+   * With each simulation step, values are propagated to every node that _isn't_ a cycle border.
+   * When a pending input reaches a cycleBorder, values will not propagate from it until the next cycle begins.
+   */
+  cycleBorder?: boolean
+}
+
+/**
+ * An instance of a node in a simulation.
+ *
+ * It includes an `inputs` object which allows mapping an input to the output that's connected to it.
+ */
+export type Node = NodeDef & {
+  /**
+   * A map where the key is the node's input ID, and the value is the node and output ID that it's connected to.
+   */
+  inputs: Record<
+    string,
+    {
+      /**
+       * The ID of the node.
+       */
+      nodeId: string
+      /**
+       * The ID of the output within the node.
+       */
+      outputId: string
     }
   >
 }
@@ -175,7 +206,7 @@ export function makeSplitter(numOutputs: number): NodeType {
 /**
  * Creates a new simulation and returns it.
  */
-export function newSimulation(nodesList: Node[]): Simulation {
+export function newSimulation(nodesList: NodeDef[]): Simulation {
   const registers: number[] = []
 
   for (let i = 0; i < MAX_REGISTERS; i++) {
@@ -184,7 +215,17 @@ export function newSimulation(nodesList: Node[]): Simulation {
 
   const nodes: Record<string, Node> = {}
   for (const node of nodesList) {
-    nodes[node.id] = node
+    nodes[node.id] = {
+      ...node,
+      inputs: {},
+    }
+  }
+
+  // Update the `inputs` map for all the nodes.
+  for (const nodeId in nodes) {
+    for (const [outputId, target] of Object.entries(nodes[nodeId].outputs)) {
+      nodes[target.nodeId].inputs[target.inputId] = { nodeId, outputId }
+    }
   }
 
   return {
@@ -209,7 +250,7 @@ export function simulationStep(simulation: Simulation): Simulation {
       // and output its values.
       const outputs = node.type.executeRising(simulation, pendingInputs)
       for (const outputId in outputs) {
-        const target = node.connections[outputId]
+        const target = node.outputs[outputId]
         const value = outputs[outputId]
         newPendingInputs[target.nodeId] = {
           ...newPendingInputs[target.nodeId],
