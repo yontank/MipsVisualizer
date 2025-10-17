@@ -74,7 +74,9 @@ export function DataTable<TData, TValue>({
       <TableVirtuoso
         style={{ height }}
         totalCount={rows.length}
-        rangeChanged={(range) => console.log('range', range)}
+        rangeChanged={(range) => console.log("range", range)}
+        endReached={() => {}}
+        startReached={() => {}}
         components={{
           Table: TableComponent,
           TableRow: TableRowComponent(rows),

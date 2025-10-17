@@ -9,9 +9,47 @@ import {
 } from "@/components/ui/table";
 import { DataTable } from "./VirtualizedTable";
 import type { ColumnDef } from "@tanstack/react-table";
+import { useEffect, useState } from "react";
+import type { hexadecimal } from "types";
+import { int2hex } from "@/lib/utils";
 
+function createMemoryArr(
+  index: number,
+  VIRT_LIMIT: number,
+  memValues: Map<hexadecimal, hexadecimal>
+) {
+  const result: { address: hexadecimal; value: hexadecimal }[] = [];
+
+  const low = Math.max(index - VIRT_LIMIT / 2, 0);
+  const high = Math.min(index + VIRT_LIMIT / 2, Math.pow(2, 32) - 1);
+
+  for (let i = low; i < high; i++) {
+    // convert the i address into a hexadecimal value.
+    const hexAddr = int2hex(i);
+
+    // if the hexadecimalv value doesn't exist, set its value to 0x0000:0000 (since it's not inside our record, it means its empty)
+    if (memValues.has(hexAddr)) {
+      //@ts-expect-error we're checking that the value exists above, why would it be undefined?
+      result.push({ address: hexAddr, value: memValues.get(hexAddr) });
+    } else result.push({ address: hexAddr, value: "0x00000000" });
+  }
+
+  return result;
+}
+const n1gg3r = new Map<hexadecimal, hexadecimal>();
 function RegMemViewer() {
   // Static Data,
+
+  const [memoryArr, setMemoryArr] = useState<
+    {
+      address: string;
+      value: string;
+    }[]
+  >(createMemoryArr(500, 2048 * 4, n1gg3r));
+
+  useEffect(() => {}, []);
+
+  if (memoryArr === undefined) return <></>;
 
   const registerValues = [
     { name: "$zero", number: 0, value: "0x00000000" },
@@ -51,76 +89,11 @@ function RegMemViewer() {
     { name: "lo", number: "", value: "" },
   ];
   //
-  const memValues = [
-    {
-      address: "0x00ff0000",
-      value: "00FFDABB",
-    },
-
-    {
-      address: "0x00FF001C",
-      value: "00F2C1BA",
-    },
-    {
-      address: "0x00ff0000",
-      value: "00FFDABB",
-    },
-
-    {
-      address: "0x00FF001C",
-      value: "00F2C1BA",
-    },
-    {
-      address: "0x00ff0000",
-      value: "00FFDABB",
-    },
-
-    {
-      address: "0x00FF001C",
-      value: "00F2C1BA",
-    },
-    {
-      address: "0x00ff0000",
-      value: "00FFDABB",
-    },
-
-    {
-      address: "0x00FF001C",
-      value: "00F2C1BA",
-    },
-    {
-      address: "0x00ff0000",
-      value: "00FFDABB",
-    },
-
-    {
-      address: "0x00FF001C",
-      value: "00F2C1BA",
-    },
-    {
-      address: "0x00ff0000",
-      value: "00FFDABB",
-    },
-
-    {
-      address: "0x00FF001C",
-      value: "00F2C1BA",
-    },
-    {
-      address: "0x00ff0000",
-      value: "00FFDABB",
-    },
-
-    {
-      address: "0x00FF001C",
-      value: "00F2C1BA",
-    },
-  ];
 
   const columns: ColumnDef<{ address: string; value: string }>[] = [
     {
       accessorKey: "address",
-      cell: (info) => info.getValue() + "hi",
+      cell: (info) => info.getValue(),
       header: "Address",
       size: 50,
     },
@@ -133,7 +106,7 @@ function RegMemViewer() {
   ];
   return (
     <div>
-      <DataTable columns={columns} data={memValues} height="50vh" />
+      <DataTable columns={columns} data={memoryArr} height="50vh" />
     </div>
   );
 
