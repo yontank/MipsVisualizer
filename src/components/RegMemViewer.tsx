@@ -61,6 +61,60 @@ function RegMemViewer() {
       address: "0x00FF001C",
       value: "00F2C1BA",
     },
+    {
+      address: "0x00ff0000",
+      value: "00FFDABB",
+    },
+
+    {
+      address: "0x00FF001C",
+      value: "00F2C1BA",
+    },
+    {
+      address: "0x00ff0000",
+      value: "00FFDABB",
+    },
+
+    {
+      address: "0x00FF001C",
+      value: "00F2C1BA",
+    },
+    {
+      address: "0x00ff0000",
+      value: "00FFDABB",
+    },
+
+    {
+      address: "0x00FF001C",
+      value: "00F2C1BA",
+    },
+    {
+      address: "0x00ff0000",
+      value: "00FFDABB",
+    },
+
+    {
+      address: "0x00FF001C",
+      value: "00F2C1BA",
+    },
+    {
+      address: "0x00ff0000",
+      value: "00FFDABB",
+    },
+
+    {
+      address: "0x00FF001C",
+      value: "00F2C1BA",
+    },
+    {
+      address: "0x00ff0000",
+      value: "00FFDABB",
+    },
+
+    {
+      address: "0x00FF001C",
+      value: "00F2C1BA",
+    },
   ];
 
   const columns: ColumnDef<{ address: string; value: string }>[] = [
