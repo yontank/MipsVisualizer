@@ -7,9 +7,12 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { DataTable } from "./VirtualizedTable";
+import type { ColumnDef } from "@tanstack/react-table";
 
 function RegMemViewer() {
   // Static Data,
+
   const registerValues = [
     { name: "$zero", number: 0, value: "0x00000000" },
     { name: "$at", number: 1, value: "0x00000001" },
@@ -53,12 +56,36 @@ function RegMemViewer() {
       address: "0x00ff0000",
       value: "00FFDABB",
     },
+
+    {
+      address: "0x00FF001C",
+      value: "00F2C1BA",
+    },
   ];
 
-  type tableData = { titles: string[]; values: (string | number)[][] };
-  //   TODO: Make values writable, and updating Simulation.
+  const columns: ColumnDef<{ address: string; value: string }>[] = [
+    {
+      accessorKey: "address",
+      cell: (info) => info.getValue() + "hi",
+      header: "Address",
+      size: 50,
+    },
+    {
+      accessorKey: "value",
+      cell: (info) => info.getValue(),
+      header: "Value",
+      size: 50,
+    },
+  ];
+  return (
+    <div>
+      <DataTable columns={columns} data={memValues} height="50vh" />
+    </div>
+  );
 
-  const MyTable = ({ titles, values }: tableData) => {
+  type tableData = { titles: string[]; values: (string | number)[][] };
+
+  const RegisterTable = ({ titles, values }: tableData) => {
     if (titles.length == 0 || values.length == 0) return <></>;
 
     return (
@@ -67,20 +94,41 @@ function RegMemViewer() {
           <TableRow>
             {titles.map((e) => (
               <>
-                <TableHead>{e}</TableHead>
+                <TableHead className="text-center">{e}</TableHead>
               </>
             ))}
           </TableRow>
         </TableHeader>
         <TableBody>
           {values.map((e, i) => (
-            <TableRow key={`row-${i}`} className={"odd:bg-gray-300"}>
+            <TableRow
+              key={`row-${i}`}
+              className={"odd:bg-gray-300 text-center"}
+            >
               {e.map((t, j) => (
                 <TableCell key={`cell-${j}`}>{t}</TableCell>
               ))}
             </TableRow>
           ))}
         </TableBody>
+      </Table>
+    );
+  };
+
+  const MemoryTable = ({ titles, values }: tableData) => {
+    if (titles.length == 0 || values.length == 0) return <></>;
+
+    return (
+      <Table>
+        <TableHeader>
+          <TableRow>
+            {titles.map((e) => (
+              <>
+                <TableHead className="text-center">{e}</TableHead>
+              </>
+            ))}
+          </TableRow>
+        </TableHeader>
         <TableBody></TableBody>
       </Table>
     );
@@ -88,7 +136,7 @@ function RegMemViewer() {
 
   return (
     <div className="w-fit max-w-xl h-screen overflow-y-auto border rounded-md ">
-      <Tabs defaultValue="register" className="w-[400px] ">
+      <Tabs defaultValue="register" className="w-[325px] ">
         <div className="flex justify-center w-full sticky top-2 z-50 h-fit my-2 ">
           <TabsList className="w-full">
             <TabsTrigger value="register">Register</TabsTrigger>
@@ -97,14 +145,15 @@ function RegMemViewer() {
         </div>
 
         <TabsContent value="register">
-          <MyTable
-            titles={Object.keys(registerValues[0])}
+          <RegisterTable
+            titles={Object.keys(memValues[0])}
             values={registerValues.map((e) => Object.values(e))}
+            // rowStyle={}
           />
         </TabsContent>
 
         <TabsContent value="memory">
-          <MyTable
+          <MemoryTable
             titles={Object.keys(memValues[0])}
             values={memValues.map((e) => Object.values(e))}
           />
