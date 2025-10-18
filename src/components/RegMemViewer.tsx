@@ -9,47 +9,11 @@ import {
 } from "@/components/ui/table";
 import { DataTable } from "./VirtualizedTable";
 import type { ColumnDef } from "@tanstack/react-table";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import type { hexadecimal } from "types";
 import { int2hex } from "@/lib/utils";
-
-function createMemoryArr(
-  index: number,
-  VIRT_LIMIT: number,
-  memValues: Map<hexadecimal, hexadecimal>
-) {
-  const result: { address: hexadecimal; value: hexadecimal }[] = [];
-
-  const low = Math.max(index - VIRT_LIMIT / 2, 0);
-  const high = Math.min(index + VIRT_LIMIT / 2, Math.pow(2, 32) - 1);
-
-  for (let i = low; i < high; i++) {
-    // convert the i address into a hexadecimal value.
-    const hexAddr = int2hex(i);
-
-    // if the hexadecimalv value doesn't exist, set its value to 0x0000:0000 (since it's not inside our record, it means its empty)
-    if (memValues.has(hexAddr)) {
-      //@ts-expect-error we're checking that the value exists above, why would it be undefined?
-      result.push({ address: hexAddr, value: memValues.get(hexAddr) });
-    } else result.push({ address: hexAddr, value: "0x00000000" });
-  }
-
-  return result;
-}
-const n1gg3r = new Map<hexadecimal, hexadecimal>();
-function RegMemViewer() {
-  // Static Data,
-
-  const [memoryArr, setMemoryArr] = useState<
-    {
-      address: string;
-      value: string;
-    }[]
-  >(createMemoryArr(500, 2048 * 4, n1gg3r));
-
-  useEffect(() => {}, []);
-
-  if (memoryArr === undefined) return <></>;
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 
   const registerValues = [
     { name: "$zero", number: 0, value: "0x00000000" },
@@ -88,6 +52,93 @@ function RegMemViewer() {
     { name: "hi", number: "", value: "" },
     { name: "lo", number: "", value: "" },
   ];
+
+function createMemoryArr(
+  index: number,
+  VIRT_LIMIT: number,
+  memValues: Map<hexadecimal, hexadecimal>
+) {
+  const result: { address: hexadecimal; value: hexadecimal }[] = [];
+
+  const low = Math.max(index - VIRT_LIMIT / 2, 0);
+  const high = Math.min(index + VIRT_LIMIT / 2, Math.pow(2, 32) - 1);
+
+  for (let i = low; i < high; i++) {
+    // convert the i address into a hexadecimal value.
+    const hexAddr = int2hex(i);
+
+    // if the hexadecimalv value doesn't exist, set its value to 0x0000:0000 (since it's not inside our record, it means its empty)
+    if (memValues.has(hexAddr)) {
+      //@ts-expect-error we're checking that the value exists above, why would it be undefined?
+      result.push({ address: hexAddr, value: memValues.get(hexAddr) });
+    } else result.push({ address: hexAddr, value: "0x00000000" });
+  }
+
+  return result;
+}
+const n1gg3r = new Map<hexadecimal, hexadecimal>();
+n1gg3r.set("0x00000000", "0x00000001");
+n1gg3r.set("0x00000001", "0x00000002");
+
+function MemoryInput(props) {
+  const [value, setValue] = useState<string>("");
+
+  /**
+   * TODO: Set state value inside the datatable alone, we dont want to fucking re-render the ENTIRE component when we only need the table to re render(memory)
+   * TODO: also, i'd like to add a way to edit the values directly in the table
+   * TODO: adding a (onSubmit button) (for the input) so that I'd add a way to submit the input value into the memory table, that way we can update the table without re-rendering the entire component
+   * @param keys 
+   * @returns 
+   */
+  const handleChange = (keys: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = keys.currentTarget;
+    const newChar = value.charAt(value.length - 1);
+    // FIXME: can be optomized by if the regex is not fitting, simply do not call the setState function,
+    // needs to be checked if its something that needs to be done, (meaning there's some performance issues)
+    // if there are, we'll also need to allow special keys (up, down, left, right arrows, enter, space key,etc.)
+    if (!newChar.match(/[a-fA-F0-9]/i)){
+      return value.substring(0, value.length - 1);
+    }
+    
+    console.log(newChar, value)
+    return value.toUpperCase();
+  };
+
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
+    if (event.key === "Enter") {
+      // Submit the value
+      console.log("Submitting:", value);
+      // setValue("");
+    }
+  };
+
+  return (
+    <div>
+      <Label>Memory Address</Label>
+      <Input
+      maxLength={8}
+        autoCapitalize="characters"
+        placeholder="e.g 0x12345678"
+        value={value}
+        onChange={(e) => setValue(handleChange(e))}
+        onKeyDown={handleKeyDown}
+      />
+    </div>
+  );
+}
+function RegMemViewer() {
+  // Static Data,
+
+  // Todo update SetMemory Arr after getting submitting the input location of the memory address
+  const [memoryArr] = useState<
+    {
+      address: string;
+      value: string;
+    }[]
+  >(createMemoryArr(500, 2048 * 4, n1gg3r));
+
+  if (memoryArr === undefined) return <></>;
+
   //
 
   const columns: ColumnDef<{ address: string; value: string }>[] = [
@@ -106,6 +157,7 @@ function RegMemViewer() {
   ];
   return (
     <div>
+      <MemoryInput/>
       <DataTable columns={columns} data={memoryArr} height="50vh" />
     </div>
   );

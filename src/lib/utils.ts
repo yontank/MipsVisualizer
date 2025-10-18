@@ -8,7 +8,11 @@ export function int2hex(number: number): hexadecimal {
   if (number < 0) {
     number = 0xffffffff + number + 1;
   }
-  return `0x${number.toString(16).toUpperCase()}`;
+
+  const hexValue = number.toString(16).toUpperCase();
+  const paddedHex = hexValue.padStart(8, "0");
+  return ("0x" + paddedHex) as hexadecimal;
+
 }
 
 export function hex2int(x: hexadecimal) {
