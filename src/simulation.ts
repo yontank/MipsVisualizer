@@ -167,11 +167,21 @@ export type Simulation = {
    */
   nodes: Record<string, Node>
   /**
+   * An array of node IDs that belong to cycle border nodes.
+   */
+  cycleBorderNodes: string[]
+  /**
    * A map of input values that are waiting to get accepted into a node.
    *
    * The key is a node ID, and the value is a map of which inputId received which value.
    */
   pendingInputs: Record<string, Record<string, number>>
+  /**
+   * Whether the current cycle is finished.
+   *
+   * A cycle is considered finished when the only nodes who have pending inputs are cycle border nodes.
+   */
+  cycleFinished: boolean
 }
 
 /**
@@ -214,10 +224,14 @@ export function newSimulation(nodesList: NodeDef[]): Simulation {
   }
 
   const nodes: Record<string, Node> = {}
+  const cycleBorderNodes: string[] = []
   for (const node of nodesList) {
     nodes[node.id] = {
       ...node,
       inputs: {},
+    }
+    if (node.cycleBorder) {
+      cycleBorderNodes.push(node.id)
     }
   }
 
@@ -233,19 +247,30 @@ export function newSimulation(nodesList: NodeDef[]): Simulation {
     memory: {},
     registers,
     nodes,
+    cycleBorderNodes,
     pendingInputs: {},
+    cycleFinished: false,
   }
+}
+
+function nodeHasAllInputs(simulation: Simulation, node: Node): boolean {
+  return node.type.inputs.every(
+    (input) => input.id in simulation.pendingInputs[node.id],
+  )
 }
 
 export function simulationStep(simulation: Simulation): Simulation {
   const newPendingInputs: typeof simulation.pendingInputs = {}
+  let otherNodesHavePendingInputs = false
+
   for (const nodeId in simulation.pendingInputs) {
     const node = simulation.nodes[nodeId]
     const pendingInputs = simulation.pendingInputs[nodeId]
-    const hasAllInputs = node.type.inputs.every(
-      (input) => input.id in pendingInputs,
-    )
-    if (hasAllInputs) {
+    // Cycle border nodes only propagate their signals if the cycle is finished.
+    if (
+      (!node.cycleBorder || simulation.cycleFinished) &&
+      nodeHasAllInputs(simulation, node)
+    ) {
       // If a node has received values for all its inputs, we call its `execute` function
       // and output its values.
       const outputs = node.type.executeRising(simulation, pendingInputs)
@@ -256,6 +281,9 @@ export function simulationStep(simulation: Simulation): Simulation {
           ...newPendingInputs[target.nodeId],
           [target.inputId]: value,
         }
+        if (!simulation.nodes[target.nodeId].cycleBorder) {
+          otherNodesHavePendingInputs = true
+        }
       }
     } else {
       // If a node didn't yet receive values for all its inputs, the existing pending inputs will remain.
@@ -265,8 +293,11 @@ export function simulationStep(simulation: Simulation): Simulation {
       }
     }
   }
+
   return {
     ...simulation,
     pendingInputs: newPendingInputs,
+    // A cycle is considered finished if the only nodes who have pending inputs are cycle border nodes.
+    cycleFinished: !otherNodesHavePendingInputs,
   }
 }
