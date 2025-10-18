@@ -68,15 +68,12 @@ export function DataTable<TData, TValue>({
   });
 
   const { rows } = table.getRowModel();
-  console.log("rows", table);
   return (
     <div className="rounded-md border">
       <TableVirtuoso
+        context={{ rows, data }}
         style={{ height }}
         totalCount={rows.length}
-        rangeChanged={(range) => console.log("range", range)}
-        endReached={() => {}}
-        startReached={() => {}}
         components={{
           Table: TableComponent,
           TableRow: TableRowComponent(rows),
