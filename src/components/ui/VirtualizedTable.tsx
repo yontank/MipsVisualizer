@@ -1,16 +1,15 @@
+"use client";
+
 import {
   type ColumnDef,
   type Row,
-  type SortDirection,
-  type SortingState,
   flexRender,
   getCoreRowModel,
-  getSortedRowModel,
   useReactTable,
 } from "@tanstack/react-table";
 
 import { TableCell, TableHead, TableRow } from "@/components/ui/table";
-import { type HTMLAttributes, forwardRef, useState } from "react";
+import { type HTMLAttributes, forwardRef } from "react";
 import { TableVirtuoso } from "react-virtuoso";
 import { cn } from "@/lib/utils";
 
@@ -51,20 +50,6 @@ const TableRowComponent = <TData,>(rows: Row<TData>[]) =>
     );
   };
 
-function SortingIndicator({ isSorted }: { isSorted: SortDirection | false }) {
-  if (!isSorted) return null;
-  return (
-    <div>
-      {
-        {
-          asc: "↑",
-          desc: "↓",
-        }[isSorted]
-      }
-    </div>
-  );
-}
-
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
@@ -76,26 +61,19 @@ export function DataTable<TData, TValue>({
   data,
   height,
 }: DataTableProps<TData, TValue>) {
-  const [sorting, setSorting] = useState<SortingState>([]);
   const table = useReactTable({
     data,
     columns,
-    state: {
-      sorting,
-    },
-    onSortingChange: setSorting,
     getCoreRowModel: getCoreRowModel(),
-    getSortedRowModel: getSortedRowModel(),
   });
 
   const { rows } = table.getRowModel();
-
   return (
     <div className="rounded-md border">
       <TableVirtuoso
+        context={{ rows, data }}
         style={{ height }}
         totalCount={rows.length}
-        initialTopMostItemIndex={Math.pow(2, 32) - 1}
         components={{
           Table: TableComponent,
           TableRow: TableRowComponent(rows),
@@ -130,9 +108,6 @@ export function DataTable<TData, TValue>({
                           header.column.columnDef.header,
                           header.getContext()
                         )}
-                        <SortingIndicator
-                          isSorted={header.column.getIsSorted()}
-                        />
                       </div>
                     )}
                   </TableHead>

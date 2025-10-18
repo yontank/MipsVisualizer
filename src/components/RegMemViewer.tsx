@@ -7,7 +7,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { DataTable } from "./VirtualizedTable";
+import { DataTable } from "@/components/ui/VirtualizedTable";
 import type { ColumnDef } from "@tanstack/react-table";
 import { useState } from "react";
 import type { hexadecimal } from "types";
@@ -151,6 +151,9 @@ function MemoryTable() {
   >(createMemoryArr(500, 2048 * 4, knownMemValues));
   console.log(memoryArr.slice(0, 2));
   if (memoryArr === undefined) return <></>;
+  
+    // Get Ref of Virtuoso
+
 
   const handleSubmit = (value: number) => {
     setMemoryArr(createMemoryArr(value, 2048 * 8, knownMemValues));
@@ -172,6 +175,7 @@ type tableData = { titles: string[]; values: (string | number)[][] };
 
 function RegMemViewer() {
   // Todo update SetMemory Arr after getting submitting the input location of the memory address
+  // Todo: Make Virtualized Table Specific For Memory Table to make it less Memory Hungry
   const RegisterTable = ({ titles, values }: tableData) => {
     if (titles.length == 0 || values.length == 0) return <></>;
 

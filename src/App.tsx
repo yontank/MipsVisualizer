@@ -1,17 +1,4 @@
-import { useState, useCallback } from "react";
-import {
-  ReactFlow,
-  applyNodeChanges,
-  applyEdgeChanges,
-  addEdge,
-  type NodeChange,
-  type EdgeChange,
-} from "@xyflow/react";
-import { BlackBoxHardwareNode } from "./components/electornics/BlackBoxHardwareNode";
-import "@xyflow/react/dist/style.css";
-import MuxNode from "./components/electornics/Mux";
 import RegMemViewer from "./components/RegMemViewer";
-
 function App() {
   return (
     <>
