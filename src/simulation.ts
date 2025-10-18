@@ -171,11 +171,15 @@ export type Simulation = {
    */
   cycleBorderNodes: string[]
   /**
-   * A map of input values that are waiting to get accepted into a node.
+   * A map of the values of every node's inputs.
    *
-   * The key is a node ID, and the value is a map of which inputId received which value.
+   * The key is a node ID, and the value is a map of which inputId has which value.
    */
-  pendingInputs: Record<string, Record<string, number>>
+  inputValues: Record<string, Record<string, number>>
+  /**
+   * A set of node IDs, of nodes who have some inputs and are yet to output their value.
+   */
+  pendingNodes: Set<string>
   /**
    * Whether the current cycle is finished.
    *
@@ -248,24 +252,28 @@ export function newSimulation(nodesList: NodeDef[]): Simulation {
     registers,
     nodes,
     cycleBorderNodes,
-    pendingInputs: {},
+    inputValues: {},
+    pendingNodes: new Set(),
     cycleFinished: false,
   }
 }
 
 function nodeHasAllInputs(simulation: Simulation, node: Node): boolean {
   return node.type.inputs.every(
-    (input) => input.id in simulation.pendingInputs[node.id],
+    (input) => input.id in simulation.inputValues[node.id],
   )
 }
 
 export function simulationStep(simulation: Simulation): Simulation {
-  const newPendingInputs: typeof simulation.pendingInputs = {}
+  // If the previous step was the end of a cycle, the inputs' values will be cleared.
+  const newInputValues: typeof simulation.inputValues = simulation.cycleFinished
+    ? {}
+    : { ...simulation.inputValues }
+  const newPendingNodes: Set<string> = new Set()
   let otherNodesHavePendingInputs = false
 
-  for (const nodeId in simulation.pendingInputs) {
+  for (const nodeId of simulation.pendingNodes) {
     const node = simulation.nodes[nodeId]
-    const pendingInputs = simulation.pendingInputs[nodeId]
     // Cycle border nodes only propagate their signals if the cycle is finished.
     if (
       (!node.cycleBorder || simulation.cycleFinished) &&
@@ -273,30 +281,31 @@ export function simulationStep(simulation: Simulation): Simulation {
     ) {
       // If a node has received values for all its inputs, we call its `execute` function
       // and output its values.
-      const outputs = node.type.executeRising(simulation, pendingInputs)
+      const outputs = node.type.executeRising(
+        simulation,
+        simulation.inputValues[nodeId],
+      )
       for (const outputId in outputs) {
         const target = node.outputs[outputId]
         const value = outputs[outputId]
-        newPendingInputs[target.nodeId] = {
-          ...newPendingInputs[target.nodeId],
+        newInputValues[target.nodeId] = {
+          ...newInputValues[target.nodeId],
           [target.inputId]: value,
         }
+        newPendingNodes.add(target.nodeId)
         if (!simulation.nodes[target.nodeId].cycleBorder) {
           otherNodesHavePendingInputs = true
         }
       }
     } else {
-      // If a node didn't yet receive values for all its inputs, the existing pending inputs will remain.
-      newPendingInputs[nodeId] = {
-        ...newPendingInputs[nodeId],
-        ...pendingInputs,
-      }
+      newPendingNodes.add(nodeId)
     }
   }
 
   return {
     ...simulation,
-    pendingInputs: newPendingInputs,
+    inputValues: newInputValues,
+    pendingNodes: newPendingNodes,
     // A cycle is considered finished if the only nodes who have pending inputs are cycle border nodes.
     cycleFinished: !otherNodesHavePendingInputs,
   }
