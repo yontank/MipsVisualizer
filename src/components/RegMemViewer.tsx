@@ -10,7 +10,7 @@ import {
 import { DataTable } from "@/components/ui/VirtualizedTable";
 import type { ColumnDef } from "@tanstack/react-table";
 import { useState } from "react";
-import type { hexadecimal } from "types";
+import type { Hexadecimal } from "types";
 import { hex2int, int2hex } from "@/lib/utils";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -70,9 +70,9 @@ const columns: ColumnDef<{ address: string; value: string }>[] = [
 function createMemoryArr(
   index: number,
   VIRT_LIMIT: number,
-  memValues: Map<hexadecimal, hexadecimal>
+  memValues: Map<Hexadecimal, Hexadecimal>
 ) {
-  const result: { address: hexadecimal; value: hexadecimal }[] = [];
+  const result: { address: Hexadecimal; value: Hexadecimal }[] = [];
 
   const low = Math.max(index - VIRT_LIMIT / 2, 0);
   const high = Math.min(index + VIRT_LIMIT / 2, Math.pow(2, 32));
@@ -90,7 +90,7 @@ function createMemoryArr(
 
   return result;
 }
-const knownMemValues = new Map<hexadecimal, hexadecimal>();
+const knownMemValues = new Map<Hexadecimal, Hexadecimal>();
 knownMemValues.set("0x00000000", "0x00000001");
 knownMemValues.set("0x00000001", "0x00000002");
 
@@ -122,7 +122,7 @@ function MemoryInput(props) {
       console.log("Submitting:", value);
 
       props.onSubmit(
-        hex2int(("0x" + event.currentTarget.value) as hexadecimal)
+        hex2int(("0x" + event.currentTarget.value) as Hexadecimal)
       );
     }
   };
