@@ -18,3 +18,11 @@ export function int2hex(number: number, numDigits: number = 8): Hexadecimal {
 export function hex2int(x: Hexadecimal) {
   return Number(x);
 }
+
+export function intToHex(x: number) {
+  if (x < 0) {
+    x = 0xffffffff + x + 1
+  }
+
+  return "0x" + x.toString(16).toUpperCase()
+}

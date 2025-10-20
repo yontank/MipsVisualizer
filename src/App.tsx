@@ -17,7 +17,7 @@ function App() {
       <RegMemViewer />
       {/* <ExecutionDisplay/> */}
     </>
-  );
+  )
 }
 
-export default App;
+export default App

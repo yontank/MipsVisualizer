@@ -17,7 +17,14 @@ export function BlackBoxHardwareNode({ data }: NodeProps<BlackBoxNode>) {
         {/* Input */}
         <div>
           {data.inputs.map((e) => (
+          {data.inputs.map((e) => (
             <div className="relative border-2 border-solid">
+              <Handle
+                type="source"
+                position={Position.Left}
+                id={e.id}
+                key={e.id}
+              />
               <Handle
                 type="source"
                 position={Position.Left}
@@ -27,13 +34,21 @@ export function BlackBoxHardwareNode({ data }: NodeProps<BlackBoxNode>) {
               <div className="h-1/2 w-fit pl-1 ">{e.name}</div>
             </div>
           ))}
+          ))}
         </div>
 
         {/* Outputs */}
 
         <div>
           {data.outputs.map((e) => (
+          {data.outputs.map((e) => (
             <div className="relative border-2 border-solid">
+              <Handle
+                type="target"
+                position={Position.Right}
+                id={e.id}
+                key={e.id}
+              />
               <Handle
                 type="target"
                 position={Position.Right}
@@ -46,5 +61,6 @@ export function BlackBoxHardwareNode({ data }: NodeProps<BlackBoxNode>) {
         </div>
       </div>
     </div>
-  );
+  )
 }
+

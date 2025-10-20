@@ -1,58 +1,48 @@
-import React from 'react'
-import { type Node } from "@xyflow/react"
+import { intToHex } from "@/lib/utils"
+import type { Wire } from "@/simulation"
+import { type Node, type NodeProps } from "@xyflow/react"
+import { FaArrowRightLong } from "react-icons/fa6"
 
-export type MuxNodeData = {
-    label: string,
+type MuxData = {
+  label: string
+  inputs: {
+    id: string
+    visible: boolean
+    value: Wire | number
+  }[]
+  outputs?: { id: string; name: string; visible: boolean }[]
 }
 
+export type MuxNode = Node<MuxData, "MuxNode">
 
-interface TrapezoidProps {
-    borderColor?: string;
-    bgColor?: string;
-    borderWidth?: number; // in pixels
-    height?: string;
-    width?: string;
-}
-
-const Trapezoid: React.FC<TrapezoidProps> = ({
-    borderColor = 'bg-black',
-    bgColor = 'bg-blue-500',
-    borderWidth = 4,
-    height = '150px',
-    width = '300px',
-}) => {
-    const outerClipPath = 'polygon(10% 0%, 90% 0%, 100% 100%, 0% 100%)';
-    const innerClipPath = 'polygon(12% 0%, 88% 0%, 98% 100%, 2% 100%)'; // slightly smaller to simulate border
-
-    return (
-        <div
-            className={`relative ${borderColor}`}
-            style={{
-                height,
-                width,
-                clipPath: outerClipPath,
-            }}
-        >
-            <div
-                className={`absolute top-0 left-0 w-full h-full ${bgColor}`}
-                style={{
-                    clipPath: innerClipPath,
-                    margin: `${borderWidth}px`,
-                }}
-            />
+export const Mux = ({ data }: NodeProps<MuxNode>) => {
+  return (
+    <>
+      <div className="h-48 w-16 border-2 border-solid border-black rounded-3xl flex items-center  flex-row-reverse">
+        <span className="text-left">{data.label}</span>
+        <div>
+          {}
+          {data.inputs
+            .filter((e) => e.visible)
+            .map((e, i) => {
+              return (
+                <div className="w-8 h-8 relative">
+                  {typeof e.value === "number" ? (
+                    <div className="flex gap-1 absolute -left-11.5 justify-center items-center ">
+                      <div className="flex flex-row-reverse items-center justify-center gap-1">
+                        <FaArrowRightLong />
+                        {intToHex(e.value)}
+                      </div>
+                      <p className="ml-1">{i}</p>
+                    </div>
+                  ) : (
+                    <>Handle!</>
+                  )}
+                </div>
+              )
+            })}
         </div>
-    );
-};
-
-
-
-
-export type BlackBoxNode = Node<MuxNodeData, 'MuxNodeData'>;
-function Mux() {
-    return (
-        <Trapezoid borderWidth={0} />
-
-    )
+      </div>
+    </>
+  )
 }
-
-export default Mux
