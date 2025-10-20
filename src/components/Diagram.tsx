@@ -1,6 +1,7 @@
 import type { Simulation } from "@/simulation"
 import { useEffect, useRef, useState } from "react"
 import { MouseTooltip } from "./MouseTooltip"
+import { intToHex } from "@/lib/utils"
 
 /**
  * The stroke width of the duplicate wires for interaction, in pixels.
@@ -31,7 +32,6 @@ export function Diagram(props: {
       current.appendChild(clone)
       clones.push(clone)
       const wire = e.id.split(".")
-      console.log(e.id, wire)
       clone.addEventListener("mouseover", () => {
         setHoveredWire(wire)
       })
@@ -45,6 +45,12 @@ export function Diagram(props: {
       }
     }
   }, [])
+
+  const hoveredWireValue =
+    hoveredWire &&
+    props.simulation.inputValues[hoveredWire[0]]?.[hoveredWire[1]]
+  const tooltipContent =
+    hoveredWireValue != undefined && intToHex(hoveredWireValue)
 
   return (
     <>
@@ -60,11 +66,10 @@ export function Diagram(props: {
           ),
         )}
       />
-      {hoveredWire && (
-        <MouseTooltip>
-          {props.simulation.inputValues[hoveredWire[0]]?.[hoveredWire[1]]}
-        </MouseTooltip>
-      )}
+      {/* TODO control number of digits based on wire */}
+      {tooltipContent ? (
+        <MouseTooltip>{tooltipContent}</MouseTooltip>
+      ) : undefined}
     </>
   )
 }
