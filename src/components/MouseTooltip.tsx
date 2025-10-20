@@ -12,7 +12,7 @@ export function MouseTooltip(props: { children: ReactNode }) {
 
   useEffect(() => {
     const listener = (e: MouseEvent) => {
-      setMousePos({ x: e.screenX, y: e.screenY, moved: true })
+      setMousePos({ x: e.pageX, y: e.pageY, moved: true })
     }
     window.addEventListener("mousemove", listener)
     return () => {
@@ -23,8 +23,8 @@ export function MouseTooltip(props: { children: ReactNode }) {
   return mousePos.moved
     ? createPortal(
         <Card
-          className="w-fit p-2 absolute left-0 top-0"
-          style={{ left: mousePos.x, top: mousePos.y }}
+          className="w-fit p-2 absolute pointer-events-none"
+          style={{ left: mousePos.x, top: mousePos.y, translate: "-50% -105%" }}
         >
           {props.children}
         </Card>,
