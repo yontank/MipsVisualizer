@@ -29,7 +29,8 @@ function ExecutionPanel() {
       {/* <button onClick={showValue} /> */}
       <Editor
         height={"100vh"}
-        width={"450px"}
+        width={"300px"}
+        
         defaultLanguage="mips"
         defaultValue="# Write your code here."
         theme="vs-dark"

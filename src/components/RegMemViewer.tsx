@@ -1,4 +1,4 @@
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import {
   Table,
   TableBody,
@@ -6,14 +6,14 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from "@/components/ui/table";
-import { DataTable } from "@/components/ui/VirtualizedTable";
-import type { ColumnDef } from "@tanstack/react-table";
-import { useState } from "react";
-import type { Hexadecimal } from "types";
-import { hex2int, int2hex } from "@/lib/utils";
-import { Label } from "@/components/ui/label";
-import { Input } from "@/components/ui/input";
+} from "@/components/ui/table"
+import { DataTable } from "@/components/ui/VirtualizedTable"
+import type { ColumnDef } from "@tanstack/react-table"
+import { useState } from "react"
+import type { Hexadecimal } from "types"
+import { hex2int, int2hex } from "@/lib/utils"
+import { Label } from "@/components/ui/label"
+import { Input } from "@/components/ui/input"
 
 const registerValues = [
   { name: "$zero", number: 0, value: "0x00000000" },
@@ -51,7 +51,7 @@ const registerValues = [
   { name: "pc", number: "", value: "" },
   { name: "hi", number: "", value: "" },
   { name: "lo", number: "", value: "" },
-];
+]
 const columns: ColumnDef<{ address: string; value: string }>[] = [
   {
     accessorKey: "address",
@@ -65,37 +65,37 @@ const columns: ColumnDef<{ address: string; value: string }>[] = [
     header: "Value",
     size: 50,
   },
-];
+]
 
 function createMemoryArr(
   index: number,
   VIRT_LIMIT: number,
-  memValues: Map<Hexadecimal, Hexadecimal>
+  memValues: Map<Hexadecimal, Hexadecimal>,
 ) {
-  const result: { address: Hexadecimal; value: Hexadecimal }[] = [];
+  const result: { address: Hexadecimal; value: Hexadecimal }[] = []
 
-  const low = Math.max(index - VIRT_LIMIT / 2, 0);
-  const high = Math.min(index + VIRT_LIMIT / 2, Math.pow(2, 32));
+  const low = Math.max(index - VIRT_LIMIT / 2, 0)
+  const high = Math.min(index + VIRT_LIMIT / 2, Math.pow(2, 32))
 
   for (let i = low; i < high; i++) {
     // convert the i address into a hexadecimal value.
-    const hexAddr = int2hex(i);
+    const hexAddr = int2hex(i)
 
     // if the hexadecimalv value doesn't exist, set its value to 0x0000:0000 (since it's not inside our record, it means its empty)
     if (memValues.has(hexAddr)) {
       //@ts-expect-error we're checking that the value exists above, why would it be undefined?
-      result.push({ address: hexAddr, value: memValues.get(hexAddr) });
-    } else result.push({ address: hexAddr, value: "0x00000000" });
+      result.push({ address: hexAddr, value: memValues.get(hexAddr) })
+    } else result.push({ address: hexAddr, value: "0x00000000" })
   }
 
-  return result;
+  return result
 }
-const knownMemValues = new Map<Hexadecimal, Hexadecimal>();
-knownMemValues.set("0x00000000", "0x00000001");
-knownMemValues.set("0x00000001", "0x00000002");
+const knownMemValues = new Map<Hexadecimal, Hexadecimal>()
+knownMemValues.set("0x00000000", "0x00000001")
+knownMemValues.set("0x00000001", "0x00000002")
 
 function MemoryInput(props) {
-  const [value, setValue] = useState<string>("");
+  const [value, setValue] = useState<string>("")
 
   /**
    * TODO: Set state value inside the datatable alone, we dont want to fucking re-render the ENTIRE component when we only need the table to re render(memory)
@@ -105,27 +105,25 @@ function MemoryInput(props) {
    * @returns
    */
   const handleChange = (keys: React.ChangeEvent<HTMLInputElement>) => {
-    const { value } = keys.currentTarget;
-    const newChar = value.charAt(value.length - 1);
+    const { value } = keys.currentTarget
+    const newChar = value.charAt(value.length - 1)
     // FIXME: can be optomized by if the regex is not fitting, simply do not call the setState function,
     // needs to be checked if its something that needs to be done, (meaning there's some performance issues)
     // if there are, we'll also need to allow special keys (up, down, left, right arrows, enter, space key,etc.)
     if (!newChar.match(/[a-fA-F0-9]/i)) {
-      return value.substring(0, value.length - 1);
+      return value.substring(0, value.length - 1)
     }
-    return value.toUpperCase();
-  };
+    return value.toUpperCase()
+  }
 
   const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Enter") {
       // Submit the value
-      console.log("Submitting:", value);
+      console.log("Submitting:", value)
 
-      props.onSubmit(
-        hex2int(("0x" + event.currentTarget.value) as Hexadecimal)
-      );
+      props.onSubmit(hex2int(("0x" + event.currentTarget.value) as Hexadecimal))
     }
-  };
+  }
 
   return (
     <div>
@@ -139,25 +137,24 @@ function MemoryInput(props) {
         onKeyDown={handleKeyDown}
       />
     </div>
-  );
+  )
 }
 
 function MemoryTable() {
   const [memoryArr, setMemoryArr] = useState<
     {
-      address: string;
-      value: string;
+      address: string
+      value: string
     }[]
-  >(createMemoryArr(500, 2048 * 4, knownMemValues));
-  console.log(memoryArr.slice(0, 2));
-  if (memoryArr === undefined) return <></>;
-  
-    // Get Ref of Virtuoso
+  >(createMemoryArr(500, 2048 * 4, knownMemValues))
+  console.log(memoryArr.slice(0, 2))
+  if (memoryArr === undefined) return <></>
 
+  // Get Ref of Virtuoso
 
   const handleSubmit = (value: number) => {
-    setMemoryArr(createMemoryArr(value, 2048 * 8, knownMemValues));
-  };
+    setMemoryArr(createMemoryArr(value, 2048 * 8, knownMemValues))
+  }
 
   return (
     <div className="">
@@ -168,16 +165,16 @@ function MemoryTable() {
         height="calc(100vh - 113px)"
       />
     </div>
-  );
+  )
 }
 
-type tableData = { titles: string[]; values: (string | number)[][] };
+type tableData = { titles: string[]; values: (string | number)[][] }
 
 function RegMemViewer() {
   // Todo update SetMemory Arr after getting submitting the input location of the memory address
   // Todo: Make Virtualized Table Specific For Memory Table to make it less Memory Hungry
   const RegisterTable = ({ titles, values }: tableData) => {
-    if (titles.length == 0 || values.length == 0) return <></>;
+    if (titles.length == 0 || values.length == 0) return <></>
 
     return (
       <Table>
@@ -203,8 +200,8 @@ function RegMemViewer() {
           ))}
         </TableBody>
       </Table>
-    );
-  };
+    )
+  }
 
   return (
     <div className="w-fit max-w-xl h-screen overflow-y-auto border rounded-md ">
@@ -229,7 +226,7 @@ function RegMemViewer() {
         </TabsContent>
       </Tabs>
     </div>
-  );
+  )
 }
 
-export default RegMemViewer;
+export default RegMemViewer
