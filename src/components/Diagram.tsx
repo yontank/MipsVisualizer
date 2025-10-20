@@ -13,32 +13,37 @@ export function Diagram(props: {
   svg: React.FunctionComponent<React.SVGProps<SVGSVGElement>>
 }) {
   const svgRef = useRef<SVGSVGElement | null>(null)
-  const [hoveredWire, setHoveredWire] = useState<string[] | undefined>(
-    undefined,
-  )
+  const [hoveredWire, setHoveredWire] = useState<
+    { nodeId: string; inputId: string } | undefined
+  >(undefined)
 
   useEffect(() => {
     if (!svgRef.current) {
       return
     }
+
     const current = svgRef.current
+
     const clones: HTMLElement[] = []
     // Iterate over all the wires, and make a clone that has a thicker stroke width.
-    for (const e of current.querySelectorAll('[id*="."]')) {
+    for (const e of current.querySelectorAll<HTMLElement>("[data-input]")) {
       const clone = e.cloneNode(true) as HTMLElement
       clone.style.strokeWidth = INTERACTION_STROKE_WIDTH + "px"
       clone.style.stroke = "transparent"
       clone.id = e.id + "-interact"
       current.appendChild(clone)
       clones.push(clone)
-      const wire = e.id.split(".")
+
+      const nodeId = e.dataset.node!
+      const inputId = e.dataset.input!
       clone.addEventListener("mouseover", () => {
-        setHoveredWire(wire)
+        setHoveredWire({ nodeId, inputId })
       })
       clone.addEventListener("mouseleave", () => {
         setHoveredWire(undefined)
       })
     }
+
     return () => {
       for (const e of clones) {
         current.removeChild(e)
@@ -48,7 +53,7 @@ export function Diagram(props: {
 
   const hoveredWireValue =
     hoveredWire &&
-    props.simulation.inputValues[hoveredWire[0]]?.[hoveredWire[1]]
+    props.simulation.inputValues[hoveredWire.nodeId]?.[hoveredWire.inputId]
   const tooltipContent =
     hoveredWireValue != undefined && intToHex(hoveredWireValue)
 
