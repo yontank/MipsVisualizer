@@ -20,6 +20,7 @@ function DebugUI() {
       <ButtonGroup className="cursor-pointer">
         <TooltipProvider>
           <Tooltip delayDuration={800}>
+            
             <TooltipTrigger asChild>
               <ButtonGroup className="">
                 <Button
@@ -36,6 +37,7 @@ function DebugUI() {
                 </Button>
               </ButtonGroup>
             </TooltipTrigger>
+            
             <TooltipContent>
               <p>Compile</p>
             </TooltipContent>
