@@ -16,7 +16,7 @@ function DebugUI() {
   const [isRunning, setIsRunning] = useState<boolean>(false);
 
   return (
-    <div className="w-screen my-2.5 flex justify-center">
+    <div className="w-fit my-2.5 flex justify-center">
       <ButtonGroup className="cursor-pointer">
         <TooltipProvider>
           <Tooltip delayDuration={800}>

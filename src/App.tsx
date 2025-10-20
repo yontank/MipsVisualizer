@@ -5,7 +5,7 @@ function App() {
   return (
     <>
       {/* <ExecutionPanel/> */}
-      <div className="absolute  position-fixed  right-4 z-50">
+      <div className="absolute z-10 top-0 left-1/2 transform -translate-x-1/2">
         <DebugUI />
       </div>
 
