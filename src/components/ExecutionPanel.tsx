@@ -1,30 +1,52 @@
-import { Label } from '@/components/ui/label'
-import { Input } from '@/components/ui/input'
-import { Separator } from './ui/separator'
-import React from 'react'
-import { Plus, PlusIcon } from 'lucide-react'
+import Editor, { type Monaco, type OnMount } from "@monaco-editor/react";
+import { useRef } from "react";
+type IStandaloneCodeEditor = Parameters<OnMount>[0];
 
 function ExecutionPanel() {
+  // todo: some work her needs to be done.
+
+  const editorRef = useRef<IStandaloneCodeEditor>(null);
+
+  function handleEditorDidMount(editor: IStandaloneCodeEditor, monaco: Monaco) {
+    editorRef.current = editor;
+    // editor.getModel
+
+    /** Highlight specific Lines */
+
+    editor.createDecorationsCollection([
+      {
+        range: new monaco.Range(1, 3, 1, 10),
+        options: {
+          isWholeLine: true,
+          inlineClassName: "inlineHighlight"
+        },
+      },
+    ]);
+  }
+
   return (
-    <div className='w-1/3 max-w-3xl h-screen border-2 border-solid text-center '>
-      <Label className='text-center block py-3'> write your instructions</Label>
-      <Separator/>
-      
-      <div className='m-auto flex items-center space-x-2'>
-        <Label>1</Label>
-        <Input placeholder='Your Command, here.'/>
-      </div>
-
-      <div className='m-auto flex items-center space-x-2 my-1'>
-        <Label>2</Label>
-        <Input placeholder='Your Command, here.'/>
-      </div>
-
-      <div className='w-full h-fit py-2 border-2 border-solid m-auto'>
-        <Plus/>
-      </div>
+    <div className="">
+      {/* <button onClick={showValue} /> */}
+      <Editor
+        height={"100vh"}
+        width={"450px"}
+        defaultLanguage="mips"
+        defaultValue="# Write your code here."
+        theme="vs-dark"
+        onMount={handleEditorDidMount}
+        options={{
+          // readOnly: true,
+          minimap: { enabled: false },
+          overviewRulerLanes: 0,
+          scrollbar: {
+            vertical: "hidden",
+            horizontal: "hidden",
+            handleMouseWheel: false,
+          },
+        }}
+      />
     </div>
-  )
+  );
 }
 
-export default ExecutionPanel
+export default ExecutionPanel;

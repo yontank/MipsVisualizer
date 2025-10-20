@@ -8,13 +8,7 @@ export type BlackBoxData = {
 
 export type BlackBoxNode = Node<BlackBoxData, "BlackBoxHardware">
 
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-
 export function BlackBoxHardwareNode({ data }: NodeProps<BlackBoxNode>) {
-  //   const onChange = useCallback((evt) => {
-  //     console.log(evt.target.value);
-  //   }, []);
-
   return (
     <div className="IM border-2 border-solid w-60 h-60 border-black">
       <h3 className="text-center">{data.label}</h3>
