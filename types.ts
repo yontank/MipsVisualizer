@@ -1,1 +1,1 @@
-export type hexadecimal = `0x${string}`;
+export type Hexadecimal = `0x${string}`;
