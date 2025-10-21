@@ -1,36 +1,31 @@
-import Editor, { type Monaco, type OnMount } from "@monaco-editor/react";
-import { useRef } from "react";
-type IStandaloneCodeEditor = Parameters<OnMount>[0];
-
+import Editor, { useMonaco, type OnMount } from "@monaco-editor/react"
+import { useRef, useState } from "react"
+import { Button } from "./ui/button"
+type IStandaloneCodeEditor = Parameters<OnMount>[0]
+// const editorRef = useRef<IStandaloneCodeEditor>(null)
 function ExecutionPanel() {
-  // todo: some work her needs to be done.
+  const [inc, setInc] = useState<number>(0)
 
-  const editorRef = useRef<IStandaloneCodeEditor>(null);
+  const editorRef = useRef<IStandaloneCodeEditor>(null)
+  const monaco = useMonaco()
 
-  function handleEditorDidMount(editor: IStandaloneCodeEditor, monaco: Monaco) {
-    editorRef.current = editor;
-    // editor.getModel
-
-    /** Highlight specific Lines */
-
-    editor.createDecorationsCollection([
-      {
-        range: new monaco.Range(1, 3, 1, 10),
-        options: {
-          isWholeLine: true,
-          inlineClassName: "inlineHighlight"
-        },
-      },
-    ]);
+  const handleEditorDidMount: OnMount = (editor) => {
+    editorRef.current = editor
+    editorRef.current = editor
+    editorRef.current.setPosition({ lineNumber: 1, column: 24 })
+    editorRef.current.focus()
   }
+
+  if (!editorRef || !monaco) return <>Loading..</>
 
   return (
     <div className="">
-      {/* <button onClick={showValue} /> */}
+      <Button onClick={() => setInc(inc + 1)} className="z-10">
+        hi
+      </Button>
       <Editor
         height={"100vh"}
-        width={"300px"}
-        
+        width={"375px"}
         defaultLanguage="mips"
         defaultValue="# Write your code here."
         theme="vs-dark"
@@ -47,7 +42,24 @@ function ExecutionPanel() {
         }}
       />
     </div>
-  );
+  )
 }
 
-export default ExecutionPanel;
+export default ExecutionPanel
+
+// editorRef.current?.createDecorationsCollection([
+//   {
+//     range: new monaco.Range(inc, 0, inc, 9999),
+//     options: {
+//       // isWholeLine: true,
+//       // inlineClassName: "inlineHighlight",
+//       blockClassName: "inlineHighlight",
+//       blockPadding: [0, 14, 0, 0],
+//       // linesDecorationsClassName: "inlineHighlight",
+//       // afterContentClassName: "inlineHighlight",
+//       // lineNumberClassName: "inlineHighlight",
+//       stickiness:
+//         monaco.editor.TrackedRangeStickiness.NeverGrowsWhenTypingAtEdges,
+//     },
+//   },
+// ])
