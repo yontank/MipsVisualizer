@@ -1,26 +1,27 @@
-"use client";
+"use client"
 
-import { BugPlayIcon, PlayIcon, SquareIcon, Undo2Icon } from "lucide-react";
+import { BugPlayIcon, PlayIcon, SquareIcon, Undo2Icon } from "lucide-react"
 
-import { Button } from "@/components/ui/button";
-import { ButtonGroup } from "@/components/ui/button-group";
-import { useState } from "react";
+import { Button } from "@/components/ui/button"
+import { ButtonGroup } from "@/components/ui/button-group"
+import { useContext } from "react"
 import {
   Tooltip,
   TooltipProvider,
   TooltipTrigger,
   TooltipContent,
-} from "./ui/tooltip";
+} from "./ui/tooltip"
+import { SimulationContext } from "@/context/SimulationContext"
 
 function DebugUI() {
-  const [isRunning, setIsRunning] = useState<boolean>(false);
+  const { simulation, startSimulation, stopSimulation } =
+    useContext(SimulationContext)
 
   return (
     <div className="w-fit my-2.5 flex justify-center">
       <ButtonGroup className="cursor-pointer">
         <TooltipProvider>
           <Tooltip delayDuration={800}>
-            
             <TooltipTrigger asChild>
               <ButtonGroup className="">
                 <Button
@@ -28,16 +29,14 @@ function DebugUI() {
                   size="icon"
                   aria-label="Go Back"
                   className="hover:text-blue-600 cursor-pointer"
-                  disabled={isRunning}
-                  onClick={() => {
-                    setIsRunning(true);
-                  }}
+                  disabled={!!simulation}
+                  onClick={startSimulation}
                 >
                   <BugPlayIcon />
                 </Button>
               </ButtonGroup>
             </TooltipTrigger>
-            
+
             <TooltipContent>
               <p>Compile</p>
             </TooltipContent>
@@ -49,9 +48,9 @@ function DebugUI() {
                 <Button
                   variant="outline"
                   className="hover:text-red-600 cursor-pointer"
-                  disabled={!isRunning}
+                  disabled={!simulation}
                   onClick={() => {
-                    setIsRunning(false);
+                    stopSimulation()
                   }}
                 >
                   <SquareIcon />
@@ -67,7 +66,7 @@ function DebugUI() {
                 <Button
                   variant="outline"
                   className="hover:text-green-600 cursor-pointer"
-                  disabled={!isRunning}
+                  disabled={!simulation}
                 >
                   <PlayIcon />
                 </Button>
@@ -82,7 +81,7 @@ function DebugUI() {
                 <Button
                   variant={"outline"}
                   className="hover:text-red-600 cursor-pointer"
-                  disabled={!isRunning}
+                  disabled={!simulation}
                 >
                   <Undo2Icon />
                 </Button>
@@ -95,7 +94,7 @@ function DebugUI() {
         </TooltipProvider>
       </ButtonGroup>
     </div>
-  );
+  )
 }
 
-export default DebugUI;
+export default DebugUI

@@ -2,18 +2,33 @@
 
 import RegMemViewer from "./components/RegMemViewer"
 import DebugUI from "@/components/DebugUI"
-import ExecutionDisplay from "@/components/ExecutionPanel"
+import { type EditorInterface, EditorPanel } from "@/components/EditorPanel"
 
 import TestDiagram from "@/assets/diagram.svg?react"
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./components/ui/tabs"
 import EmulatorTableUI from "./components/MarsEmulatorUI/page"
-import { Input } from "./components/ui/input"
-import { Label } from "./components/ui/label"
+import { useRef, useState } from "react"
+import type { Simulation } from "./simulation"
+import { SimulationContext } from "./context/SimulationContext"
+import { Diagram } from "./components/Diagram"
+
 function App() {
+  const [simulation, setSimulation] = useState<Simulation | undefined>()
+  const editorInterface = useRef<EditorInterface>({ getValue: () => "" })
+
+  const compile = () => {
+    console.log(editorInterface.current.getValue())
+  }
+
+  const stopSimulation = () => {
+    setSimulation(undefined)
+  }
+
   return (
-    <>
-      {/* <ExecutionPanel/> */}
+    <SimulationContext
+      value={{ simulation, startSimulation: compile, stopSimulation }}
+    >
       <div className="absolute z-10 top-0 left-1/2 transform -translate-x-1/2">
         <DebugUI />
       </div>
@@ -29,7 +44,7 @@ function App() {
             </TabsTrigger>
           </TabsList>
           <TabsContent value="IDE">
-            <ExecutionDisplay />
+            <EditorPanel editorInterface={editorInterface} />
           </TabsContent>
 
           <TabsContent value="debugger">
@@ -37,14 +52,13 @@ function App() {
           </TabsContent>
         </Tabs>
         <div className="flex-1 flex justify-center items-center overflow-auto min-w-36">
-          <TestDiagram />
+          <Diagram simulation={simulation} svg={TestDiagram} />
         </div>
 
         <RegMemViewer />
       </div>
-    </>
+    </SimulationContext>
   )
 }
-
 
 export default App

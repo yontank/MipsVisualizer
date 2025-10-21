@@ -9,7 +9,7 @@ import { intToHex } from "@/lib/utils"
 const INTERACTION_STROKE_WIDTH = 4
 
 export function Diagram(props: {
-  simulation: Simulation
+  simulation?: Simulation
   svg: React.FunctionComponent<React.SVGProps<SVGSVGElement>>
 }) {
   const svgRef = useRef<SVGSVGElement | null>(null)
@@ -53,6 +53,7 @@ export function Diagram(props: {
 
   const hoveredWireValue =
     hoveredWire &&
+    props.simulation &&
     props.simulation.inputValues[hoveredWire.nodeId]?.[hoveredWire.inputId]
   const tooltipContent =
     hoveredWireValue != undefined && intToHex(hoveredWireValue)
@@ -61,15 +62,18 @@ export function Diagram(props: {
     <>
       <props.svg
         ref={svgRef}
-        style={Object.fromEntries(
-          Object.entries(props.simulation.inputValues).flatMap(
-            ([nodeId, input]) =>
-              Object.keys(input).map((inputId) => [
-                `--${nodeId}-${inputId}`,
-                "red",
-              ]),
-          ),
-        )}
+        style={
+          props.simulation &&
+          Object.fromEntries(
+            Object.entries(props.simulation.inputValues).flatMap(
+              ([nodeId, input]) =>
+                Object.keys(input).map((inputId) => [
+                  `--${nodeId}-${inputId}`,
+                  "red",
+                ]),
+            ),
+          )
+        }
       />
       {/* TODO control number of digits based on wire */}
       {tooltipContent ? (

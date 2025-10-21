@@ -1,9 +1,20 @@
 import Editor, { type OnMount } from "@monaco-editor/react"
-import { type editor } from "monaco-editor"
-import { useRef } from "react"
+import { editor } from "monaco-editor"
+import { useImperativeHandle, useRef, type Ref } from "react"
 
-function EditorPanel() {
+/**
+ * A generic interface for getting the text of a code editor.
+ */
+export interface EditorInterface {
+  getValue: () => string
+}
+
+export function EditorPanel(props: { editorInterface: Ref<EditorInterface> }) {
   const editorRef = useRef<editor.IStandaloneCodeEditor>(null)
+
+  useImperativeHandle(props.editorInterface, () => ({
+    getValue: () => editorRef.current!.getValue(),
+  }))
 
   const handleEditorDidMount: OnMount = (editor) => {
     editorRef.current = editor
@@ -33,5 +44,3 @@ function EditorPanel() {
     />
   )
 }
-
-export default EditorPanel
