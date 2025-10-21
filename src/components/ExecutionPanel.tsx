@@ -1,36 +1,24 @@
-import Editor, { type Monaco, type OnMount } from "@monaco-editor/react";
-import { useRef } from "react";
-type IStandaloneCodeEditor = Parameters<OnMount>[0];
+import Editor, { type OnMount } from "@monaco-editor/react"
+import { useRef } from "react"
+type IStandaloneCodeEditor = Parameters<OnMount>[0]
 
 function ExecutionPanel() {
-  // todo: some work her needs to be done.
+  const editorRef = useRef<IStandaloneCodeEditor>(null)
 
-  const editorRef = useRef<IStandaloneCodeEditor>(null);
+  const handleEditorDidMount: OnMount = (editor) => {
+    editorRef.current = editor
 
-  function handleEditorDidMount(editor: IStandaloneCodeEditor, monaco: Monaco) {
-    editorRef.current = editor;
-    // editor.getModel
-
-    /** Highlight specific Lines */
-
-    editor.createDecorationsCollection([
-      {
-        range: new monaco.Range(1, 3, 1, 10),
-        options: {
-          isWholeLine: true,
-          inlineClassName: "inlineHighlight"
-        },
-      },
-    ]);
+    editor.setPosition({ lineNumber: 2, column: 1 })
+    editor.focus()
   }
+
+  if (!editorRef) return <></>
 
   return (
     <div className="">
-      {/* <button onClick={showValue} /> */}
       <Editor
         height={"100vh"}
-        width={"300px"}
-        
+        width={"375px"}
         defaultLanguage="mips"
         defaultValue="# Write your code here."
         theme="vs-dark"
@@ -47,7 +35,7 @@ function ExecutionPanel() {
         }}
       />
     </div>
-  );
+  )
 }
 
-export default ExecutionPanel;
+export default ExecutionPanel

@@ -6,6 +6,10 @@ import ExecutionDisplay from "@/components/ExecutionPanel"
 
 import TestDiagram from "@/assets/diagram.svg?react"
 
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "./components/ui/tabs"
+import EmulatorTableUI from "./components/MarsEmulatorUI/page"
+import { Input } from "./components/ui/input"
+import { Label } from "./components/ui/label"
 function App() {
   return (
     <>
@@ -15,8 +19,23 @@ function App() {
       </div>
 
       <div className="flex h-screen">
-        <ExecutionDisplay />
+        <Tabs defaultValue="IDE">
+          <TabsList className="w-full">
+            <TabsTrigger className="w-1/2 text-center" value="IDE">
+              Editor
+            </TabsTrigger>
+            <TabsTrigger className="w-1/2 text-center" value="debugger">
+              Execution
+            </TabsTrigger>
+          </TabsList>
+          <TabsContent value="IDE">
+            <ExecutionDisplay />
+          </TabsContent>
 
+          <TabsContent value="debugger">
+            <EmulatorTableUI />
+          </TabsContent>
+        </Tabs>
         <div className="flex-1 flex justify-center items-center overflow-auto min-w-36">
           <TestDiagram />
         </div>
@@ -26,5 +45,6 @@ function App() {
     </>
   )
 }
+
 
 export default App
