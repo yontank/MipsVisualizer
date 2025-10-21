@@ -1,9 +1,9 @@
 import Editor, { type OnMount } from "@monaco-editor/react"
+import { type editor } from "monaco-editor"
 import { useRef } from "react"
-type IStandaloneCodeEditor = Parameters<OnMount>[0]
 
-function ExecutionPanel() {
-  const editorRef = useRef<IStandaloneCodeEditor>(null)
+function EditorPanel() {
+  const editorRef = useRef<editor.IStandaloneCodeEditor>(null)
 
   const handleEditorDidMount: OnMount = (editor) => {
     editorRef.current = editor
@@ -12,30 +12,26 @@ function ExecutionPanel() {
     editor.focus()
   }
 
-  if (!editorRef) return <></>
-
   return (
-    <div className="">
-      <Editor
-        height={"100vh"}
-        width={"375px"}
-        defaultLanguage="mips"
-        defaultValue="# Write your code here."
-        theme="vs-dark"
-        onMount={handleEditorDidMount}
-        options={{
-          // readOnly: true,
-          minimap: { enabled: false },
-          overviewRulerLanes: 0,
-          scrollbar: {
-            vertical: "hidden",
-            horizontal: "hidden",
-            handleMouseWheel: false,
-          },
-        }}
-      />
-    </div>
+    <Editor
+      height="100%"
+      width={"375px"}
+      defaultLanguage="mips"
+      defaultValue="# Write your code here."
+      theme="vs-dark"
+      onMount={handleEditorDidMount}
+      options={{
+        // readOnly: true,
+        minimap: { enabled: false },
+        overviewRulerLanes: 0,
+        scrollbar: {
+          vertical: "hidden",
+          horizontal: "hidden",
+          handleMouseWheel: false,
+        },
+      }}
+    />
   )
 }
 
-export default ExecutionPanel
+export default EditorPanel
