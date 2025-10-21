@@ -1,6 +1,11 @@
+/// <reference types="vite-plugin-svgr/client" />
+
 import RegMemViewer from "./components/RegMemViewer"
 import DebugUI from "@/components/DebugUI"
 import ExecutionDisplay from "@/components/ExecutionPanel"
+
+import TestDiagram from "@/assets/diagram.svg?react"
+
 function App() {
   return (
     <>
@@ -12,8 +17,8 @@ function App() {
       <div className="flex h-screen">
         <ExecutionDisplay />
 
-        <div className="bg-blue-500 flex-1 overflow-auto resize-x min-w-36">
-          Diagram
+        <div className="flex-1 flex justify-center items-center overflow-auto min-w-36">
+          <TestDiagram />
         </div>
 
         <RegMemViewer />
