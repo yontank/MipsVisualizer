@@ -48,10 +48,10 @@ type Instruction = {
   capture: number[]
   /**
    * Encodes the captured parameters into the instruction's machine code.
-   * @param params The values of the captured tokens.
+   * @param operands The values of the captured tokens.
    * @returns The encoded binary instruction, or an error message.
    */
-  encode: (params: number[]) => { error: string } | number
+  encode: (operands: number[]) => { error: string } | number
 }
 
 type ExecutionRow = {
@@ -270,9 +270,13 @@ function readToken(state: CodeState): Token | Error {
  * Assembles the given assembly code and returns the resulting machine code,
  * and some extra debug information.
  * @param code The MIPS assembly code to assemble.
+ * @param initialPC The address where the program starts.
  * @returns The array of instruction words, or an error message.
  */
-export function assemble(code: string): AssembleResult | Error {
+export function assemble(
+  code: string,
+  initialPC: number,
+): AssembleResult | Error {
   const state: CodeState = {
     code,
     index: 0,
@@ -282,6 +286,7 @@ export function assemble(code: string): AssembleResult | Error {
 
   const data: number[] = []
   const executionInfo: ExecutionRow[] = []
+  let pc = initialPC
 
   while (!state.reachedEnd) {
     const startIndex = state.index
@@ -331,10 +336,11 @@ export function assemble(code: string): AssembleResult | Error {
       }
       data.push(code)
       executionInfo.push({
-        address: 0, // TODO
+        address: pc,
         code,
         source: state.code.substring(startIndex, state.index).trim(),
       })
+      pc += 4
 
       const next = readToken(state)
       if (next.kind != "newline" && next.kind != "eof") {
@@ -354,4 +360,4 @@ export function assemble(code: string): AssembleResult | Error {
   }
 }
 
-console.log(assemble("add $1, $2, $3\nsub $0, $0, $0"))
+console.log(assemble("add $t4, $t5, $t6\nsub $0, $0, $0", 0x400000))
