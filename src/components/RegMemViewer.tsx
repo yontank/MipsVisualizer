@@ -11,9 +11,8 @@ import { DataTable } from "@/components/ui/VirtualizedTable"
 import type { ColumnDef } from "@tanstack/react-table"
 import { useState } from "react"
 import type { Hexadecimal } from "types"
-import { hex2int, int2hex } from "@/lib/utils"
-import { Label } from "@/components/ui/label"
-import { Input } from "@/components/ui/input"
+import {  int2hex } from "@/lib/utils"
+import { MemoryInput } from "./MemoryInput"
 
 const registerValues = [
   { name: "$zero", number: 0, value: "0x00000000" },
@@ -94,52 +93,6 @@ const knownMemValues = new Map<Hexadecimal, Hexadecimal>()
 knownMemValues.set("0x00000000", "0x00000001")
 knownMemValues.set("0x00000001", "0x00000002")
 
-function MemoryInput(props) {
-  const [value, setValue] = useState<string>("")
-
-  /**
-   * TODO: Set state value inside the datatable alone, we dont want to fucking re-render the ENTIRE component when we only need the table to re render(memory)
-   * TODO: also, i'd like to add a way to edit the values directly in the table
-   * TODO: adding a (onSubmit button) (for the input) so that I'd add a way to submit the input value into the memory table, that way we can update the table without re-rendering the entire component
-   * @param keys
-   * @returns
-   */
-  const handleChange = (keys: React.ChangeEvent<HTMLInputElement>) => {
-    const { value } = keys.currentTarget
-    const newChar = value.charAt(value.length - 1)
-    // FIXME: can be optomized by if the regex is not fitting, simply do not call the setState function,
-    // needs to be checked if its something that needs to be done, (meaning there's some performance issues)
-    // if there are, we'll also need to allow special keys (up, down, left, right arrows, enter, space key,etc.)
-    if (!newChar.match(/[a-fA-F0-9]/i)) {
-      return value.substring(0, value.length - 1)
-    }
-    return value.toUpperCase()
-  }
-
-  const handleKeyDown = (event: React.KeyboardEvent<HTMLInputElement>) => {
-    if (event.key === "Enter") {
-      // Submit the value
-      console.log("Submitting:", value)
-
-      props.onSubmit(hex2int(("0x" + event.currentTarget.value) as Hexadecimal))
-    }
-  }
-
-  return (
-    <div>
-      <Label>Memory Address</Label>
-      <Input
-        maxLength={8}
-        autoCapitalize="characters"
-        placeholder="e.g 0x12345678"
-        value={value}
-        onChange={(e) => setValue(handleChange(e))}
-        onKeyDown={handleKeyDown}
-      />
-    </div>
-  )
-}
-
 function MemoryTable() {
   const [memoryArr, setMemoryArr] = useState<
     {
@@ -147,7 +100,7 @@ function MemoryTable() {
       value: string
     }[]
   >(createMemoryArr(500, 2048 * 4, knownMemValues))
-  console.log(memoryArr.slice(0, 2))
+
   if (memoryArr === undefined) return <></>
 
   // Get Ref of Virtuoso
@@ -157,8 +110,9 @@ function MemoryTable() {
   }
 
   return (
-    <div className="">
+    <div>
       <MemoryInput onSubmit={handleSubmit} />
+
       <DataTable
         columns={columns}
         data={memoryArr}
