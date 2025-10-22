@@ -17,7 +17,7 @@ function ExecutionPanel() {
   return (
     <div className="">
       <Editor
-        height={"100vh"}
+          height={"calc(100vh - 110px)"}
         width={"375px"}
         defaultLanguage="mips"
         defaultValue="# Write your code here."

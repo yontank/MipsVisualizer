@@ -204,9 +204,9 @@ function RegMemViewer() {
   }
 
   return (
-    <div className="w-fit max-w-xl h-screen overflow-y-auto border rounded-md ">
+    <div className="w-fit max-w-xl h-screen overflow-none border rounded-md ">
       <Tabs defaultValue="register" className="w-[325px] ">
-        <div className="flex justify-center w-full sticky top-2 z-50 h-fit my-2 ">
+        <div className="flex justify-center w-full sticky top-2 z-50 h-full my-2">
           <TabsList className="w-full">
             <TabsTrigger value="register">Register</TabsTrigger>
             <TabsTrigger value="memory">Memory</TabsTrigger>
