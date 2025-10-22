@@ -1,6 +1,10 @@
-import Editor, { type OnMount } from "@monaco-editor/react"
+import Editor, { useMonaco, type OnMount } from "@monaco-editor/react"
 import { editor } from "monaco-editor"
-import { useImperativeHandle, useRef, type Ref } from "react"
+import { useImperativeHandle, useState, type Ref } from "react"
+import { Input } from "./ui/input"
+import { Label } from "@radix-ui/react-label"
+import { parseHex } from "@/lib/utils"
+import { useSimulationContext } from "@/context/SimulationContext"
 
 /**
  * A generic interface for getting the text of a code editor.
@@ -10,7 +14,13 @@ export interface EditorInterface {
 }
 
 export function EditorPanel(props: { editorInterface: Ref<EditorInterface> }) {
-  const editorRef = useRef<editor.IStandaloneCodeEditor>(null)
+  //TODO: Change ErrorLine to fit dynamically with Simulation context
+
+  const [decorations, setDecorations] = useState<
+    editor.IEditorDecorationsCollection | undefined
+  >(undefined)
+  const monaco = useMonaco()
+  const { pcAddr, setPCAddr, editorRef } = useSimulationContext()
 
   useImperativeHandle(props.editorInterface, () => ({
     getValue: () => editorRef.current!.getValue(),
@@ -21,26 +31,62 @@ export function EditorPanel(props: { editorInterface: Ref<EditorInterface> }) {
 
     editor.setPosition({ lineNumber: 2, column: 1 })
     editor.focus()
+    setDecorations(editor.createDecorationsCollection())
   }
 
+  if (!editorRef || !monaco) return <></>
+
+  decorations?.clear()
+
+  // if (errorLine != undefined)
+  //   decorations?.append([
+  //     {
+  //       range: new monaco.Range(errorLine, 1, errorLine, 24),
+  //       options: {
+  //         isWholeLine: true,
+  //         blockClassName: "errorVscode",
+  //         blockPadding: [0, 14, 0, 0],
+  //         shouldFillLineOnLineBreak: true,
+  //         stickiness:
+  //           monaco.editor.TrackedRangeStickiness.NeverGrowsWhenTypingAtEdges,
+  //       },
+  //     },
+  //   ])
   return (
-    <Editor
-      height="100%"
-      width={"375px"}
-      defaultLanguage="mips"
-      defaultValue="# Write your code here."
-      theme="vs-dark"
-      onMount={handleEditorDidMount}
-      options={{
-        // readOnly: true,
-        minimap: { enabled: false },
-        overviewRulerLanes: 0,
-        scrollbar: {
-          vertical: "hidden",
-          horizontal: "hidden",
-          handleMouseWheel: false,
-        },
-      }}
-    />
+    <>
+      <div>
+        <Label className="p-1">Initial PC:</Label>
+        <Input
+          maxLength={10}
+          className="m-1"
+          placeholder="e.g 0x12345678"
+          value={pcAddr}
+          onChange={(e) => {
+            setPCAddr(parseHex(e.currentTarget.value))
+          }}
+        />
+      </div>
+
+      <div>
+        <Editor
+          height={"calc(100vh - 110px)"}
+          width={"375px"}
+          defaultLanguage="mips"
+          defaultValue={"# Write your code here.\n"}
+          theme="vs-dark"
+          onMount={handleEditorDidMount}
+          options={{
+            // readOnly: true,
+            minimap: { enabled: false },
+            overviewRulerLanes: 0,
+            scrollbar: {
+              vertical: "hidden",
+              horizontal: "hidden",
+              handleMouseWheel: false,
+            },
+          }}
+        />
+      </div>
+    </>
   )
 }

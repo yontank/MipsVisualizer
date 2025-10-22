@@ -1,8 +1,19 @@
-import type { Simulation } from "@/simulation"
-import { createContext } from "react"
+import type { EditorInterface } from "@/components/EditorPanel"
+import { assemble } from "@/lib/assembler"
+import { newSimulation, type Simulation } from "@/simulation"
+import {
+  createContext,
+  useContext,
+  useRef,
+  useState,
+  type RefObject,
+} from "react"
 
 type Context = {
   simulation?: Simulation
+
+  editorRef: RefObject<EditorInterface | undefined>
+
   /**
    * Compiles the code and starts the simulation.
    */
@@ -11,6 +22,76 @@ type Context = {
    * Stops the currently running simulation.
    */
   stopSimulation: () => void
+  error?: { code?: number; line: number; msg: string }
+
+  pcAddr: string
+  setPCAddr: React.Dispatch<React.SetStateAction<string>>
 }
 
-export const SimulationContext = createContext<Context>(undefined!)
+type Props = {
+  children: React.ReactNode
+}
+
+const SimulationContext = createContext<Context>(undefined!)
+
+export function SimulationContextProvider({ children }: Props) {
+  //TODO: Use Set Simulation to connect it into startSimulation and hte latter
+  const [simulation, setSimulation] = useState<Simulation | undefined>(
+    undefined,
+  )
+  /** Customized PC Addresss, (Since in some tests it's changing.) */
+  const [pcAddr, setPCAddr] = useState<string>("0x00400000")
+  const [error, setError] = useState<
+    { code?: number; line: number; msg: string } | undefined
+  >(undefined)
+  const editorRef = useRef<EditorInterface | undefined>(undefined)
+
+  const startSimulation = () => {
+    if (editorRef.current == undefined) throw Error("n1gg3re")
+    const value = editorRef.current.getValue()
+
+    const r = assemble(value, Number(pcAddr))
+
+    // TODO: If code not compiled por favor
+    if (r.kind == "error") {
+      // TODO: for the love of god, change that before i accidentally commit & push it
+      alert(
+        "n1gg3r1e can't MIPS LOLOLOLOL error in line  " +
+          r.line +
+          " HAHAHA LOSER",
+      )
+      setError({ msg: r.errorMessage, line: r.line })
+    } else if (r.kind == "result") {
+      // TODO: In Good Compile, do dis PLS PLS PLS
+    } else {
+      throw Error("how did we get here?")
+    }
+  }
+  const stopSimulation = () => {
+    setSimulation(undefined)
+    setError(undefined)
+  }
+
+  return (
+    <SimulationContext
+      value={{
+        simulation,
+        startSimulation,
+        stopSimulation,
+        error,
+        pcAddr,
+        setPCAddr,
+        editorRef,
+      }}
+    >
+      {children}
+    </SimulationContext>
+  )
+}
+
+// eslint-disable-next-line react-refresh/only-export-components
+export const useSimulationContext = () => {
+  const context = useContext(SimulationContext)
+
+  return context
+}
