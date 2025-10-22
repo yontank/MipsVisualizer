@@ -1,7 +1,7 @@
 import type { Simulation } from "@/simulation"
 import { useEffect, useRef, useState } from "react"
 import { MouseTooltip } from "./MouseTooltip"
-import { intToHex } from "@/lib/utils"
+import { int2hex } from "@/lib/utils"
 
 /**
  * The stroke width of the duplicate wires for interaction, in pixels.
@@ -56,7 +56,7 @@ export function Diagram(props: {
     props.simulation &&
     props.simulation.inputValues[hoveredWire.nodeId]?.[hoveredWire.inputId]
   const tooltipContent =
-    hoveredWireValue != undefined && intToHex(hoveredWireValue)
+    hoveredWireValue != undefined && int2hex(hoveredWireValue)
 
   return (
     <>
