@@ -13,9 +13,11 @@ import type { Simulation } from "./simulation"
 import { SimulationContext } from "./context/SimulationContext"
 import { Diagram } from "./components/Diagram"
 
+
 function App() {
   const [simulation, setSimulation] = useState<Simulation | undefined>()
   const editorInterface = useRef<EditorInterface>({ getValue: () => "" })
+  const [pcValue, setPCValue] = useState("")
 
   const compile = () => {
     console.log(editorInterface.current.getValue())
@@ -30,7 +32,8 @@ function App() {
       value={{ simulation, startSimulation: compile, stopSimulation }}
     >
       <div className="absolute z-10 top-0 left-1/2 transform -translate-x-1/2">
-        <DebugUI />
+        <DebugUI
+        />
       </div>
 
       <div className="flex h-screen">
@@ -54,7 +57,6 @@ function App() {
         <div className="flex-1 flex justify-center items-center overflow-auto min-w-36">
           <Diagram simulation={simulation} svg={TestDiagram} />
         </div>
-
         <RegMemViewer />
       </div>
     </SimulationContext>
