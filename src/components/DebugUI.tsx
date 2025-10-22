@@ -1,26 +1,27 @@
-"use client";
+import { BugPlayIcon, PlayIcon, SquareIcon, Undo2Icon } from "lucide-react"
 
-import { BugPlayIcon, PlayIcon, SquareIcon, Undo2Icon } from "lucide-react";
-
-import { Button } from "@/components/ui/button";
-import { ButtonGroup } from "@/components/ui/button-group";
-import { useState } from "react";
+import { Button } from "@/components/ui/button"
+import { ButtonGroup } from "@/components/ui/button-group"
+import { useState } from "react"
 import {
   Tooltip,
   TooltipProvider,
   TooltipTrigger,
   TooltipContent,
-} from "./ui/tooltip";
-
+} from "./ui/tooltip"
+/**
+ * A Component that Contains Buttons to Start, Stop, the compilation of the program
+ * The Component will probably sbbe at the top of the screen.
+ * @returns
+ */
 function DebugUI() {
-  const [isRunning, setIsRunning] = useState<boolean>(false);
+  const [isRunning, setIsRunning] = useState<boolean>(false)
 
   return (
-    <div className="w-screen my-2.5 flex justify-center">
+    <div className="absolute my-2.5 flex justify-center">
       <ButtonGroup className="cursor-pointer">
         <TooltipProvider>
           <Tooltip delayDuration={800}>
-            
             <TooltipTrigger asChild>
               <ButtonGroup className="">
                 <Button
@@ -30,14 +31,14 @@ function DebugUI() {
                   className="hover:text-blue-600 cursor-pointer"
                   disabled={isRunning}
                   onClick={() => {
-                    setIsRunning(true);
+                    setIsRunning(true)
                   }}
                 >
                   <BugPlayIcon />
                 </Button>
               </ButtonGroup>
             </TooltipTrigger>
-            
+
             <TooltipContent>
               <p>Compile</p>
             </TooltipContent>
@@ -51,7 +52,7 @@ function DebugUI() {
                   className="hover:text-red-600 cursor-pointer"
                   disabled={!isRunning}
                   onClick={() => {
-                    setIsRunning(false);
+                    setIsRunning(false)
                   }}
                 >
                   <SquareIcon />
@@ -95,7 +96,7 @@ function DebugUI() {
         </TooltipProvider>
       </ButtonGroup>
     </div>
-  );
+  )
 }
 
-export default DebugUI;
+export default DebugUI
