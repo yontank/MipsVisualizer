@@ -29,36 +29,40 @@ export type SimulationChange =
        */
       value: number
     }
+type InputList = readonly {
+  /**
+   * A string that uniquely identifies this input in this node.
+   */
+  id: string
+  /**
+   * If true, this input will not have to wait for a value for the node to output a value during rising clock.
+   */
+  falling?: true
+}[]
 
-// TODO figure out a way to statically type node input IDs and the `inputs` parameter in `execute`
+type OutputList = readonly {
+  /**
+   * A string that uniquely identifies this output in this node.
+   */
+  id: string
+}[]
+
 /**
  * An object describing a node - its inputs, outputs and behavior.
  */
-export type NodeType = {
+export type NodeType<
+  Inputs extends InputList = InputList,
+  Outputs extends OutputList = OutputList,
+> = {
   /**
-   * An array of the inputs this node has.
+   * A map of the inputs this node has.
    */
-  inputs: {
-    /**
-     * A string that uniquely identifies this input in this node.
-     */
-    id: string
-    /**
-     * When the input changes, an update of the node will only trigger during this specified part of the clock cycle.
-     * If it's not defined, it's assumed to be `"rising"`.
-     */
-    clockMode?: "rising" | "falling"
-  }[]
+  inputs: Inputs
 
   /**
    * An array of the outputs this node has.
    */
-  outputs: {
-    /**
-     * A string that uniquely identifies this output in this node.
-     */
-    id: string
-  }[]
+  outputs: Outputs
 
   /**
    * This function is called during the rising part of the clock cycle.
@@ -69,8 +73,8 @@ export type NodeType = {
    */
   executeRising: (
     simulation: Simulation,
-    inputs: Record<string, number>,
-  ) => Record<string, number>
+    inputs: { [I in Inputs[number]["id"]]: number },
+  ) => { [O in Outputs[number]["id"]]: number }
 
   /**
    * This function is called during the falling part of the clock cycle.
@@ -80,7 +84,7 @@ export type NodeType = {
    */
   executeFalling?: (
     simulation: Simulation,
-    inputs: Record<string, number>,
+    inputs: { [I in Inputs[number]["id"]]: number },
   ) => SimulationChange | undefined
 }
 
