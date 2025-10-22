@@ -1,6 +1,6 @@
 import type { EditorInterface } from "@/components/EditorPanel"
 import { assemble } from "@/lib/assembler"
-import { newSimulation, type Simulation } from "@/simulation"
+import { newSimulation, type Simulation } from "@/logic/simulation"
 import {
   createContext,
   useContext,

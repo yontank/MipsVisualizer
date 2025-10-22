@@ -32,7 +32,7 @@ export type SimulationChange =
 
 // TODO figure out a way to statically type node input IDs and the `inputs` parameter in `execute`
 /**
- * An object describing a node - its inputs, outputs, behavior and style.
+ * An object describing a node - its inputs, outputs and behavior.
  */
 export type NodeType = {
   /**

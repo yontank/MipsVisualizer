@@ -1,4 +1,4 @@
-import type { Simulation } from "@/simulation"
+import type { Simulation } from "@/logic/simulation"
 import { useEffect, useRef, useState } from "react"
 import { MouseTooltip } from "./MouseTooltip"
 import { int2hex } from "@/lib/utils"

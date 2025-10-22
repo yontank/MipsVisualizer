@@ -8,9 +8,15 @@ import TestDiagram from "@/assets/diagram.svg?react"
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./components/ui/tabs"
 import EmulatorTableUI from "./components/MarsEmulatorUI/page"
+<<<<<<< HEAD
 import { useRef } from "react"
 import { SimulationContextProvider } from "./context/SimulationContext"
+=======
+import { useRef, useState } from "react"
+import { SimulationContext } from "./context/SimulationContext"
+>>>>>>> origin/ront_dev
 import { Diagram } from "./components/Diagram"
+
 
 function App() {
   const editorInterface = useRef<EditorInterface>({ getValue: () => "" })
