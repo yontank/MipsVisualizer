@@ -1,30 +1,16 @@
-import React, { createContext, useState, useEffect } from "react";
-
-type Props = {
-  children: React.ReactNode;
-};
+import type { Simulation } from "@/simulation"
+import { createContext } from "react"
 
 type Context = {
-  count: number;
-  increment: () => void;
-};
+  simulation?: Simulation
+  /**
+   * Compiles the code and starts the simulation.
+   */
+  startSimulation: () => void
+  /**
+   * Stops the currently running simulation.
+   */
+  stopSimulation: () => void
+}
 
-const SimulationContext = createContext<Context | null>(null);
-
-export const SimulationContextProvider = ({ children }: Props) => {
-  const [count, setCount] = useState(0);
-  //TODO: boilerpalte! change!
-  useEffect(() => {
-    setCount(42);
-  }, []);
-
-  const increment = () => {
-    setCount(count + 1);
-  };
-
-  return (
-    <SimulationContext.Provider value={{ count, increment }}>
-      {children}
-    </SimulationContext.Provider>
-  );
-};
+export const SimulationContext = createContext<Context>(undefined!)

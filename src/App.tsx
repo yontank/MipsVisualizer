@@ -2,53 +2,37 @@
 
 import RegMemViewer from "./components/RegMemViewer"
 import DebugUI from "@/components/DebugUI"
-import ExecutionDisplay from "@/components/ExecutionPanel"
+import { type EditorInterface, EditorPanel } from "@/components/EditorPanel"
 
 import TestDiagram from "@/assets/diagram.svg?react"
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./components/ui/tabs"
 import EmulatorTableUI from "./components/MarsEmulatorUI/page"
-import { editor } from "monaco-editor"
-import React, { useState, useRef } from "react"
+import { useRef, useState } from "react"
+import type { Simulation } from "./simulation"
+import { SimulationContext } from "./context/SimulationContext"
+import { Diagram } from "./components/Diagram"
+
 
 function App() {
-  const [IDEErrorLine, setIDEErrorLine] = useState<number | undefined>(1)
+  const [simulation, setSimulation] = useState<Simulation | undefined>()
+  const editorInterface = useRef<EditorInterface>({ getValue: () => "" })
   const [pcValue, setPCValue] = useState("")
-  const editorRef = useRef<editor.IStandaloneCodeEditor | undefined>(undefined)
 
-  const onCompile = () => {
-    // editorRef: RefObject<editor.IStandaloneCodeEditor>
-    const ideText = editorRef.current?.getValue()
-    console.log(ideText)
-    // TODO: Run Compiler.
-
-    // TODO: If the Compiler didnt work, Send Error Msg To to the IDE with number and shit
-    setIDEErrorLine(() => 5)
-    // TODO: otherwise, set the simulation as needed.
+  const compile = () => {
+    console.log(editorInterface.current.getValue())
   }
 
-  const onStop = () => {
-    // TODO: Set Simulation Context to undefined,
-    // TODO: anything else, bruv?
-  }
-
-  const onNextCycle = () => {
-    // TODO: Save context into History
-    // TODO: Execute the MIPS Emulator, and update the Simulation Context
-  }
-
-  const onUndo = () => {
-    // TODO: Get The History Of Simulations, and choose the last one.
+  const stopSimulation = () => {
+    setSimulation(undefined)
   }
 
   return (
-    <>
+    <SimulationContext
+      value={{ simulation, startSimulation: compile, stopSimulation }}
+    >
       <div className="absolute z-10 top-0 left-1/2 transform -translate-x-1/2">
         <DebugUI
-          onCompile={onCompile}
-          onNextCycle={onNextCycle}
-          onStop={onStop}
-          onUndo={onUndo}
         />
       </div>
 
@@ -63,12 +47,7 @@ function App() {
             </TabsTrigger>
           </TabsList>
           <TabsContent value="IDE">
-            <ExecutionDisplay
-              editorRef={editorRef}
-              errorLine={IDEErrorLine}
-              pcValue={pcValue}
-              setPCValue={setPCValue}
-            />
+            <EditorPanel editorInterface={editorInterface} />
           </TabsContent>
 
           <TabsContent value="debugger">
@@ -76,11 +55,11 @@ function App() {
           </TabsContent>
         </Tabs>
         <div className="flex-1 flex justify-center items-center overflow-auto min-w-36">
-          <TestDiagram />
+          <Diagram simulation={simulation} svg={TestDiagram} />
         </div>
         <RegMemViewer />
       </div>
-    </>
+    </SimulationContext>
   )
 }
 
