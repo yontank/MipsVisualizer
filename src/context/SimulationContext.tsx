@@ -1,4 +1,4 @@
-import type { Simulation } from "@/simulation"
+import type { Simulation } from "@/logic/simulation"
 import { createContext } from "react"
 
 type Context = {

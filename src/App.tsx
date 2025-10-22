@@ -9,10 +9,9 @@ import TestDiagram from "@/assets/diagram.svg?react"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./components/ui/tabs"
 import EmulatorTableUI from "./components/MarsEmulatorUI/page"
 import { useRef, useState } from "react"
-import type { Simulation } from "./simulation"
+import type { Simulation } from "./logic/simulation"
 import { SimulationContext } from "./context/SimulationContext"
 import { Diagram } from "./components/Diagram"
-
 
 function App() {
   const [simulation, setSimulation] = useState<Simulation | undefined>()
@@ -32,8 +31,7 @@ function App() {
       value={{ simulation, startSimulation: compile, stopSimulation }}
     >
       <div className="absolute z-10 top-0 left-1/2 transform -translate-x-1/2">
-        <DebugUI
-        />
+        <DebugUI />
       </div>
 
       <div className="flex h-screen">
