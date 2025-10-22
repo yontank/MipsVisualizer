@@ -162,7 +162,7 @@ function MemoryTable() {
       <DataTable
         columns={columns}
         data={memoryArr}
-        height="calc(100vh - 113px)"
+        height="calc(100vh - 114px)"
       />
     </div>
   )
@@ -204,7 +204,7 @@ function RegMemViewer() {
   }
 
   return (
-    <div className="w-fit max-w-xl h-screen overflow-none border rounded-md ">
+    <div className="w-[325px] max-w-xl h-screen  border rounded-md  overflow-auto ">
       <Tabs defaultValue="register" className="w-[325px] ">
         <div className="flex justify-center w-full sticky top-2 z-50 h-full my-2">
           <TabsList className="w-full">
@@ -217,11 +217,10 @@ function RegMemViewer() {
           <RegisterTable
             titles={Object.keys(registerValues[0])}
             values={registerValues.map((e) => Object.values(e))}
-            // rowStyle={}
           />
         </TabsContent>
 
-        <TabsContent value="memory">
+        <TabsContent value="memory" className="overflow-y-hidden">
           <MemoryTable />
         </TabsContent>
       </Tabs>
