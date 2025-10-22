@@ -1,35 +1,36 @@
 import Editor, { useMonaco, type OnMount } from "@monaco-editor/react"
-import { useEffect, useRef, useState } from "react"
+import { useState, type RefObject } from "react"
 import { Label } from "./ui/label"
 import { Input } from "./ui/input"
 import { parseHex as validateHex } from "@/lib/utils"
-import { Button } from "./ui/button"
 import { editor } from "monaco-editor"
-type IStandaloneCodeEditor = Parameters<OnMount>[0]
 
-function ExecutionPanel() {
-  const editorRef = useRef<IStandaloneCodeEditor>(null)
+function ExecutionPanel(props: {
+  editorRef: RefObject<editor.IStandaloneCodeEditor | undefined>
+  errorLine: number | undefined
+  pcValue: string
+  setPCValue: React.Dispatch<React.SetStateAction<string>>
+}) {
   const monaco = useMonaco()
-  const [pcValue, setPCValue] = useState("")
-  const [errorLine, setErrorLine] = useState<number | undefined>()
+  const errorLine = props.errorLine
   const [decorations, setDecorations] = useState<
     editor.IEditorDecorationsCollection | undefined
   >(undefined)
 
   const handleEditorDidMount: OnMount = (editor) => {
-    editorRef.current = editor
+    props.editorRef.current = editor
 
     editor.setPosition({ lineNumber: 2, column: 1 })
+
     editor.focus()
     setDecorations(editor.createDecorationsCollection())
   }
 
-  if (!editorRef || !monaco) return <></>
+  if (!props.editorRef || !monaco) return <></>
 
   decorations?.clear()
-  
-  
-  if (errorLine)
+
+  if (errorLine != undefined)
     decorations?.append([
       {
         range: new monaco.Range(errorLine, 1, errorLine, 24),
@@ -43,6 +44,7 @@ function ExecutionPanel() {
         },
       },
     ])
+
   return (
     <>
       <div>
@@ -51,9 +53,9 @@ function ExecutionPanel() {
           maxLength={10}
           className="m-1"
           placeholder="e.g 0x12345678"
-          value={pcValue}
+          value={props.pcValue}
           onChange={(e) => {
-            setPCValue(validateHex(e.currentTarget.value))
+            props.setPCValue(validateHex(e.currentTarget.value))
           }}
         />
       </div>
@@ -63,7 +65,7 @@ function ExecutionPanel() {
           height={"calc(100vh - 110px)"}
           width={"375px"}
           defaultLanguage="mips"
-          defaultValue="# Write your code here."
+          defaultValue={"# Write your code here.\n"}
           theme="vs-dark"
           onMount={handleEditorDidMount}
           options={{
