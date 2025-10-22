@@ -116,7 +116,7 @@ function MemoryTable() {
       <DataTable
         columns={columns}
         data={memoryArr}
-        height="calc(100vh - 114px)"
+        height="calc(100vh - 130px)"
       />
     </div>
   )
@@ -174,7 +174,7 @@ function RegMemViewer() {
           />
         </TabsContent>
 
-        <TabsContent value="memory" className="overflow-y-hidden">
+        <TabsContent value="memory" className="overflow-y-hidden overflow-x-hidden">
           <MemoryTable />
         </TabsContent>
       </Tabs>
