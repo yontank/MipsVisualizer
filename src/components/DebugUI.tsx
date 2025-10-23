@@ -9,13 +9,14 @@ import {
   TooltipTrigger,
   TooltipContent,
 } from "./ui/tooltip"
+import { useSimulationContext } from "@/context/SimulationContext"
 /**
  * A Component that Contains Buttons to Start, Stop, the compilation of the program
  * The Component will probably sbbe at the top of the screen.
  * @returns
  */
 function DebugUI() {
-  const [isRunning, setIsRunning] = useState<boolean>(false)
+  const { stopSimulation, startSimulation, simulation } = useSimulationContext()
 
   return (
     <div className="absolute my-2.5 flex justify-center">
@@ -29,9 +30,9 @@ function DebugUI() {
                   size="icon"
                   aria-label="Go Back"
                   className="hover:text-blue-600 cursor-pointer"
-                  disabled={isRunning}
+                  disabled={!!simulation}
                   onClick={() => {
-                    setIsRunning(true)
+                    startSimulation()
                   }}
                 >
                   <BugPlayIcon />
@@ -50,9 +51,9 @@ function DebugUI() {
                 <Button
                   variant="outline"
                   className="hover:text-red-600 cursor-pointer"
-                  disabled={!isRunning}
+                  disabled={!simulation}
                   onClick={() => {
-                    setIsRunning(false)
+                    stopSimulation()
                   }}
                 >
                   <SquareIcon />
@@ -68,7 +69,8 @@ function DebugUI() {
                 <Button
                   variant="outline"
                   className="hover:text-green-600 cursor-pointer"
-                  disabled={!isRunning}
+                  disabled={!simulation}
+                  // TODO: needs to be implemented in simulation for function call.
                 >
                   <PlayIcon />
                 </Button>
@@ -83,7 +85,8 @@ function DebugUI() {
                 <Button
                   variant={"outline"}
                   className="hover:text-red-600 cursor-pointer"
-                  disabled={!isRunning}
+                  disabled={!simulation}
+                  // TODO: needs to be implemented in simulation for function call.
                 >
                   <Undo2Icon />
                 </Button>

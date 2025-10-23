@@ -1,6 +1,6 @@
 import Editor, { useMonaco, type OnMount } from "@monaco-editor/react"
 import { editor } from "monaco-editor"
-import { useImperativeHandle, useState, type Ref } from "react"
+import { useEffect, useImperativeHandle, useState, type Ref } from "react"
 import { Input } from "./ui/input"
 import { Label } from "@radix-ui/react-label"
 import { parseHex } from "@/lib/utils"
@@ -20,7 +20,7 @@ export function EditorPanel(props: { editorInterface: Ref<EditorInterface> }) {
     editor.IEditorDecorationsCollection | undefined
   >(undefined)
   const monaco = useMonaco()
-  const { pcAddr, setPCAddr, editorRef } = useSimulationContext()
+  const { pcAddr, setPCAddr, editorRef, error } = useSimulationContext()
 
   useImperativeHandle(props.editorInterface, () => ({
     getValue: () => editorRef.current!.getValue(),
@@ -37,21 +37,22 @@ export function EditorPanel(props: { editorInterface: Ref<EditorInterface> }) {
   if (!editorRef || !monaco) return <></>
 
   decorations?.clear()
+  if (error != undefined) {
+    decorations?.append([
+      {
+        range: new monaco.Range(error.line, 1, error.line, 24),
+        options: {
+          isWholeLine: true,
+          blockClassName: "errorVscode",
+          blockPadding: [error.line, 0, error.line, 55],
+          shouldFillLineOnLineBreak: true,
+          stickiness:
+            monaco.editor.TrackedRangeStickiness.NeverGrowsWhenTypingAtEdges,
+        },
+      },
+    ])
+  }
 
-  // if (errorLine != undefined)
-  //   decorations?.append([
-  //     {
-  //       range: new monaco.Range(errorLine, 1, errorLine, 24),
-  //       options: {
-  //         isWholeLine: true,
-  //         blockClassName: "errorVscode",
-  //         blockPadding: [0, 14, 0, 0],
-  //         shouldFillLineOnLineBreak: true,
-  //         stickiness:
-  //           monaco.editor.TrackedRangeStickiness.NeverGrowsWhenTypingAtEdges,
-  //       },
-  //     },
-  //   ])
   return (
     <>
       <div>
