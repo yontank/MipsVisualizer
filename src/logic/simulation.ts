@@ -210,7 +210,7 @@ export type Simulation = {
   /**
    * A record where the key is an address number, and the value is the byte at that address.
    */
-  memory: Record<number, number>
+  memory: Record<number, number | undefined>
   /**
    * A set of all the nodes in the simulation, where the key is the node ID and the value is the node.
    * They do not contain state.

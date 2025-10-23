@@ -14,6 +14,6 @@ export const instructionMemory: NodeType<Outputs> = nodeType(
     },
   ] as const,
   (simulation, inputs) => ({
-    instruction: simulation.memory[inputs.readAddress],
+    instruction: simulation.memory[inputs.readAddress] ?? 0,
   }),
 )

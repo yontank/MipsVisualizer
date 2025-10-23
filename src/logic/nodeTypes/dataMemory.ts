@@ -11,7 +11,7 @@ export const dataMemory: NodeType<Outputs> = nodeType(
   ] as const,
   (simulation, inputs) => ({
     readData:
-      inputs.controlMemRead == 1 ? simulation.memory[inputs.address] : 0,
+      inputs.controlMemRead == 1 ? (simulation.memory[inputs.address] ?? 0) : 0,
   }),
   (_, inputs) => {
     if (inputs.controlMemWrite == 1) {
