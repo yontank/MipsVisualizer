@@ -299,7 +299,10 @@ export function newSimulation(blueprint: Blueprint): Simulation {
 function nodeHasAllInputs(simulation: Simulation, nodeId: string): boolean {
   const node = simulation.nodes[nodeId]
   return node.type.inputs.every(
-    (input) => input.id in simulation.inputValues[nodeId],
+    (input) =>
+      input.falling ||
+      node.constantInputs?.[input.id] ||
+      input.id in simulation.inputValues[nodeId],
   )
 }
 
@@ -320,10 +323,11 @@ export function simulationStep(simulation: Simulation): Simulation {
     ) {
       // If a node has received values for all its inputs, we call its `execute` function
       // and output its values.
-      const outputs = node.type.executeRising(
-        simulation,
-        simulation.inputValues[nodeId],
-      )
+      let inputValues = simulation.inputValues[nodeId]
+      if (node.constantInputs) {
+        inputValues = { ...inputValues, ...node.constantInputs }
+      }
+      const outputs = node.type.executeRising(simulation, inputValues)
       for (const outputId in outputs) {
         const [targetNodeId, targetInputId] = nodeTarget(node.outputs[outputId])
         const value = outputs[outputId]
