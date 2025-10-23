@@ -227,11 +227,11 @@ export const singleCycle: Blueprint = {
     splitterReadData2: {
       type: makeSplitter(2),
       outputs: {
-        in0: {
+        out0: {
           nodeId: "muxALUSrc",
           inputId: "in0",
         },
-        in1: {
+        out1: {
           nodeId: "dataMemory",
           inputId: "writeData",
         },
