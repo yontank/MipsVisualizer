@@ -53,7 +53,7 @@ export function SimulationContextProvider({ children }: Props) {
     const value = editorRef.current.getValue()
 
     const r = assemble(value, Number(pcAddr))
-    console.log(r)
+
     // TODO: If code not compiled por favor
     if (r.kind == "error") {
       setError({ msg: r.errorMessage, line: r.line })
