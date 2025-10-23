@@ -11,8 +11,11 @@ type OutTemplate = `out${number}`
 type Outputs = Record<number, OutTemplate>
 
 function extractBits(n: number, start: number, end: number) {
-  const mask = ((1 << (end - start + 1)) - 1) << start
-  return (n & mask) >>> start
+  if (start == 0 && end == 31) {
+    return n
+  }
+  const mask = (1 << (end - start + 1)) - 1
+  return (n >>> start) & mask
 }
 
 /**
@@ -23,13 +26,14 @@ function extractBits(n: number, start: number, end: number) {
  */
 export function makeSplitter(
   numOutputs: number,
-  bitRanges?: [start: number, end: number][],
+  bitRanges?: ([start: number, end: number] | undefined)[],
 ): NodeType<Outputs> {
   return nodeType(inputs, (_, inputs) => {
     const values: Record<OutTemplate, number> = {}
     for (let i = 0; i < numOutputs; i++) {
-      values[`out${i}`] = bitRanges
-        ? extractBits(inputs.in, ...bitRanges[i])
+      const extractRange = bitRanges?.[i]
+      values[`out${i}`] = extractRange
+        ? extractBits(inputs.in, ...extractRange)
         : inputs.in
     }
     return values
