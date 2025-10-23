@@ -47,21 +47,19 @@ export function SimulationContextProvider({ children }: Props) {
   const editorRef = useRef<EditorInterface | undefined>(undefined)
 
   const startSimulation = () => {
-    if (editorRef.current == undefined) throw Error("n1gg3re")
+    if (editorRef.current == undefined)
+      throw Error("Undefined Reference to the editor"
+    )
     const value = editorRef.current.getValue()
 
     const r = assemble(value, Number(pcAddr))
-
+    console.log(r)
     // TODO: If code not compiled por favor
     if (r.kind == "error") {
-      // TODO: for the love of god, change that before i accidentally commit & push it
-      alert(
-        "n1gg3r1e can't MIPS LOLOLOLOL error in line  " +
-          r.line +
-          " HAHAHA LOSER",
-      )
       setError({ msg: r.errorMessage, line: r.line })
     } else if (r.kind == "result") {
+      setError(undefined)
+
       // TODO: In Good Compile, do dis PLS PLS PLS
     } else {
       throw Error("how did we get here?")
