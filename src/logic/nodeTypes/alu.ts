@@ -14,7 +14,7 @@ const ALUActions: Record<number, ALUFunc> = {
 
 type Outputs = ["result", "zero"]
 
-export const ALU: NodeType<Outputs> = nodeType(
+export const alu: NodeType<Outputs> = nodeType(
   [
     {
       id: "in0",
