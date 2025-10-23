@@ -8,6 +8,7 @@ const ALUActions: Record<number, ALUFunc> = {
   [0b0001]: (a, b) => a | b, // Or
   [0b0010]: (a, b) => a + b, // Add
   [0b0110]: (a, b) => a - b, // Subtract
+  [0b0111]: (a, b) => (a < b ? 1 : 0), // Set on less than
   [0b1100]: (a, b) => ~(a | b), // Nor
 }
 
