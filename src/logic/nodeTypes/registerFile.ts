@@ -5,25 +5,28 @@ type Outputs = ["data1", "data2"]
 export const registerFile: NodeType<Outputs> = nodeType(
   [
     {
-      id: "read1",
+      id: "readRegister1",
     },
     {
-      id: "read2",
+      id: "readRegister2",
     },
     {
       id: "writeRegister",
+      falling: true,
     },
     {
       id: "writeData",
+      falling: true,
     },
     {
       id: "controlRegWrite",
+      falling: true,
     },
   ] as const,
 
   (simulation, inputs) => ({
-    data1: simulation.registers[inputs.read1],
-    data2: simulation.registers[inputs.read2],
+    data1: simulation.registers[inputs.readRegister1],
+    data2: simulation.registers[inputs.readRegister2],
   }),
 
   (simulation, inputs) => {
