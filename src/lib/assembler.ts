@@ -359,5 +359,3 @@ export function assemble(
     executionInfo,
   }
 }
-
-console.log(assemble("add $t4, $t5, $t6\nsub $0, $0, $0", 0x400000))
