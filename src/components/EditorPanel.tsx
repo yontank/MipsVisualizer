@@ -5,7 +5,6 @@ import { Input } from "./ui/input"
 import { Label } from "@radix-ui/react-label"
 import { parseHex } from "@/lib/utils"
 import { useSimulationContext } from "@/context/SimulationContext"
-import { toast } from "sonner"
 
 /**
  * A generic interface for getting the text of a code editor.

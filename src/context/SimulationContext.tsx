@@ -1,7 +1,6 @@
 import type { EditorInterface } from "@/components/EditorPanel"
-import { Toaster } from "@/components/ui/sonner"
 import { assemble } from "@/lib/assembler"
-import { newSimulation, type Simulation } from "@/logic/simulation"
+import { type Simulation } from "@/logic/simulation"
 import {
   createContext,
   useContext,
@@ -28,6 +27,9 @@ type Context = {
 
   pcAddr: string
   setPCAddr: React.Dispatch<React.SetStateAction<string>>
+
+  rightTabValue: "IDE" | "debugger"
+  setRightTabValue: React.Dispatch<React.SetStateAction<"IDE" | "debugger">>
 }
 
 type Props = {
@@ -46,6 +48,7 @@ export function SimulationContextProvider({ children }: Props) {
   const [error, setError] = useState<
     { code?: number; line: number; msg: string } | undefined
   >(undefined)
+  const [rightTabValue, setRightTabValue] = useState<"IDE" | "debugger">("IDE")
   const editorRef = useRef<EditorInterface | undefined>(undefined)
 
   const startSimulation = () => {
@@ -70,10 +73,9 @@ export function SimulationContextProvider({ children }: Props) {
           icon: "!text-white ",
         },
       })
-
-
     } else if (r.kind == "result") {
       setError(undefined)
+      setRightTabValue("debugger")
 
       // TODO: In Good Compile, do dis PLS PLS PLS
     } else {
@@ -88,6 +90,8 @@ export function SimulationContextProvider({ children }: Props) {
   return (
     <SimulationContext
       value={{
+        rightTabValue,
+        setRightTabValue,
         simulation,
         startSimulation,
         stopSimulation,
