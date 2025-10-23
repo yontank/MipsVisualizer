@@ -9,6 +9,7 @@ import {
   useState,
   type RefObject,
 } from "react"
+import { toast } from "sonner"
 
 type Context = {
   simulation?: Simulation
@@ -57,6 +58,20 @@ export function SimulationContextProvider({ children }: Props) {
     // TODO: If code not compiled por favor
     if (r.kind == "error") {
       setError({ msg: r.errorMessage, line: r.line })
+
+      toast.error("Error in line " + r.line, {
+        description: r.errorMessage,
+        position: "bottom-left",
+        duration: 4500,
+        className: "!bg-red-700 !border-red-400",
+        classNames: {
+          title: "!text-white",
+          description: "!text-white !text-bold",
+          icon: "!text-white ",
+        },
+      })
+
+
     } else if (r.kind == "result") {
       setError(undefined)
 

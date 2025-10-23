@@ -54,20 +54,6 @@ export function EditorPanel(props: { editorInterface: Ref<EditorInterface> }) {
     ])
   }
 
-  if (error) {
-    toast.error("Error in line " + error.line, {
-      description: error.msg,
-      position: "bottom-left",
-      duration: 4500,
-      className: "!bg-red-700 !border-red-400",
-      classNames: {
-        title: "!text-white",
-        description: "!text-white !text-bold",
-        icon: "!text-white ",
-      },
-    })
-  }
-
   return (
     <>
       <div>
