@@ -21,21 +21,18 @@ import type { CSSProperties } from "react"
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[]
   data: TData[]
+  setRowStyle?: (row: Row<TData>) => CSSProperties
 }
 
 export function DataTable<TData, TValue>({
   columns,
   data,
+  setRowStyle: getRowStyle,
 }: DataTableProps<TData, TValue>) {
   const table = useReactTable({
     data,
     columns,
     getCoreRowModel: getCoreRowModel(),
-    meta: {
-      getRowStyles: (row: Row<TData>): CSSProperties => ({
-        backgroundColor: row.index % 2 === 0 ? "white" : "#f9f9f9",
-      }),
-    },
   })
 
   return (
@@ -63,9 +60,11 @@ export function DataTable<TData, TValue>({
           {table.getRowModel().rows?.length ? (
             table.getRowModel().rows.map((row) => (
               <TableRow
-                // className="bg-amber-300"
                 key={row.id}
                 data-state={row.getIsSelected() && "selected"}
+                style={
+                  typeof getRowStyle === "function" ? getRowStyle(row) : {}
+                }
               >
                 {row.getVisibleCells().map((cell) => (
                   <TableCell key={cell.id}>

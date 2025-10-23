@@ -23,7 +23,6 @@ export const columns: ColumnDef<CompiledMIPS>[] = [
       const address = row.getValue("address") as Hexadecimal
 
       return (
-        // <div className={address === "0x00400000" ? "bg-red-600 " : ""}>
         <div>{address}</div>
         // </div>
       )
@@ -33,15 +32,8 @@ export const columns: ColumnDef<CompiledMIPS>[] = [
     accessorKey: "code",
     header: "Code",
     cell: ({ row }) => {
-      //   const address = row.getValue("address") as Hexadecimal
       const code = row.getValue("code") as Hexadecimal
-      return (
-        <div
-        //   className={address === "0x00400000" ? "bg-red-600 -mx-4 h-full" : ""}
-        >
-          {code}
-        </div>
-      )
+      return <div>{code}</div>
     },
   },
   {
@@ -49,10 +41,7 @@ export const columns: ColumnDef<CompiledMIPS>[] = [
     header: "Source",
     cell: ({ row }) => {
       const source = row.getValue("source") as string
-      return (
-        // <div className={address === "0x00400000" ? "bg-red-600 " : ""}>
-        <div>{source}</div>
-      )
+      return <div>{source}</div>
     },
   },
 ]

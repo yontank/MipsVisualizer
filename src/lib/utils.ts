@@ -4,7 +4,12 @@ import { type Hexadecimal } from "@/../types"
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
-
+/**
+ *
+ * @param number The given number you want to to show in base16
+ * @param numDigits how many 'digits' are in the value
+ * @returns a string that is a hexadecimal representation of the number
+ */
 export function int2hex(number: number, numDigits: number = 8): Hexadecimal {
   if (number < 0) {
     number = 0xffffffff + number + 1
@@ -14,19 +19,21 @@ export function int2hex(number: number, numDigits: number = 8): Hexadecimal {
   const paddedHex = hexValue.padStart(numDigits, "0")
   return ("0x" + paddedHex) as Hexadecimal
 }
-
+/**
+ * Converts Hex Into Integer
+ * @param x Hexadecimal string number
+ * @returns An Integer in Base 10 from Base 16
+ */
 export function hex2int(x: Hexadecimal) {
   return Number(x)
 }
 
-export function intToHex(x: number) {
-  if (x < 0) {
-    x = 0xffffffff + x + 1
-  }
-
-  return "0x" + x.toString(16).toUpperCase()
-}
-
+/**
+ * Given a value string, get the last character and make it fi inside the string for a hexadecimal output.
+ * Should be used with onChange component elements.
+ * @param value a hexadecimal output
+ * @returns a hexadecimal string
+ */
 export const parseHex = (value: string) => {
   if (value.length <= 2) return "0x"
 
