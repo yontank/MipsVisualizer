@@ -1,4 +1,4 @@
-import type { NodeType } from "../simulation"
+import { nodeType, type NodeType } from "../simulation"
 
 const inputs = [
   {
@@ -24,17 +24,14 @@ function extractBits(n: number, start: number, end: number) {
 export function makeSplitter(
   numOutputs: number,
   bitRanges?: [start: number, end: number][],
-): NodeType<typeof inputs, Outputs> {
-  return {
-    inputs,
-    executeRising: (_, inputs) => {
-      const values: Record<OutTemplate, number> = {}
-      for (let i = 0; i < numOutputs; i++) {
-        values[`out${i}`] = bitRanges
-          ? extractBits(inputs.in, ...bitRanges[i])
-          : inputs.in
-      }
-      return values
-    },
-  }
+): NodeType<Outputs> {
+  return nodeType(inputs, (_, inputs) => {
+    const values: Record<OutTemplate, number> = {}
+    for (let i = 0; i < numOutputs; i++) {
+      values[`out${i}`] = bitRanges
+        ? extractBits(inputs.in, ...bitRanges[i])
+        : inputs.in
+    }
+    return values
+  })
 }

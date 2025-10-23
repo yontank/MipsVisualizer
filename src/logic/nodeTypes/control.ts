@@ -1,10 +1,4 @@
-import type { NodeType, OutputObject } from "../simulation"
-
-const inputs = [
-  {
-    id: "in",
-  },
-] as const
+import { nodeType, type OutputObject } from "../simulation"
 
 type Outputs = [
   "regDst",
@@ -98,7 +92,11 @@ const outputMap: Record<number, OutputObject<Outputs>> = {
  *
  * Its input is expected to be just the 6 opcode bits of an instruction.
  */
-export const control: NodeType<typeof inputs, Outputs> = {
-  inputs,
-  executeRising: (_, inputs) => outputMap[inputs.in],
-}
+export const control = nodeType(
+  [
+    {
+      id: "in",
+    },
+  ] as const,
+  (_, inputs) => outputMap[inputs.in],
+)

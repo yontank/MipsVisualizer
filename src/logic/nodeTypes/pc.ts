@@ -1,20 +1,18 @@
-import type { NodeType } from "../simulation"
-
-const inputs = [
-  {
-    id: "in",
-  },
-] as const
+import { nodeType, type NodeType } from "../simulation"
 
 type Outputs = ["out"]
 
-export const pc: NodeType<typeof inputs, Outputs> = {
-  inputs,
-  executeRising: (simulation) => ({ out: simulation.pc }),
-  executeFalling: (_, inputs) => {
+export const pc: NodeType<Outputs> = nodeType(
+  [
+    {
+      id: "in",
+    },
+  ] as const,
+  (simulation) => ({ out: simulation.pc }),
+  (_, inputs) => {
     return {
       type: "pcset",
       value: inputs.in,
     }
   },
-}
+)

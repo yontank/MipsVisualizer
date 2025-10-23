@@ -1,4 +1,4 @@
-import type { NodeType } from "../simulation"
+import { nodeType, type NodeType } from "../simulation"
 
 // "slt" isn't supported yet.
 
@@ -11,27 +11,25 @@ const ALUActions: Record<number, ALUFunc> = {
   [0b1100]: (a, b) => ~(a | b), // Nor
 }
 
-const inputs = [
-  {
-    id: "in0",
-  },
-  {
-    id: "in1",
-  },
-  {
-    id: "control",
-  },
-] as const
-
 type Outputs = ["result", "zero"]
 
-export const ALU: NodeType<typeof inputs, Outputs> = {
-  inputs,
-  executeRising: (_, inputs) => {
+export const ALU: NodeType<Outputs> = nodeType(
+  [
+    {
+      id: "in0",
+    },
+    {
+      id: "in1",
+    },
+    {
+      id: "control",
+    },
+  ] as const,
+  (_, inputs) => {
     const result = ALUActions[inputs.control](inputs.in0, inputs.in1)
     return {
       result,
       zero: result == 0 ? 1 : 0,
     }
   },
-}
+)

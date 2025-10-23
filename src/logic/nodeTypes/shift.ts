@@ -1,4 +1,4 @@
-import type { NodeType } from "../simulation"
+import { nodeType, type NodeType } from "../simulation"
 
 const inputs = [
   {
@@ -16,11 +16,8 @@ type Outputs = ["out"]
 export function makeShifter(
   dir: "left" | "right",
   bits: number,
-): NodeType<typeof inputs, Outputs> {
-  return {
-    inputs,
-    executeRising: (_, inputs) => ({
-      out: dir == "left" ? inputs.in << bits : inputs.in >> bits,
-    }),
-  }
+): NodeType<Outputs> {
+  return nodeType(inputs, (_, inputs) => ({
+    out: dir == "left" ? inputs.in << bits : inputs.in >> bits,
+  }))
 }

@@ -50,21 +50,30 @@ type InputList = readonly {
 
 type OutputList = Record<number, string>
 
+type InputObject<List extends InputList> = { [I in List[number]["id"]]: number }
+
 export type OutputObject<List extends OutputList> = {
   [O in List[number]]: number
 }
 
+type ExecuteRisingFunction<Outputs extends OutputList> = (
+  simulation: Simulation,
+  inputs: Record<string, number>,
+) => OutputObject<Outputs>
+
+type ExecuteFallingFunction = (
+  simulation: Simulation,
+  inputs: Record<string, number>,
+) => SimulationChange | undefined
+
 /**
  * An object describing a node - its inputs, outputs and behavior.
  */
-export type NodeType<
-  Inputs extends InputList = InputList,
-  Outputs extends OutputList = OutputList,
-> = {
+export type NodeType<Outputs extends OutputList = OutputList> = {
   /**
    * A map of the inputs this node has.
    */
-  inputs: Inputs
+  inputs: InputList
 
   /**
    * This function is called during the rising part of the clock cycle.
@@ -73,10 +82,7 @@ export type NodeType<
    * @param inputs An object containing the values of all inputs.
    * @returns An object with the node's outputs.
    */
-  executeRising: (
-    simulation: Simulation,
-    inputs: { [I in Inputs[number]["id"]]: number },
-  ) => OutputObject<Outputs>
+  executeRising: ExecuteRisingFunction<Outputs>
 
   /**
    * This function is called during the falling part of the clock cycle.
@@ -84,10 +90,35 @@ export type NodeType<
    * @param simulation The simulation that the node is in.
    * @param inputs An object containing the values of all inputs.
    */
+  executeFalling?: ExecuteFallingFunction
+}
+
+/**
+ * Creates a new node type.
+ *
+ * (The only reason this function exists is because TypeScript can infer generics better when they're parameters in a function,
+ * and because force-casting with `as` is easier)
+ *
+ * @param inputs List of inputs that this node receives.
+ * @param executeRising Function that will get called in the rising clock cycle, when the node has values for all its inputs.
+ * @param executeFalling An optional function that will be called during the falling clock cycle.
+ */
+export function nodeType<Outputs extends OutputList, Inputs extends InputList>(
+  inputs: Inputs,
+  executeRising: (
+    simulation: Simulation,
+    inputs: InputObject<Inputs>,
+  ) => OutputObject<Outputs>,
   executeFalling?: (
     simulation: Simulation,
-    inputs: { [I in Inputs[number]["id"]]: number },
-  ) => SimulationChange | undefined
+    inputs: InputObject<Inputs>,
+  ) => SimulationChange | undefined,
+): NodeType<Outputs> {
+  return {
+    inputs,
+    executeRising: executeRising as ExecuteRisingFunction<Outputs>,
+    executeFalling: executeFalling as ExecuteFallingFunction,
+  }
 }
 
 /**
@@ -112,18 +143,18 @@ type NodeInputTarget =
 /**
  * A definition of a node that will be in a simulation.
  */
-export type NodeDef = {
+export type NodeDef<Outputs extends OutputList = OutputList> = {
   /**
    * This node's type.
    */
-  type: NodeType
+  type: NodeType<Outputs>
   /**
    * A map where the key is the node's output ID, and the value is where to output to.
    *
    * The input target can be an object describing a node and an input ID, or just a string,
    * in which case it'll output to that node with the inputID "in".
    */
-  outputs: Record<string, NodeInputTarget>
+  outputs: Record<Outputs[number], NodeInputTarget>
   /**
    * A map of constant values that should be fed into this node's inputs.
    */
@@ -142,12 +173,15 @@ export type NodeDef = {
  *
  * It includes an `inputs` object which allows mapping an input to the output that's connected to it.
  */
-export type Node = NodeDef & {
+export type Node<
+  Inputs extends InputList = InputList,
+  Outputs extends OutputList = OutputList,
+> = NodeDef<Outputs> & {
   /**
    * A map where the key is the node's input ID, and the value is the node and output ID that it's connected to.
    */
   inputs: Record<
-    string,
+    Inputs[number]["id"],
     {
       /**
        * The ID of the node.

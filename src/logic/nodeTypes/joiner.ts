@@ -1,13 +1,4 @@
-import type { NodeType } from "../simulation"
-
-const inputs = [
-  {
-    id: "in0",
-  },
-  {
-    id: "in1",
-  },
-] as const
+import { nodeType, type NodeType } from "../simulation"
 
 type Outputs = ["out"]
 
@@ -17,9 +8,16 @@ type Outputs = ["out"]
  * Currently this is hard-coded for the join that happens in the Jump Address in the single cycle diagram.
  * We'll generalize it if it appears in more places.
  */
-export const joiner: NodeType<typeof inputs, Outputs> = {
-  inputs,
-  executeRising: (_, inputs) => ({
+export const joiner: NodeType<Outputs> = nodeType(
+  [
+    {
+      id: "in0",
+    },
+    {
+      id: "in1",
+    },
+  ] as const,
+  (_, inputs) => ({
     out: inputs.in0 | (inputs.in1 << 28),
   }),
-}
+)

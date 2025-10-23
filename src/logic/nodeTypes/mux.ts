@@ -1,13 +1,8 @@
-import type { NodeType } from "../simulation"
+import { nodeType, type NodeType } from "../simulation"
 
 type Outputs = ["out"]
 
-const makeInputs = (numInputs: number) => [
-  { id: "control" } as const,
-  ...Array.from({ length: numInputs }, (_, i) => ({ id: `in${i}` as const })),
-]
-
-type Mux = NodeType<ReturnType<typeof makeInputs>, Outputs>
+type Mux = NodeType<Outputs>
 
 /**
  * Stores all the mux nodetypes created so far, based on their number of inputs.
@@ -23,12 +18,18 @@ export function makeMux(numInputs: number): Mux {
     return cache[numInputs]
   }
 
-  const inputs = makeInputs(numInputs)
-
-  const mux: Mux = {
-    inputs,
-    executeRising: (_, inputs) => ({ out: inputs[`in${inputs.control}`] }),
-  }
+  const mux: Mux = nodeType(
+    [
+      // The inputs of a mux are "control", and "in" followed by the index.
+      { id: "control" } as const,
+      ...Array.from({ length: numInputs }, (_, i) => ({
+        id: `in${i}` as const,
+      })),
+    ],
+    (_, inputs) => ({
+      out: inputs[`in${inputs.control}`],
+    }),
+  )
 
   cache[numInputs] = mux
 
