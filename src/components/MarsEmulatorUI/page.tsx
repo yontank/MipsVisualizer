@@ -55,7 +55,7 @@ export default function DemoPage() {
           </h2>
           <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight text-center mt-5">
             {" "}
-            Compile Some code and code so we'll show you what here boi
+            Write some MIPS Code, Compile it, and lets see what those wires do
           </h3>
         </div>
       </div>
