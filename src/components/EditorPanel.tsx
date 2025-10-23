@@ -70,7 +70,7 @@ export function EditorPanel(props: { editorInterface: Ref<EditorInterface> }) {
 
       <div>
         <Editor
-          height={"calc(100vh - 110px)"}
+          height={"calc(100vh - 112px)"}
           width={"375px"}
           defaultLanguage="mips"
           defaultValue={"# Write your code here.\n"}
