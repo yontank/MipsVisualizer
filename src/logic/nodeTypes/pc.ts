@@ -6,6 +6,7 @@ export const pc: NodeType<Outputs> = nodeType(
   [
     {
       id: "in",
+      falling: true,
     },
   ] as const,
   (simulation) => ({ out: simulation.pc }),
