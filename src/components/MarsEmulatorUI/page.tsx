@@ -1,10 +1,16 @@
 "use server"
+import { useSimulationContext } from "@/context/SimulationContext"
 import { columns, type CompiledMIPS } from "./columns"
 import { DataTable } from "./data-table"
 
-// async function getData(): Promise<Payment[]> {
+/**
+ * TODO: Intergrade simulation array of hexadecimal codes into here.
+ *
+ * @returns
+ */
 function getData(): CompiledMIPS[] {
   // Fetch data from your API here.
+
   return [
     {
       id: "",
@@ -34,8 +40,29 @@ function getData(): CompiledMIPS[] {
 }
 
 export default function DemoPage() {
+  const { simulation } = useSimulationContext()
   const data = getData()
-
+  /**
+   * If there's no Simulation object yet, it means we havent compiled the MIPS code to visualize it, show some boiler plate message about how
+   * he needs to compile to get the code
+   */
+  if (!simulation)
+    return (
+      <div className="container mx-auto py-15 w-[375px]">
+        <div>
+          <h2 className="scroll-m-20 text-center text-5xl font-bold tracking-tight text-balance">
+            No Compiled Code yet
+          </h2>
+          <h3 className="scroll-m-20 text-2xl font-semibold tracking-tight text-center mt-5">
+            {" "}
+            Compile Some code and code so we'll show you what here boi
+          </h3>
+        </div>
+      </div>
+    )
+  /**
+   * Simulation Exists, lets render the commands and each step
+   */
   return (
     <div className="container mx-auto py-10 w-[375px]">
       <DataTable
