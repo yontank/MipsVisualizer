@@ -1,10 +1,11 @@
 import Editor, { useMonaco, type OnMount } from "@monaco-editor/react"
 import { editor } from "monaco-editor"
-import { useEffect, useImperativeHandle, useState, type Ref } from "react"
+import { useImperativeHandle, useState, type Ref } from "react"
 import { Input } from "./ui/input"
 import { Label } from "@radix-ui/react-label"
 import { parseHex } from "@/lib/utils"
 import { useSimulationContext } from "@/context/SimulationContext"
+import { toast } from "sonner"
 
 /**
  * A generic interface for getting the text of a code editor.
@@ -53,13 +54,27 @@ export function EditorPanel(props: { editorInterface: Ref<EditorInterface> }) {
     ])
   }
 
+  if (error) {
+    toast.error("Error in line " + error.line, {
+      description: error.msg,
+      position: "bottom-left",
+      duration: 4500,
+      className: "!bg-red-700 !border-red-400",
+      classNames: {
+        title: "!text-white",
+        description: "!text-white !text-bold",
+        icon: "!text-white ",
+      },
+    })
+  }
+
   return (
     <>
       <div>
         <Label className="p-1">Initial PC:</Label>
         <Input
           maxLength={10}
-          className="m-1"
+          className="m-1 "
           placeholder="e.g 0x12345678"
           value={pcAddr}
           onChange={(e) => {

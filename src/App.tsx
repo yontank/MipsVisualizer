@@ -11,6 +11,7 @@ import EmulatorTableUI from "./components/MarsEmulatorUI/page"
 import { SimulationContextProvider } from "./context/SimulationContext"
 import { useRef } from "react"
 import { Diagram } from "./components/Diagram"
+import { Toaster } from "./components/ui/sonner"
 
 function App() {
   const editorInterface = useRef<EditorInterface>({ getValue: () => "" })
@@ -44,6 +45,7 @@ function App() {
         </div>
         <RegMemViewer />
       </div>
+      <Toaster />
     </SimulationContextProvider>
   )
 }

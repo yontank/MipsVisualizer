@@ -1,4 +1,5 @@
 import type { EditorInterface } from "@/components/EditorPanel"
+import { Toaster } from "@/components/ui/sonner"
 import { assemble } from "@/lib/assembler"
 import { newSimulation, type Simulation } from "@/logic/simulation"
 import {
@@ -48,8 +49,7 @@ export function SimulationContextProvider({ children }: Props) {
 
   const startSimulation = () => {
     if (editorRef.current == undefined)
-      throw Error("Undefined Reference to the editor"
-    )
+      throw Error("Undefined Reference to the editor")
     const value = editorRef.current.getValue()
 
     const r = assemble(value, Number(pcAddr))
