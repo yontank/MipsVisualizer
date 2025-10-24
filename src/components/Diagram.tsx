@@ -6,7 +6,9 @@ import { int2hex } from "@/lib/utils"
 /**
  * The stroke width of the duplicate wires for interaction, in pixels.
  */
-const INTERACTION_STROKE_WIDTH = 4
+const INTERACTION_STROKE_WIDTH = 6
+
+const strokeCSSVariable = (node: string, input: string) => `--${node}-${input}`
 
 export function Diagram(props: {
   simulation?: Simulation
@@ -27,15 +29,22 @@ export function Diagram(props: {
     const clones: HTMLElement[] = []
     // Iterate over all the wires, and make a clone that has a thicker stroke width.
     for (const e of current.querySelectorAll<HTMLElement>("[data-input]")) {
+      const nodeId = e.dataset.node!
+      const inputId = e.dataset.input!
+      e.style.strokeWidth = `var(${strokeCSSVariable(nodeId, inputId)}, inherit)`
+      e.style.transition = "stroke-width 0.25s"
+
       const clone = e.cloneNode(true) as HTMLElement
       clone.style.strokeWidth = INTERACTION_STROKE_WIDTH + "px"
-      clone.style.stroke = "transparent"
+      clone.style.visibility = "hidden"
+      clone.style.pointerEvents = "painted"
       clone.id = e.id + "-interact"
+      for (const child of clone.querySelectorAll<HTMLElement>("*")) {
+        child.style.removeProperty("stroke-width")
+      }
       current.appendChild(clone)
       clones.push(clone)
 
-      const nodeId = e.dataset.node!
-      const inputId = e.dataset.input!
       clone.addEventListener("mouseover", () => {
         setHoveredWire({ nodeId, inputId })
       })
@@ -63,16 +72,13 @@ export function Diagram(props: {
       <props.svg
         ref={svgRef}
         style={
-          props.simulation &&
-          Object.fromEntries(
-            Object.entries(props.simulation.inputValues).flatMap(
-              ([nodeId, input]) =>
-                Object.keys(input).map((inputId) => [
-                  `--${nodeId}-${inputId}`,
-                  "red",
-                ]),
-            ),
-          )
+          (props.simulation &&
+            hoveredWire &&
+            tooltipContent && {
+              [strokeCSSVariable(hoveredWire.nodeId, hoveredWire.inputId)]:
+                "2px",
+            }) ||
+          undefined
         }
       />
       {/* TODO control number of digits based on wire */}
