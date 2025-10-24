@@ -1,6 +1,11 @@
 import type { EditorInterface } from "@/components/EditorPanel"
 import { assemble } from "@/lib/assembler"
-import { type Simulation } from "@/logic/simulation"
+import { singleCycle } from "@/logic/blueprints/singleCycle"
+import {
+  newSimulation,
+  simulationStep,
+  type Simulation,
+} from "@/logic/simulation"
 import {
   createContext,
   useContext,
@@ -19,6 +24,10 @@ type Context = {
    * Compiles the code and starts the simulation.
    */
   startSimulation: () => void
+  /**
+   * Runs a single cycle of the simulation.
+   */
+  cycleSimulation: () => void
   /**
    * Stops the currently running simulation.
    */
@@ -76,12 +85,19 @@ export function SimulationContextProvider({ children }: Props) {
     } else if (r.kind == "result") {
       setError(undefined)
       setRightTabValue("debugger")
-
-      // TODO: In Good Compile, do dis PLS PLS PLS
+      setSimulation(newSimulation(singleCycle, r.data, Number(pcAddr)))
     } else {
       throw Error("how did we get here?")
     }
   }
+
+  const cycleSimulation = () => {
+    if (!simulation) {
+      return
+    }
+    setSimulation(simulationStep(simulation))
+  }
+
   const stopSimulation = () => {
     setSimulation(undefined)
     setError(undefined)
@@ -94,6 +110,7 @@ export function SimulationContextProvider({ children }: Props) {
         setRightTabValue,
         simulation,
         startSimulation,
+        cycleSimulation,
         stopSimulation,
         error,
         pcAddr,

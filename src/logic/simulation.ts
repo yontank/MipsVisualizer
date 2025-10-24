@@ -340,7 +340,6 @@ function getNodeInputs(
 }
 
 export function simulationStep(simulation: Simulation): Simulation {
-  console.log(simulation.state)
   if (simulation.state == "rising") {
     const newInputValues: typeof simulation.inputValues = {
       ...simulation.inputValues,
