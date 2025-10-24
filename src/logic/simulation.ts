@@ -231,11 +231,17 @@ export type Simulation = {
    */
   pendingNodes: Set<string>
   /**
-   * Whether the current cycle is finished.
+   * The current state of the simulation.
    *
-   * A cycle is considered finished when the only nodes who have pending inputs are cycle border nodes.
+   * During `"rising"`, inputs are propagated from node to node.
+   * When there are no more pending nodes, it transitions to "risingFinished"
+   *
+   * The next step after that, the `"executeFalling"` function will be called for all nodes
+   * that have one, after which the state will be `"fallingFinished"`.
+   *
+   * Afterwards, cycle border nodes will become pending again, transitioning back to `"rising"`.
    */
-  cycleFinished: boolean
+  state: "rising" | "risingFinished" | "fallingFinished"
 }
 
 /**
@@ -250,13 +256,20 @@ const nodeTarget = (
   target: NodeInputTarget,
 ): [nodeId: string, inputId: string] => [
   typeof target == "string" ? target : target.nodeId,
-  typeof target == "string" ? target : target.nodeId,
+  typeof target == "string" ? "in" : target.inputId,
 ]
 
 /**
  * Creates a new simulation and returns it.
+ * @param blueprint The blueprint that the simulation should be based on.
+ * @param instructionMemory The words for the instruction data.
+ * @param initialPC The address where the instruction memory should start from.
  */
-export function newSimulation(blueprint: Blueprint): Simulation {
+export function newSimulation(
+  blueprint: Blueprint,
+  instructionMemory: number[],
+  initialPC: number,
+): Simulation {
   const registers: number[] = []
 
   for (let i = 0; i < MAX_REGISTERS; i++) {
@@ -284,15 +297,20 @@ export function newSimulation(blueprint: Blueprint): Simulation {
     }
   }
 
+  const memory: Record<number, number> = {}
+  for (let i = 0; i < instructionMemory.length; i++) {
+    memory[initialPC + i * 4] = instructionMemory[i]
+  }
+
   return {
-    pc: 0, // TODO what should be the initial PC?
-    memory: {},
+    pc: initialPC,
+    memory,
     registers,
     nodes,
     cycleBorderNodes,
     inputValues: {},
-    pendingNodes: new Set(),
-    cycleFinished: false,
+    pendingNodes: new Set(cycleBorderNodes),
+    state: "rising",
   }
 }
 
@@ -306,50 +324,107 @@ function nodeHasAllInputs(simulation: Simulation, nodeId: string): boolean {
   )
 }
 
-export function simulationStep(simulation: Simulation): Simulation {
-  // If the previous step was the end of a cycle, the inputs' values will be cleared.
-  const newInputValues: typeof simulation.inputValues = simulation.cycleFinished
-    ? {}
-    : { ...simulation.inputValues }
-  const newPendingNodes: Set<string> = new Set()
-  let otherNodesHavePendingInputs = false
-
-  for (const nodeId of simulation.pendingNodes) {
-    const node = simulation.nodes[nodeId]
-    // Cycle border nodes only propagate their signals if the cycle is finished.
-    if (
-      (!node.cycleBorder || simulation.cycleFinished) &&
-      nodeHasAllInputs(simulation, nodeId)
-    ) {
-      // If a node has received values for all its inputs, we call its `execute` function
-      // and output its values.
-      let inputValues = simulation.inputValues[nodeId]
-      if (node.constantInputs) {
-        inputValues = { ...inputValues, ...node.constantInputs }
-      }
-      const outputs = node.type.executeRising(simulation, inputValues)
-      for (const outputId in outputs) {
-        const [targetNodeId, targetInputId] = nodeTarget(node.outputs[outputId])
-        const value = outputs[outputId]
-        newInputValues[targetNodeId] = {
-          ...newInputValues[targetNodeId],
-          [targetInputId]: value,
-        }
-        newPendingNodes.add(targetNodeId)
-        if (!simulation.nodes[targetNodeId].cycleBorder) {
-          otherNodesHavePendingInputs = true
-        }
-      }
-    } else {
-      newPendingNodes.add(nodeId)
-    }
+/**
+ * Returns an object containing all of a node's input values.
+ */
+function getNodeInputs(
+  simulation: Simulation,
+  nodeId: string,
+): Record<string, number> {
+  const node = simulation.nodes[nodeId]
+  let inputValues = simulation.inputValues[nodeId]
+  if (node.constantInputs) {
+    inputValues = { ...inputValues, ...node.constantInputs }
   }
+  return inputValues
+}
 
-  return {
-    ...simulation,
-    inputValues: newInputValues,
-    pendingNodes: newPendingNodes,
-    // A cycle is considered finished if the only nodes who have pending inputs are cycle border nodes.
-    cycleFinished: !otherNodesHavePendingInputs,
+export function simulationStep(simulation: Simulation): Simulation {
+  console.log(simulation.state)
+  if (simulation.state == "rising") {
+    const newInputValues: typeof simulation.inputValues = {
+      ...simulation.inputValues,
+    }
+    const newPendingNodes: Set<string> = new Set()
+
+    for (const nodeId of simulation.pendingNodes) {
+      const node = simulation.nodes[nodeId]
+      if (node.cycleBorder || nodeHasAllInputs(simulation, nodeId)) {
+        // If a node has received values for all its inputs, we call its `execute` function
+        // and output its values.
+        const inputValues = getNodeInputs(simulation, nodeId)
+
+        const outputs = node.type.executeRising(simulation, inputValues)
+        for (const outputId in outputs) {
+          // Forward each output value to its target input.
+          const [targetNodeId, targetInputId] = nodeTarget(
+            node.outputs[outputId],
+          )
+          const value = outputs[outputId]
+          newInputValues[targetNodeId] = {
+            ...newInputValues[targetNodeId],
+            [targetInputId]: value,
+          }
+
+          const targetNodeInput = simulation.nodes[
+            targetNodeId
+          ].type.inputs.find((i) => i.id == targetInputId)
+
+          if (!targetNodeInput) {
+            throw new Error(
+              `Attempt to forward value to undefined input '${targetInputId}' in node '${targetNodeId}'`,
+            )
+          }
+
+          if (!targetNodeInput.falling) {
+            // We'll add the target node to `pendingNodes` only if the input isn't a `falling` one.
+            newPendingNodes.add(targetNodeId)
+          }
+        }
+      } else {
+        newPendingNodes.add(nodeId)
+      }
+    }
+
+    return {
+      ...simulation,
+      inputValues: newInputValues,
+      pendingNodes: newPendingNodes,
+      // A cycle is finished if there are no more pending nodes.
+      state: newPendingNodes.size == 0 ? "risingFinished" : "rising",
+    }
+  } else if (simulation.state == "risingFinished") {
+    // In the `"risingFinished"` step, we call the `executeFalling` function of all nodes that have one.
+    const newSimulation: Simulation = {
+      ...simulation,
+      state: "fallingFinished",
+    }
+    for (const nodeId in simulation.nodes) {
+      const node = simulation.nodes[nodeId]
+      if (node.type.executeFalling) {
+        const change = node.type.executeFalling(
+          simulation,
+          getNodeInputs(simulation, nodeId),
+        )
+        if (change) {
+          if (change.type == "regset") {
+            newSimulation.registers[change.register] = change.value
+          } else if (change.type == "memset") {
+            newSimulation.memory[change.address] = change.value
+          } else if (change.type == "pcset") {
+            newSimulation.pc = change.value
+          }
+        }
+      }
+    }
+    return newSimulation
+  } else {
+    // In the `"fallingFinished"` step, we make all cycle border nodes pending and transition back to `"rising"`.
+    return {
+      ...simulation,
+      inputValues: {},
+      pendingNodes: new Set(simulation.cycleBorderNodes),
+      state: "rising",
+    }
   }
 }
