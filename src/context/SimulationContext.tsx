@@ -49,9 +49,7 @@ const SimulationContext = createContext<Context>(undefined!)
 
 export function SimulationContextProvider({ children }: Props) {
   //TODO: Use Set Simulation to connect it into startSimulation and hte latter
-  const [simulation, setSimulation] = useState<Simulation | undefined>(
-    undefined,
-  )
+  const [simulation, setSimulation] = useState<Simulation | undefined>()
   /** Customized PC Addresss, (Since in some tests it's changing.) */
   const [pcAddr, setPCAddr] = useState<string>("0x00400000")
   const [error, setError] = useState<
@@ -85,7 +83,9 @@ export function SimulationContextProvider({ children }: Props) {
     } else if (r.kind == "result") {
       setError(undefined)
       setRightTabValue("debugger")
-      setSimulation(newSimulation(singleCycle, r.data, Number(pcAddr)))
+      setSimulation(
+        newSimulation(singleCycle, r.data, Number(pcAddr), r.executionInfo),
+      )
     } else {
       throw Error("how did we get here?")
     }

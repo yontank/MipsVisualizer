@@ -54,7 +54,7 @@ type Instruction = {
   encode: (operands: number[]) => { error: string } | number
 }
 
-type ExecutionRow = {
+export type ExecutionRow = {
   address: number
   code: number
   source: string

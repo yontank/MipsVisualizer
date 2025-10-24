@@ -1,3 +1,5 @@
+import type { ExecutionRow } from "@/lib/assembler"
+
 /**
  * The number of registers in the CPU.
  */
@@ -208,6 +210,10 @@ export type Simulation = {
    */
   registers: number[]
   /**
+   * Information about the compiled code.
+   */
+  executionInfo: ExecutionRow[]
+  /**
    * A record where the key is an address number, and the value is the byte at that address.
    */
   memory: Record<number, number | undefined>
@@ -269,6 +275,7 @@ export function newSimulation(
   blueprint: Blueprint,
   instructionMemory: number[],
   initialPC: number,
+  executionInfo: ExecutionRow[],
 ): Simulation {
   const registers: number[] = []
 
@@ -304,6 +311,7 @@ export function newSimulation(
 
   return {
     pc: initialPC,
+    executionInfo,
     memory,
     registers,
     nodes,

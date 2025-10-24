@@ -1,38 +1,24 @@
 "use client"
 
+import type { ExecutionRow } from "@/lib/assembler"
+import { int2hex } from "@/lib/utils"
 import { type ColumnDef } from "@tanstack/react-table"
-import type { Hexadecimal } from "types"
 
-// This type is used to define the shape of our data.
-// You can use a Zod schema here if you want.
-export type CompiledMIPS = {
-  id: string
-  address: Hexadecimal
-  code: Hexadecimal
-  source: string
-}
-
-export const columns: ColumnDef<CompiledMIPS>[] = [
-  {
-    id: "id",
-  },
+export const columns: ColumnDef<ExecutionRow>[] = [
   {
     accessorKey: "address",
     header: "Address",
     cell: ({ row }) => {
-      const address = row.getValue("address") as Hexadecimal
+      const address = int2hex(row.getValue("address"))
 
-      return (
-        <div>{address}</div>
-        // </div>
-      )
+      return <div>{address}</div>
     },
   },
   {
     accessorKey: "code",
     header: "Code",
     cell: ({ row }) => {
-      const code = row.getValue("code") as Hexadecimal
+      const code = int2hex(row.getValue("code"))
       return <div>{code}</div>
     },
   },
