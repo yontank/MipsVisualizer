@@ -14,6 +14,7 @@ type Token = {
     | "lparen"
     | "rparen"
     | "eof"
+    | "comment"
   value: string
   numberValue?: number
 }
@@ -186,6 +187,8 @@ function readToken(state: CodeState): Token | Error {
       return { kind: "lparen", value: c }
     case ")":
       return { kind: "rparen", value: c }
+    case "#":
+      return { kind: "comment", value: c }
   }
 
   // Read register.
@@ -351,6 +354,18 @@ export function assemble(
         }
       }
     }
+
+    if (result.kind == "comment") {
+      let token = readToken(state)
+
+      while (
+        token.kind != "eof" &&
+        token.kind != "newline" &&
+        !state.reachedEnd
+      ) {
+        token = readToken(state)
+      }
+    }
   }
 
   return {
@@ -359,5 +374,3 @@ export function assemble(
     executionInfo,
   }
 }
-
-console.log(assemble("add $t4, $t5, $t6\nsub $0, $0, $0", 0x400000))
