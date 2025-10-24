@@ -26,9 +26,9 @@
      inkscape:pagecheckerboard="0"
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="px"
-     inkscape:zoom="8.5414051"
-     inkscape:cx="751.10592"
-     inkscape:cy="177.78105"
+     inkscape:zoom="4.4549819"
+     inkscape:cx="797.64634"
+     inkscape:cy="154.77055"
      inkscape:window-width="1920"
      inkscape:window-height="1008"
      inkscape:window-x="0"
@@ -766,8 +766,7 @@
          x="325.29752"
          y="60.338158"
          id="text86"
-         inkscape:label=""><title
-           id="title25">asdasdas</title><tspan
+         inkscape:label=""><tspan
            sodipodi:role="line"
            id="tspan86"
            style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:6.4px;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Bold';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;fill:#020000;fill-opacity:1;stroke:none;stroke-width:0.529167;stroke-dasharray:none"
@@ -1242,8 +1241,7 @@
        style="stroke-width:0.529167;stroke-dasharray:none;stroke:#000000;stroke-opacity:1"
        transform="translate(-10.102792)"
        data-node="muxRegDst"
-       data-input="in1"><title
-         id="title1">SplitterRDImmediate-MuxRegDst.Input2</title><path
+       data-input="in1"><path
          style="fill:none;fill-opacity:0"
          d="m 122.94722,199.17097 50.10395,0"
          id="path21"
