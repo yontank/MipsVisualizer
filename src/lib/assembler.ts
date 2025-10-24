@@ -345,7 +345,16 @@ export function assemble(
       })
       pc += 4
 
-      const next = readToken(state)
+      let next = readToken(state)
+      if (next.kind == "comment") {
+        while (
+          next.kind != "newline" &&
+          next.kind != "eof" &&
+          !state.reachedEnd
+        )
+          next = readToken(state)
+      }
+
       if (next.kind != "newline" && next.kind != "eof") {
         return {
           kind: "error",
