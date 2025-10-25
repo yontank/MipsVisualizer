@@ -3,7 +3,7 @@ import { useSimulationContext } from "@/context/SimulationContext"
 import { columns } from "./columns"
 import { DataTable } from "./data-table"
 
-export default function DemoPage() {
+export default function ExecutionPanel() {
   const { simulation } = useSimulationContext()
   /**
    * If there's no Simulation object yet, it means we havent compiled the MIPS code to visualize it, show some boiler plate message about how

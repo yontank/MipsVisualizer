@@ -7,7 +7,7 @@ import { type EditorInterface, EditorPanel } from "@/components/EditorPanel"
 import TestDiagram from "@/assets/diagram.svg?react"
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "./components/ui/tabs"
-import EmulatorTableUI from "./components/MarsEmulatorUI/page"
+import ExecutionPanel from "./components/ExecutionPanel"
 
 import { useRef } from "react"
 import { Diagram } from "./components/Diagram"
@@ -47,7 +47,7 @@ function App() {
           </TabsContent>
 
           <TabsContent value="debugger">
-            <EmulatorTableUI />
+            <ExecutionPanel />
           </TabsContent>
         </Tabs>
         <div className="flex-1 flex justify-center items-center overflow-auto min-w-36">
