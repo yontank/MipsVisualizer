@@ -4,7 +4,7 @@ import { columns } from "./columns"
 import { DataTable } from "./data-table"
 
 export default function ExecutionPanel() {
-  const { simulation } = useSimulationContext()
+  const { simulation, prevPc } = useSimulationContext()
   /**
    * If there's no Simulation object yet, it means we havent compiled the MIPS code to visualize it, show some boiler plate message about how
    * he needs to compile to get the code
@@ -32,7 +32,7 @@ export default function ExecutionPanel() {
         data={simulation.executionInfo}
         setRowStyle={(row) => {
           const address = row.original.address
-          if (address == simulation.pc) {
+          if (address == prevPc) {
             return {
               backgroundColor: "#a3deff",
               fontWeight: "bold",

@@ -37,6 +37,8 @@ type Context = {
   pcAddr: string
   setPCAddr: React.Dispatch<React.SetStateAction<string>>
 
+  prevPc: number | undefined
+
   rightTabValue: "IDE" | "debugger"
   setRightTabValue: React.Dispatch<React.SetStateAction<"IDE" | "debugger">>
 }
@@ -52,6 +54,7 @@ export function SimulationContextProvider({ children }: Props) {
   const [simulation, setSimulation] = useState<Simulation | undefined>()
   /** Customized PC Addresss, (Since in some tests it's changing.) */
   const [pcAddr, setPCAddr] = useState<string>("0x00400000")
+  const [prevPc, setPrevPc] = useState<number | undefined>()
   const [error, setError] = useState<
     { code?: number; line: number; msg: string } | undefined
   >(undefined)
@@ -83,6 +86,7 @@ export function SimulationContextProvider({ children }: Props) {
     } else if (r.kind == "result") {
       setError(undefined)
       setRightTabValue("debugger")
+      setPrevPc(undefined)
       setSimulation(
         newSimulation(singleCycle, r.data, Number(pcAddr), r.executionInfo),
       )
@@ -95,7 +99,12 @@ export function SimulationContextProvider({ children }: Props) {
     if (!simulation) {
       return
     }
-    setSimulation(simulationStep(simulation))
+    setPrevPc(simulation.pc)
+    let newSimulation = simulation
+    do {
+      newSimulation = simulationStep(newSimulation)
+    } while (newSimulation.state != "fallingFinished")
+    setSimulation(newSimulation)
   }
 
   const stopSimulation = () => {
@@ -115,6 +124,7 @@ export function SimulationContextProvider({ children }: Props) {
         error,
         pcAddr,
         setPCAddr,
+        prevPc,
         editorRef,
       }}
     >
