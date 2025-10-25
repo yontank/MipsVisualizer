@@ -170,9 +170,7 @@ function readToken(state: CodeState): Token | Error {
   }
 
   if (char(state) === "#") {
-    /** Sign for Comment */
-    while(!state.reachedEnd && state.index < state.code.length && state.code[state.index] != '\n')
-      advance(state)
+    while (!state.reachedEnd && state.code[state.index] != "\n") advance(state)
   }
 
   if (state.reachedEnd) {
@@ -359,12 +357,6 @@ export function assemble(
       }
     }
   }
-
-  console.log({
-    kind: "result",
-    data,
-    executionInfo,
-  })
 
   return {
     kind: "result",
