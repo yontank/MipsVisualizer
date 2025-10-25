@@ -201,7 +201,7 @@ function readToken(state: CodeState): Token | Error {
     }
 
     const numberValue = Number(value)
-    if (!isNaN(numberValue)) {
+    if (value != "" && !isNaN(numberValue)) {
       return {
         kind: "register",
         value,
