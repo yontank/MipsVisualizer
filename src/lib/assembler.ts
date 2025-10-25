@@ -169,6 +169,10 @@ function readToken(state: CodeState): Token | Error {
     advance(state)
   }
 
+  if (char(state) === "#") {
+    while (!state.reachedEnd && state.code[state.index] != "\n") advance(state)
+  }
+
   if (state.reachedEnd) {
     return { kind: "eof", value: "" }
   }
@@ -343,6 +347,7 @@ export function assemble(
       pc += 4
 
       const next = readToken(state)
+
       if (next.kind != "newline" && next.kind != "eof") {
         return {
           kind: "error",
@@ -359,5 +364,3 @@ export function assemble(
     executionInfo,
   }
 }
-
-console.log(assemble("add $t4, $t5, $t6\nsub $0, $0, $0", 0x400000))
