@@ -415,7 +415,7 @@ export function assemble(
     } else if (result.kind != "newline" && result.kind != "eof") {
       return {
         kind: "error",
-        errorMessage: `Invalid syntax. (Didn't expect "${result.value}" here)`,
+        errorMessage: `Invalid or unsupported instruction "${result.value}".`,
         line: state.line,
       }
     }
