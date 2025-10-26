@@ -55,7 +55,7 @@ function App() {
         </div>
         <RegMemViewer />
       </div>
-      <Toaster />
+      <Toaster  richColors visibleToasts={1} duration={10000} closeButton />
     </>
   )
 }
