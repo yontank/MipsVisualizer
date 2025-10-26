@@ -14,6 +14,7 @@ export const signExtend: NodeType<Outputs> = nodeType(
     },
   ] as const,
   (_, inputs) => ({
-    out: inputs.in | ((inputs.in & SIGN_BIT_16) == SIGN_BIT_16 ? 0xffff : 0),
+    out:
+      inputs.in | ((inputs.in & SIGN_BIT_16) == SIGN_BIT_16 ? 0xffff0000 : 0),
   }),
 )
