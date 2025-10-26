@@ -325,7 +325,8 @@ export function assemble(
       if (tokenIndex != instruction.syntax.length) {
         return {
           kind: "error",
-          errorMessage: "Invalid instruction syntax.",
+          errorMessage:
+            "Invalid instruction syntax. (Not enough parameters were given)",
           line: state.line,
         }
       }
@@ -354,6 +355,12 @@ export function assemble(
           errorMessage: "Expected newline after instruction.",
           line: state.line,
         }
+      }
+    } else if (result.kind != "newline" && result.kind != "eof") {
+      return {
+        kind: "error",
+        errorMessage: `Invalid syntax. (Didn't expect "${result.value}" here)`,
+        line: state.line,
       }
     }
   }
