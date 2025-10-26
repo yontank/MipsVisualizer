@@ -75,13 +75,6 @@ export function SimulationContextProvider({ children }: Props) {
       toast.error("Error in line " + r.line, {
         description: r.errorMessage,
         position: "bottom-left",
-        duration: 4500,
-        className: "!bg-red-700 !border-red-400",
-        classNames: {
-          title: "!text-white",
-          description: "!text-white !text-bold",
-          icon: "!text-white ",
-        },
       })
     } else if (r.kind == "result") {
       setError(undefined)
