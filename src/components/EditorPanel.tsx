@@ -5,6 +5,7 @@ import { Input } from "./ui/input"
 import { Label } from "@radix-ui/react-label"
 import { parseHex } from "@/lib/utils"
 import { useSimulationContext } from "@/context/SimulationContext"
+import { toast, useSonner } from "sonner"
 
 /**
  * A generic interface for getting the text of a code editor.
@@ -15,6 +16,8 @@ export interface EditorInterface {
 
 export function EditorPanel(props: { editorInterface: Ref<EditorInterface> }) {
   //TODO: Change ErrorLine to fit dynamically with Simulation context
+
+  const {toasts} = useSonner();
 
   const [decorations, setDecorations] = useState<
     editor.IEditorDecorationsCollection | undefined
@@ -70,11 +73,13 @@ export function EditorPanel(props: { editorInterface: Ref<EditorInterface> }) {
 
       <div>
         <Editor
+
           height={"calc(100vh - 112px)"}
           width={"375px"}
           defaultLanguage="mips"
           defaultValue={"# Write your code here.\n"}
           theme="vs-dark"
+          onChange={() => {toasts.forEach(t => toast.dismiss(t.id)); decorations?.clear()}}
           onMount={handleEditorDidMount}
           options={{
             readOnly: (!!simulation),
