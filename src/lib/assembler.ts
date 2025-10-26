@@ -43,10 +43,6 @@ type Instruction = {
    */
   syntax: Token["kind"][]
   /**
-   * The indices of tokens to take the values of.
-   */
-  capture: number[]
-  /**
    * Encodes the captured parameters into the instruction's machine code.
    * @param operands The values of the captured tokens.
    * @returns The encoded binary instruction, or an error message.
@@ -95,13 +91,11 @@ function encodeRType(
 const instructions: Record<string, Instruction> = {
   add: {
     syntax: ["register", "comma", "register", "comma", "register"],
-    capture: [0, 2, 4],
     encode: (operands) =>
       encodeRType(operands[1], operands[2], operands[0], 0, 0x20),
   },
   sub: {
     syntax: ["register", "comma", "register", "comma", "register"],
-    capture: [0, 2, 4],
     encode: (operands) =>
       encodeRType(operands[1], operands[2], operands[0], 0, 0x22),
   },
@@ -316,7 +310,7 @@ export function assemble(
             line: state.line,
           }
         }
-        if (instruction.capture.includes(tokenIndex)) {
+        if (token.kind == "register" || token.kind == "number") {
           params.push(token.numberValue!)
         }
         tokenIndex++
