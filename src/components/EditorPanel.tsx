@@ -20,7 +20,7 @@ export function EditorPanel(props: { editorInterface: Ref<EditorInterface> }) {
     editor.IEditorDecorationsCollection | undefined
   >(undefined)
   const monaco = useMonaco()
-  const { pcAddr, setPCAddr, editorRef, error } = useSimulationContext()
+  const { pcAddr, setPCAddr, editorRef, error , simulation} = useSimulationContext()
 
   useImperativeHandle(props.editorInterface, () => ({
     getValue: () => editorRef.current!.getValue(),
@@ -77,7 +77,7 @@ export function EditorPanel(props: { editorInterface: Ref<EditorInterface> }) {
           theme="vs-dark"
           onMount={handleEditorDidMount}
           options={{
-            // readOnly: true,
+            readOnly: (!!simulation),
             minimap: { enabled: false },
             overviewRulerLanes: 0,
             scrollbar: {
