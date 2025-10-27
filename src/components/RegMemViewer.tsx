@@ -11,45 +11,44 @@ import { DataTable } from "@/components/ui/VirtualizedTable"
 import type { ColumnDef } from "@tanstack/react-table"
 import { useState } from "react"
 import type { Hexadecimal } from "types"
-import {  int2hex } from "@/lib/utils"
+import { int2hex } from "@/lib/utils"
 import { MemoryInput } from "./MemoryInput"
+import { useSimulationContext } from "@/context/SimulationContext"
 
 const registerValues = [
+  { name: "pc", number: "", value: "0x00000000" },
   { name: "$zero", number: 0, value: "0x00000000" },
-  { name: "$at", number: 1, value: "0x00000001" },
-  { name: "$v0", number: 2, value: "" },
-  { name: "$v1", number: 3, value: "" },
-  { name: "$a0", number: 4, value: "" },
-  { name: "$a1", number: 5, value: "" },
-  { name: "$a2", number: 6, value: "" },
-  { name: "$a3", number: 7, value: "" },
-  { name: "$t0", number: 8, value: "" },
-  { name: "$t1", number: 9, value: "" },
-  { name: "$t2", number: 10, value: "" },
-  { name: "$t3", number: 11, value: "" },
-  { name: "$t4", number: 12, value: "" },
-  { name: "$t5", number: 13, value: "" },
-  { name: "$t6", number: 14, value: "" },
-  { name: "$t7", number: 15, value: "" },
-  { name: "$s0", number: 16, value: "" },
-  { name: "$s1", number: 17, value: "" },
-  { name: "$s2", number: 18, value: "" },
-  { name: "$s3", number: 19, value: "" },
-  { name: "$s4", number: 20, value: "" },
-  { name: "$s5", number: 21, value: "" },
-  { name: "$s6", number: 22, value: "" },
-  { name: "$s7", number: 23, value: "" },
-  { name: "$t8", number: 24, value: "" },
-  { name: "$t9", number: 25, value: "" },
-  { name: "$k0", number: 26, value: "" },
-  { name: "$k1", number: 27, value: "" },
-  { name: "$gp", number: 28, value: "" },
-  { name: "$sp", number: 29, value: "" },
-  { name: "$fp", number: 30, value: "" },
-  { name: "$ra", number: 31, value: "" },
-  { name: "pc", number: "", value: "" },
-  { name: "hi", number: "", value: "" },
-  { name: "lo", number: "", value: "" },
+  { name: "$at", number: 1, value: "0x0000000" },
+  { name: "$v0", number: 2, value: "0x00000000" },
+  { name: "$v1", number: 3, value: "0x00000000" },
+  { name: "$a0", number: 4, value: "0x00000000" },
+  { name: "$a1", number: 5, value: "0x00000000" },
+  { name: "$a2", number: 6, value: "0x00000000" },
+  { name: "$a3", number: 7, value: "0x00000000" },
+  { name: "$t0", number: 8, value: "0x00000000" },
+  { name: "$t1", number: 9, value: "0x00000000" },
+  { name: "$t2", number: 10, value: "0x00000000" },
+  { name: "$t3", number: 11, value: "0x00000000" },
+  { name: "$t4", number: 12, value: "0x00000000" },
+  { name: "$t5", number: 13, value: "0x00000000" },
+  { name: "$t6", number: 14, value: "0x00000000" },
+  { name: "$t7", number: 15, value: "0x00000000" },
+  { name: "$s0", number: 16, value: "0x00000000" },
+  { name: "$s1", number: 17, value: "0x00000000" },
+  { name: "$s2", number: 18, value: "0x00000000" },
+  { name: "$s3", number: 19, value: "0x00000000" },
+  { name: "$s4", number: 20, value: "0x00000000" },
+  { name: "$s5", number: 21, value: "0x00000000" },
+  { name: "$s6", number: 22, value: "0x00000000" },
+  { name: "$s7", number: 23, value: "0x00000000" },
+  { name: "$t8", number: 24, value: "0x00000000" },
+  { name: "$t9", number: 25, value: "0x00000000" },
+  { name: "$k0", number: 26, value: "0x00000000" },
+  { name: "$k1", number: 27, value: "0x00000000" },
+  { name: "$gp", number: 28, value: "0x00000000" },
+  { name: "$sp", number: 29, value: "0x00000000" },
+  { name: "$fp", number: 30, value: "0x00000000" },
+  { name: "$ra", number: 31, value: "0x00000000" },
 ]
 const columns: ColumnDef<{ address: string; value: string }>[] = [
   {
@@ -100,15 +99,13 @@ function MemoryTable() {
       value: string
     }[]
   >(createMemoryArr(500, 2048 * 4, knownMemValues))
+  const { simulation } = useSimulationContext()
 
   if (memoryArr === undefined) return <></>
-
-  // Get Ref of Virtuoso
 
   const handleSubmit = (value: number) => {
     setMemoryArr(createMemoryArr(value, 2048 * 8, knownMemValues))
   }
-
   return (
     <div>
       <MemoryInput onSubmit={handleSubmit} />
@@ -174,7 +171,10 @@ function RegMemViewer() {
           />
         </TabsContent>
 
-        <TabsContent value="memory" className="overflow-y-hidden overflow-x-hidden">
+        <TabsContent
+          value="memory"
+          className="overflow-y-hidden overflow-x-hidden"
+        >
           <MemoryTable />
         </TabsContent>
       </Tabs>
