@@ -34,11 +34,11 @@ function createMemoryArr(
 
 const emptyArr = createMemoryArr(1, 1024, new Map())
 /**
- * TODO: I need a bunch of things here, 
+ * TODO: I need a bunch of things here,
  * TODO: 1) on new Memory State, check if i need to create a new array.
  * TODO: 2) if there's a new memory state that is relevant to our memoryArr, re-render it through useSimulationContext re-render.
  * TODO: 3)  I don't think we need to create a setNewArr state, i may be wrong,  but we do need to check how it works.
- * 
+ *
  */
 export function GetTable() {
   const { simulation } = useSimulationContext()
@@ -51,6 +51,10 @@ export function GetTable() {
 
   /** Default Values for the Memory Register */
 
+  const handleSubmit = (value: number) => {
+    // setMemoryArr(createMemoryArr(value, 2048 * 8, knownMemValues))
+  }
+
   if (
     simulation == undefined ||
     simulation.memory == undefined ||
@@ -58,7 +62,8 @@ export function GetTable() {
   )
     return (
       <>
-        EMPTY!
+        <MemoryInput onSubmit={handleSubmit} />
+
         <DataTable
           columns={columns}
           data={emptyArr}
@@ -69,7 +74,8 @@ export function GetTable() {
 
   return (
     <>
-      STATE!
+      <MemoryInput onSubmit={handleSubmit} />
+
       <DataTable
         columns={columns}
         data={memoryArr}
