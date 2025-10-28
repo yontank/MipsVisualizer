@@ -2,19 +2,21 @@ import { int2hex } from "@/lib/utils"
 import { RegisterTable } from "./data-table"
 // import { type tableData } from "./columns"
 import { useSimulationContext } from "@/context/SimulationContext"
+import { useEffect, useState } from "react"
+import { type Simulation } from "@/logic/simulation"
 
 const registerValues = [
-  { name: "pc", number: "", value: "0x00000000" },
-  { name: "$zero", number: 0, value: "0x00000000" },
-  { name: "$at", number: 1, value: "0x0000000" },
-  { name: "$v0", number: 2, value: "0x00000000" },
-  { name: "$v1", number: 3, value: "0x00000000" },
-  { name: "$a0", number: 4, value: "0x00000000" },
-  { name: "$a1", number: 5, value: "0x00000000" },
-  { name: "$a2", number: 6, value: "0x00000000" },
-  { name: "$a3", number: 7, value: "0x00000000" },
-  { name: "$t0", number: 8, value: "0x00000000" },
-  { name: "$t1", number: 9, value: "0x00000000" },
+  { name: "pc", number: "", value:  "0x00000000" },
+  { name: "$zero", number: 0, value:"0x00000000" },
+  { name: "$at", number: 1, value:  "0x00000000" },
+  { name: "$v0", number: 2, value:  "0x00000000" },
+  { name: "$v1", number: 3, value:  "0x00000000" },
+  { name: "$a0", number: 4, value:  "0x00000000" },
+  { name: "$a1", number: 5, value:  "0x00000000" },
+  { name: "$a2", number: 6, value:  "0x00000000" },
+  { name: "$a3", number: 7, value:  "0x00000000" },
+  { name: "$t0", number: 8, value:  "0x00000000" },
+  { name: "$t1", number: 9, value:  "0x00000000" },
   { name: "$t2", number: 10, value: "0x00000000" },
   { name: "$t3", number: 11, value: "0x00000000" },
   { name: "$t4", number: 12, value: "0x00000000" },
@@ -41,6 +43,23 @@ const registerValues = [
 
 function Index() {
   const { simulation } = useSimulationContext()
+  const [curr, setCurr] = useState<number[]>(new Array(32).fill(0))
+  const [prev, setPrev] = useState<number[]>(new Array(32).fill(0))
+
+  useEffect(() => {
+    if (simulation == undefined) {
+      setPrev(new Array(32).fill(0))
+      setCurr(new Array(32).fill(0))
+    } else if (simulation != undefined) {
+      setPrev([...curr])
+
+      if (typeof simulation.registers == "object") {
+        setCurr(Object.values(simulation.registers))
+      } else {
+        setCurr([...simulation.registers])
+      }
+    }
+  }, [simulation])
 
   if (simulation == undefined)
     return (
@@ -49,6 +68,12 @@ function Index() {
         values={registerValues.map((e) => Object.values(e))}
       />
     )
+  const changedIndexes: number[] = []
+  for (let i = 0; i < curr.length; i++) {
+    if (curr[i] != prev[i]) {
+      changedIndexes.push(i)
+    }
+  }
 
   const modifiedRegArr: Array<{
     name: string
@@ -99,6 +124,16 @@ function Index() {
     <RegisterTable
       titles={Object.keys(modifiedRegArr[0])}
       values={modifiedRegArr.map((e) => Object.values(e))}
+      setRowStyle={(row) => {
+        // console.log("olla", row)
+        // console.log("arr", changedIndexes)
+        if (!row) return {}
+
+        if (changedIndexes.includes(row[1] as number))
+          return { backgroundColor: "burlywood" }
+
+        return {}
+      }}
     />
   )
 }
