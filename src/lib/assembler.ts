@@ -2,6 +2,14 @@ const spaceRegex = /[^\S\r\n]/
 const digitRegex = /\d/
 const wordRegex = /\w/
 
+const OFFSET_SHAMT = 6
+const OFFSET_RD = 11
+const OFFSET_RT = 16
+const OFFSET_RS = 21
+const OFFSET_OPCODE = 26
+
+const IMMEDIATE_MASK = 0xffff
+
 type Token = {
   kind:
     | "number"
@@ -43,10 +51,6 @@ type Instruction = {
    */
   syntax: Token["kind"][]
   /**
-   * The indices of tokens to take the values of.
-   */
-  capture: number[]
-  /**
    * Encodes the captured parameters into the instruction's machine code.
    * @param operands The values of the captured tokens.
    * @returns The encoded binary instruction, or an error message.
@@ -75,12 +79,6 @@ type AssembleResult = {
 /**
  * Encodes an R-Type instruction.
  * Assumes that all the parameters are not larger than their respective bit widths.
- * @param rs The RS bits.
- * @param rt The RT bits.
- * @param rd The RD bits.
- * @param shamt The SHAMT bits.
- * @param funct The FUNCT bits.
- * @returns The binary code of the instruction.
  */
 function encodeRType(
   rs: number,
@@ -89,21 +87,79 @@ function encodeRType(
   shamt: number,
   funct: number,
 ): number {
-  return funct | (shamt << 6) | (rd << 11) | (rt << 16) | (rs << 21)
+  return (
+    funct |
+    (shamt << OFFSET_SHAMT) |
+    (rd << OFFSET_RD) |
+    (rt << OFFSET_RT) |
+    (rs << OFFSET_RS)
+  )
+}
+
+/**
+ * Encodes an I-Type instruction.
+ * Assumes that all the parameters are not larger than their respective bit widths,
+ * except for `immediate`.
+ */
+function encodeIType(
+  opcode: number,
+  rs: number,
+  rt: number,
+  immediate: number,
+) {
+  return (
+    (opcode << OFFSET_OPCODE) |
+    (rt << OFFSET_RT) |
+    (rs << OFFSET_RS) |
+    (immediate & IMMEDIATE_MASK)
+  )
 }
 
 const instructions: Record<string, Instruction> = {
   add: {
     syntax: ["register", "comma", "register", "comma", "register"],
-    capture: [0, 2, 4],
     encode: (operands) =>
       encodeRType(operands[1], operands[2], operands[0], 0, 0x20),
   },
   sub: {
     syntax: ["register", "comma", "register", "comma", "register"],
-    capture: [0, 2, 4],
     encode: (operands) =>
       encodeRType(operands[1], operands[2], operands[0], 0, 0x22),
+  },
+  and: {
+    syntax: ["register", "comma", "register", "comma", "register"],
+    encode: (operands) =>
+      encodeRType(operands[1], operands[2], operands[0], 0, 0x24),
+  },
+  or: {
+    syntax: ["register", "comma", "register", "comma", "register"],
+    encode: (operands) =>
+      encodeRType(operands[1], operands[2], operands[0], 0, 0x25),
+  },
+  slt: {
+    syntax: ["register", "comma", "register", "comma", "register"],
+    encode: (operands) =>
+      encodeRType(operands[1], operands[2], operands[0], 0, 0x2a),
+  },
+  addi: {
+    syntax: ["register", "comma", "register", "comma", "number"],
+    encode: (operands) =>
+      encodeIType(0x8, operands[1], operands[0], operands[2]),
+  },
+  beq: {
+    syntax: ["register", "comma", "register", "comma", "number"],
+    encode: (operands) =>
+      encodeIType(0x4, operands[0], operands[1], operands[2]),
+  },
+  lw: {
+    syntax: ["register", "comma", "number", "lparen", "register", "rparen"],
+    encode: (operands) =>
+      encodeIType(0x23, operands[2], operands[0], operands[1]),
+  },
+  sw: {
+    syntax: ["register", "comma", "number", "lparen", "register", "rparen"],
+    encode: (operands) =>
+      encodeIType(0x2b, operands[2], operands[0], operands[1]),
   },
 }
 
@@ -226,7 +282,7 @@ function readToken(state: CodeState): Token | Error {
   }
 
   // Read number.
-  if (digitRegex.test(c)) {
+  if (digitRegex.test(c) || (c == "-" && digitRegex.test(char(state)))) {
     let value = c
     while (!state.reachedEnd && wordRegex.test(char(state))) {
       value += char(state)
@@ -316,7 +372,7 @@ export function assemble(
             line: state.line,
           }
         }
-        if (instruction.capture.includes(tokenIndex)) {
+        if (token.kind == "register" || token.kind == "number") {
           params.push(token.numberValue!)
         }
         tokenIndex++
@@ -325,7 +381,8 @@ export function assemble(
       if (tokenIndex != instruction.syntax.length) {
         return {
           kind: "error",
-          errorMessage: "Invalid instruction syntax.",
+          errorMessage:
+            "Invalid instruction syntax. (Not enough parameters were given)",
           line: state.line,
         }
       }
@@ -354,6 +411,12 @@ export function assemble(
           errorMessage: "Expected newline after instruction.",
           line: state.line,
         }
+      }
+    } else if (result.kind != "newline" && result.kind != "eof") {
+      return {
+        kind: "error",
+        errorMessage: `Invalid or unsupported instruction "${result.value}".`,
+        line: state.line,
       }
     }
   }
