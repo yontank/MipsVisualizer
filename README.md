@@ -13,6 +13,6 @@ The pipelined version of the CPU will be implemented in the future.
 After cloning the repo:
 
 ```bash
-npm i
+npm install
 npm run dev
 ```
