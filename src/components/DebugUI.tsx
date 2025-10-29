@@ -16,8 +16,26 @@ import { useSimulationContext } from "@/context/SimulationContext"
  * @returns
  */
 function DebugUI() {
-  const { stopSimulation, startSimulation, cycleSimulation, simulation } =
-    useSimulationContext()
+  const {
+    stopSimulation,
+    startSimulation,
+    cycleSimulation,
+    simulation,
+    pcAddr,
+  } = useSimulationContext()
+
+  /** Checks if PC Address is outside the scope of the known commands inside executionInfo.
+   * calculated by  the amount of commands there are, if its outside of that range,
+   * it means we're not inside the ExecutionRow Commands, and we need to let the user know he finished his execution.
+   */
+  const isPcAddressFinished = () => {
+    if (!simulation) return false
+
+    return (
+      Number(pcAddr) <= simulation.pc &&
+      simulation.pc < Number(pcAddr) + simulation?.executionInfo.length * 4
+    )
+  }
 
   return (
     <div className="absolute my-2.5 flex justify-center">
@@ -66,7 +84,7 @@ function DebugUI() {
                 <Button
                   variant="outline"
                   className="hover:text-green-600 cursor-pointer"
-                  disabled={!simulation}
+                  disabled={!simulation || !isPcAddressFinished()}
                   onClick={cycleSimulation}
                 >
                   <PlayIcon />
