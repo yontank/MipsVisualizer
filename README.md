@@ -16,3 +16,8 @@ After cloning the repo:
 npm install
 npm run dev
 ```
+
+## Small example
+
+https://github.com/user-attachments/assets/ad5bd1f9-e6a9-492a-addf-d3b1b164cf6a
+
