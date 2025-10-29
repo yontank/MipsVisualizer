@@ -248,6 +248,10 @@ export type Simulation = {
    * Afterwards, cycle border nodes will become pending again, transitioning back to `"rising"`.
    */
   state: "rising" | "risingFinished" | "fallingFinished"
+  /**
+   * The last changes that happened in this simulation.
+   */
+  lastChanges: SimulationChange[]
 }
 
 /**
@@ -319,6 +323,7 @@ export function newSimulation(
     inputValues: {},
     pendingNodes: new Set(cycleBorderNodes),
     state: "rising",
+    lastChanges: [],
   }
 }
 
@@ -399,12 +404,14 @@ export function simulationStep(simulation: Simulation): Simulation {
       pendingNodes: newPendingNodes,
       // A cycle is finished if there are no more pending nodes.
       state: newPendingNodes.size == 0 ? "risingFinished" : "rising",
+      lastChanges: [],
     }
   } else if (simulation.state == "risingFinished") {
     // In the `"risingFinished"` step, we call the `executeFalling` function of all nodes that have one.
     const newSimulation: Simulation = {
       ...simulation,
       state: "fallingFinished",
+      lastChanges: [],
     }
     for (const nodeId in simulation.nodes) {
       const node = simulation.nodes[nodeId]
@@ -427,6 +434,7 @@ export function simulationStep(simulation: Simulation): Simulation {
           } else if (change.type == "pcset") {
             newSimulation.pc = change.value
           }
+          newSimulation.lastChanges?.push(change)
         }
       }
     }
