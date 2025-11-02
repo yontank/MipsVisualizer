@@ -29,9 +29,8 @@ export const registerFile: NodeType<Outputs> = nodeType(
     data2: simulation.registers[inputs.readRegister2],
   }),
 
-  (simulation, inputs) => {
+  (_, inputs) => {
     if (inputs.controlRegWrite) {
-      simulation.registers[inputs.writeRegister] = inputs.writeData
       return {
         type: "regset",
         register: inputs.writeRegister,

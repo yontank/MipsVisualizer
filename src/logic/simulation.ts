@@ -418,10 +418,8 @@ export function simulationStep(simulation: Simulation): Simulation {
         )
         if (change) {
           if (change.type == "regset") {
-            newSimulation.registers = {
-              ...newSimulation.registers,
-              [change.register]: change.value,
-            }
+            newSimulation.registers = [...newSimulation.registers]
+            newSimulation.registers[change.register] = change.value
           } else if (change.type == "memset") {
             newSimulation.memory = {
               ...newSimulation.memory,
@@ -430,7 +428,7 @@ export function simulationStep(simulation: Simulation): Simulation {
           } else if (change.type == "pcset") {
             newSimulation.pc = change.value
           }
-          newSimulation.lastChanges?.push(change)
+          newSimulation.lastChanges.push(change)
         }
       }
     }
