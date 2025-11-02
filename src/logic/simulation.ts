@@ -1,9 +1,5 @@
+import { NUM_REGISTERS } from "@/constants"
 import type { ExecutionRow } from "@/lib/assembler"
-
-/**
- * The number of registers in the CPU.
- */
-export const MAX_REGISTERS = 32
 
 /**
  * A change that a node may want to make to a simulation's state.
@@ -283,7 +279,7 @@ export function newSimulation(
 ): Simulation {
   const registers: number[] = []
 
-  for (let i = 0; i < MAX_REGISTERS; i++) {
+  for (let i = 0; i < NUM_REGISTERS; i++) {
     registers.push(0)
   }
 
