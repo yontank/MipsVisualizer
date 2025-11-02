@@ -26,9 +26,9 @@
      inkscape:pagecheckerboard="0"
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="px"
-     inkscape:zoom="12.600592"
-     inkscape:cx="956.46304"
-     inkscape:cy="210.26791"
+     inkscape:zoom="6.300296"
+     inkscape:cx="792.10564"
+     inkscape:cy="614.97111"
      inkscape:window-width="1920"
      inkscape:window-height="1008"
      inkscape:window-x="0"
@@ -300,7 +300,7 @@
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:24.189px;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;writing-mode:lr-tb;direction:ltr;white-space:pre;shape-inside:url(#rect43);display:inline;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:2;stroke-dasharray:none;stroke-opacity:1;paint-order:fill markers stroke"><tspan
            x="1412.4453"
            y="708.61053"
-           id="tspan2">Address</tspan></text><text
+           id="tspan1">Address</tspan></text><text
          xml:space="preserve"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.39999998px;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.529167;stroke-dasharray:none;stroke-opacity:1;paint-order:fill markers stroke;font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal"
          x="360.0079"
@@ -941,7 +941,8 @@
        id="ALUControl-ALU"
        sodipodi:nodetypes="ccc"
        data-node="alu"
-       data-input="control" /><path
+       data-input="control"
+       data-bits="4" /><path
        style="opacity:1;fill:none;fill-opacity:0;stroke:#00a3de;stroke-width:0.529167;stroke-dasharray:none;stroke-opacity:1"
        d="m 346.09202,172.26593 h 6.50882 V 89.318091 h 5.49127"
        id="Zero"
