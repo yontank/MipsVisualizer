@@ -8,7 +8,9 @@ import {
 } from "@/components/ui/table"
 import { type tableData } from "./columns"
 
-export const RegisterTable = ({ titles, values, setRowStyle }: tableData) => {
+const titles = ["Name", "Number", "Value"]
+
+export const RegisterTable = ({ values, setRowStyle }: tableData) => {
   if (titles.length == 0 || values.length == 0) return <></>
 
   return (
@@ -16,15 +18,19 @@ export const RegisterTable = ({ titles, values, setRowStyle }: tableData) => {
       <TableHeader>
         <TableRow>
           {titles.map((e) => (
-            <>
-              <TableHead className="text-center">{e}</TableHead>
-            </>
+            <TableHead key={e} className="text-center">
+              {e}
+            </TableHead>
           ))}
         </TableRow>
       </TableHeader>
       <TableBody>
         {values.map((e, i) => (
-          <TableRow key={`row-${i}`} className={"odd:bg-gray-300 text-center"} style={typeof setRowStyle === "function" ? setRowStyle(e) : {}}>
+          <TableRow
+            key={`row-${i}`}
+            className={"odd:bg-gray-300 text-center"}
+            style={setRowStyle(e)}
+          >
             {e.map((t, j) => (
               <TableCell key={`cell-${j}`}>{t}</TableCell>
             ))}
