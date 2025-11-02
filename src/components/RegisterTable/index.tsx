@@ -39,7 +39,7 @@ function Index() {
         simulation ? int2hex(r.value(simulation)) : "0x00000000",
       ])}
       setRowStyle={(row) => {
-        if (regChange && regChange.register == Number(row[1])) {
+        if (regChange && String(regChange.register) == row[1]) {
           return { backgroundColor: "burlywood" }
         }
       }}

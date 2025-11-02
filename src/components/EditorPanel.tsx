@@ -15,15 +15,14 @@ export interface EditorInterface {
 }
 
 export function EditorPanel(props: { editorInterface: Ref<EditorInterface> }) {
-  //TODO: Change ErrorLine to fit dynamically with Simulation context
-
-  const {toasts} = useSonner();
+  const { toasts } = useSonner()
 
   const [decorations, setDecorations] = useState<
     editor.IEditorDecorationsCollection | undefined
   >(undefined)
   const monaco = useMonaco()
-  const { pcAddr, setPCAddr, editorRef, error , simulation} = useSimulationContext()
+  const { initialPC, setInitialPC, editorRef, error, simulation } =
+    useSimulationContext()
 
   useImperativeHandle(props.editorInterface, () => ({
     getValue: () => editorRef.current!.getValue(),
@@ -64,25 +63,27 @@ export function EditorPanel(props: { editorInterface: Ref<EditorInterface> }) {
           maxLength={10}
           className="m-1 "
           placeholder="e.g 0x12345678"
-          value={pcAddr}
+          value={initialPC}
           onChange={(e) => {
-            setPCAddr(parseHex(e.currentTarget.value))
+            setInitialPC(parseHex(e.currentTarget.value))
           }}
         />
       </div>
 
       <div>
         <Editor
-
           height={"calc(100vh - 112px)"}
           width={"375px"}
           defaultLanguage="mips"
           defaultValue={"# Write your code here.\n"}
           theme="vs-dark"
-          onChange={() => {toasts.forEach(t => toast.dismiss(t.id)); decorations?.clear()}}
+          onChange={() => {
+            toasts.forEach((t) => toast.dismiss(t.id))
+            decorations?.clear()
+          }}
           onMount={handleEditorDidMount}
           options={{
-            readOnly: (!!simulation),
+            readOnly: !!simulation,
             minimap: { enabled: false },
             overviewRulerLanes: 0,
             scrollbar: {

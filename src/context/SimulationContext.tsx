@@ -17,6 +17,7 @@ import { toast } from "sonner"
 
 type Context = {
   simulation?: Simulation
+  simulationIndex: number | undefined
 
   editorRef: RefObject<EditorInterface | undefined>
 
@@ -32,15 +33,33 @@ type Context = {
    * Stops the currently running simulation.
    */
   stopSimulation: () => void
+  /**
+   * Steps back one cycle.
+   */
+  undoSimulation: () => void
   error?: { code?: number; line: number; msg: string }
 
-  pcAddr: string
-  setPCAddr: React.Dispatch<React.SetStateAction<string>>
+  /**
+   * The address where the instruction memory starts.
+   */
+  initialPC: string
+  setInitialPC: React.Dispatch<React.SetStateAction<string>>
 
   prevPc: number | undefined
 
   rightTabValue: "IDE" | "debugger"
   setRightTabValue: React.Dispatch<React.SetStateAction<"IDE" | "debugger">>
+}
+
+type RunningState = {
+  /**
+   * Array of all simulation states in sequence.
+   */
+  simulations: Simulation[]
+  /**
+   * The index of the currently active state.
+   */
+  index: number
 }
 
 type Props = {
@@ -50,10 +69,8 @@ type Props = {
 const SimulationContext = createContext<Context>(undefined!)
 
 export function SimulationContextProvider({ children }: Props) {
-  //TODO: Use Set Simulation to connect it into startSimulation and hte latter
-  const [simulation, setSimulation] = useState<Simulation | undefined>()
-  /** Customized PC Addresss, (Since in some tests it's changing.) */
-  const [pcAddr, setPCAddr] = useState<string>("0x00400000")
+  const [runningState, setRunningState] = useState<RunningState | undefined>()
+  const [initialPC, setInitialPC] = useState<string>("0x00400000")
   const [prevPc, setPrevPc] = useState<number | undefined>()
   const [error, setError] = useState<
     { code?: number; line: number; msg: string } | undefined
@@ -66,9 +83,8 @@ export function SimulationContextProvider({ children }: Props) {
       throw Error("Undefined Reference to the editor")
     const value = editorRef.current.getValue()
 
-    const r = assemble(value, Number(pcAddr))
+    const r = assemble(value, Number(initialPC))
 
-    // TODO: If code not compiled por favor
     if (r.kind == "error") {
       setError({ msg: r.errorMessage, line: r.line })
 
@@ -80,29 +96,60 @@ export function SimulationContextProvider({ children }: Props) {
       setError(undefined)
       setRightTabValue("debugger")
       setPrevPc(undefined)
-      setSimulation(
-        newSimulation(singleCycle, r.data, Number(pcAddr), r.executionInfo),
-      )
+      setRunningState({
+        index: 0,
+        simulations: [
+          newSimulation(
+            singleCycle,
+            r.data,
+            Number(initialPC),
+            r.executionInfo,
+          ),
+        ],
+      })
     } else {
       throw Error("how did we get here?")
     }
   }
 
-  const cycleSimulation = () => {
-    if (!simulation) {
+  const setSimulationIndex = (index: number) => {
+    if (!runningState) {
       return
     }
-    setPrevPc(simulation.pc)
-    let newSimulation = simulation
-    do {
-      newSimulation = simulationStep(newSimulation)
-    } while (newSimulation.state != "fallingFinished")
-    setSimulation(newSimulation)
+
+    while (index >= runningState.simulations.length) {
+      let newSimulation =
+        runningState.simulations[runningState.simulations.length - 1]
+      do {
+        newSimulation = simulationStep(newSimulation)
+      } while (newSimulation.state != "fallingFinished")
+      runningState.simulations.push(newSimulation)
+    }
+
+    runningState.index = index
+
+    setPrevPc(index == 0 ? undefined : runningState.simulations[index - 1].pc)
+
+    setRunningState(runningState)
+  }
+
+  const cycleSimulation = () => {
+    if (!runningState) {
+      return
+    }
+    setSimulationIndex(runningState.index + 1)
   }
 
   const stopSimulation = () => {
-    setSimulation(undefined)
+    setRunningState(undefined)
     setError(undefined)
+  }
+
+  const undoSimulation = () => {
+    if (!runningState || runningState.index == 0) {
+      return
+    }
+    setSimulationIndex(runningState.index - 1)
   }
 
   return (
@@ -110,13 +157,15 @@ export function SimulationContextProvider({ children }: Props) {
       value={{
         rightTabValue,
         setRightTabValue,
-        simulation,
+        simulation: runningState?.simulations[runningState.index],
+        simulationIndex: runningState?.index,
         startSimulation,
         cycleSimulation,
         stopSimulation,
+        undoSimulation,
         error,
-        pcAddr,
-        setPCAddr,
+        initialPC,
+        setInitialPC,
         prevPc,
         editorRef,
       }}
@@ -127,8 +176,4 @@ export function SimulationContextProvider({ children }: Props) {
 }
 
 // eslint-disable-next-line react-refresh/only-export-components
-export const useSimulationContext = () => {
-  const context = useContext(SimulationContext)
-
-  return context
-}
+export const useSimulationContext = () => useContext(SimulationContext)

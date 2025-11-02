@@ -20,8 +20,10 @@ function DebugUI() {
     stopSimulation,
     startSimulation,
     cycleSimulation,
+    undoSimulation,
     simulation,
-    pcAddr,
+    simulationIndex,
+    initialPC,
   } = useSimulationContext()
 
   /** Checks if PC Address is outside the scope of the known commands inside executionInfo.
@@ -32,8 +34,8 @@ function DebugUI() {
     if (!simulation) return false
 
     return (
-      Number(pcAddr) <= simulation.pc &&
-      simulation.pc < Number(pcAddr) + simulation?.executionInfo.length * 4
+      Number(initialPC) <= simulation.pc &&
+      simulation.pc < Number(initialPC) + simulation?.executionInfo.length * 4
     )
   }
 
@@ -75,7 +77,7 @@ function DebugUI() {
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
-                <p>stop</p>
+                <p>Stop</p>
               </TooltipContent>
             </Tooltip>
 
@@ -91,7 +93,7 @@ function DebugUI() {
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
-                <p>Play</p>
+                <p>Next Cycle</p>
               </TooltipContent>
             </Tooltip>
 
@@ -100,14 +102,14 @@ function DebugUI() {
                 <Button
                   variant={"outline"}
                   className="hover:text-red-600 cursor-pointer"
-                  disabled={!simulation}
-                  // TODO: needs to be implemented in simulation for function call.
+                  disabled={!simulation || simulationIndex == 0}
+                  onClick={undoSimulation}
                 >
                   <Undo2Icon />
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
-                <p>Undo</p>
+                <p>Previous Cycle</p>
               </TooltipContent>
             </Tooltip>
           </ButtonGroup>
