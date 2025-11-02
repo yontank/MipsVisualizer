@@ -16,7 +16,7 @@ export function Diagram(props: {
 }) {
   const svgRef = useRef<SVGSVGElement | null>(null)
   const [hoveredWire, setHoveredWire] = useState<
-    { nodeId: string; inputId: string } | undefined
+    { nodeId: string; inputId: string; bits: number } | undefined
   >(undefined)
 
   useEffect(() => {
@@ -45,8 +45,10 @@ export function Diagram(props: {
       current.appendChild(clone)
       clones.push(clone)
 
+      const bits = Number(e.dataset.bits ?? "32")
+
       clone.addEventListener("mouseover", () => {
-        setHoveredWire({ nodeId, inputId })
+        setHoveredWire({ nodeId, inputId, bits })
       })
       clone.addEventListener("mouseleave", () => {
         setHoveredWire(undefined)
@@ -65,7 +67,8 @@ export function Diagram(props: {
     props.simulation &&
     props.simulation.inputValues[hoveredWire.nodeId]?.[hoveredWire.inputId]
   const tooltipContent =
-    hoveredWireValue != undefined && int2hex(hoveredWireValue)
+    hoveredWireValue != undefined &&
+    int2hex(hoveredWireValue, Math.ceil(hoveredWire!.bits / 4))
 
   return (
     <>
@@ -81,7 +84,6 @@ export function Diagram(props: {
           undefined
         }
       />
-      {/* TODO control number of digits based on wire */}
       {tooltipContent ? (
         <MouseTooltip>{tooltipContent}</MouseTooltip>
       ) : undefined}
