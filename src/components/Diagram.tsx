@@ -84,9 +84,7 @@ export function Diagram(props: {
           undefined
         }
       />
-      {tooltipContent ? (
-        <MouseTooltip>{tooltipContent}</MouseTooltip>
-      ) : undefined}
+      <MouseTooltip show={!!tooltipContent}>{tooltipContent}</MouseTooltip>
     </>
   )
 }

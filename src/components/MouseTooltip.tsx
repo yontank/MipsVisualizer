@@ -5,14 +5,14 @@ import { Card } from "./ui/card"
 /**
  * A tooltip that follows the mouse.
  */
-export function MouseTooltip(props: { children: ReactNode }) {
+export function MouseTooltip(props: { show: boolean; children: ReactNode }) {
   // On the first render of this component, a `mousemove` event hasn't fired yet -
   // so we wait for the first mouse movement before showing the component.
-  const [mousePos, setMousePos] = useState({ x: 0, y: 0, moved: false })
+  const [mousePos, setMousePos] = useState({ x: 0, y: 0 })
 
   useEffect(() => {
     const listener = (e: MouseEvent) => {
-      setMousePos({ x: e.pageX, y: e.pageY, moved: true })
+      setMousePos({ x: e.pageX, y: e.pageY })
     }
     window.addEventListener("mousemove", listener)
     return () => {
@@ -20,7 +20,7 @@ export function MouseTooltip(props: { children: ReactNode }) {
     }
   }, [])
 
-  return mousePos.moved
+  return props.show
     ? createPortal(
         <Card
           className="w-fit p-2 absolute pointer-events-none"
