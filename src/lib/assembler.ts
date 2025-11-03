@@ -10,7 +10,8 @@ const OFFSET_RT = 16
 const OFFSET_RS = 21
 const OFFSET_OPCODE = 26
 
-const IMMEDIATE_MASK = 0xffff
+const R_IMMEDIATE_MASK = 0xffff
+const J_IMMEDIATE_MASK = 0x3ffffff
 
 type Token = {
   kind:
@@ -113,8 +114,15 @@ function encodeIType(
     (opcode << OFFSET_OPCODE) |
     (rt << OFFSET_RT) |
     (rs << OFFSET_RS) |
-    (immediate & IMMEDIATE_MASK)
+    (immediate & R_IMMEDIATE_MASK)
   )
+}
+
+/**
+ * Encodes a J-Type instruction.
+ */
+function encodeJType(opcode: number, immediate: number) {
+  return (opcode << OFFSET_OPCODE) | (immediate & J_IMMEDIATE_MASK)
 }
 
 const instructions: Record<string, Instruction> = {
@@ -162,6 +170,10 @@ const instructions: Record<string, Instruction> = {
     syntax: ["register", "comma", "number", "lparen", "register", "rparen"],
     encode: (operands) =>
       encodeIType(0x2b, operands[2], operands[0], operands[1]),
+  },
+  j: {
+    syntax: ["number"],
+    encode: (operands) => encodeJType(0x02, operands[0]),
   },
 }
 
