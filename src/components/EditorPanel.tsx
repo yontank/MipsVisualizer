@@ -31,17 +31,19 @@ export function EditorPanel(props: { editorInterface: Ref<EditorInterface> }) {
   }))
 
   useEffect(() => {
-    addEventListener("beforeunload", () => {
+    const handleBeforeUnload = () => {
       const { current } = editorRef
       if (current == undefined || current.getValue() == "")
         localStorage.removeItem(LOCAL_STORAGE_EDITOR_KEY)
       else localStorage.setItem(LOCAL_STORAGE_EDITOR_KEY, current.getValue())
-    })
+    }
+
+    addEventListener("beforeunload", handleBeforeUnload)
 
     return () => {
-      window.removeEventListener("beforeunload", () => {})
+      window.removeEventListener("beforeunload", handleBeforeUnload)
     }
-  }, [])
+  }, [editorRef])
 
   const handleEditorDidMount: OnMount = (editor) => {
     editorRef.current = editor
