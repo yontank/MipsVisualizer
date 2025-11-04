@@ -179,7 +179,7 @@ export function RegisterTable() {
               <TableCell>{r.name}</TableCell>
               <TableCell>{r.number}</TableCell>
               <TableCell>
-                {editingValues && r.number !== undefined ? (
+                {editingValues && r.number !== undefined && r.number > 0 ? (
                   <input
                     className="outline rounded-sm focus-visible:ring-ring/50 focus-visible:ring-[3px]"
                     value={editingValues[r.number]}
