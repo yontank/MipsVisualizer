@@ -50,10 +50,10 @@ export function EditorPanel(props: { editorInterface: Ref<EditorInterface> }) {
 
     if (editorValue == null) {
       editor.setPosition({ lineNumber: 2, column: 1 })
-      editor.focus()
     } else {
       editor.getModel()?.setValue(editorValue)
     }
+    editor.focus()
 
     setDecorations(editor.createDecorationsCollection())
   }
