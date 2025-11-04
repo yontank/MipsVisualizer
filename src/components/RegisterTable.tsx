@@ -12,7 +12,7 @@ import { NUM_REGISTERS, registerNames } from "@/constants"
 import type { Simulation } from "@/logic/simulation"
 import { Button } from "./ui/button"
 import { Asterisk, Check, Edit } from "lucide-react"
-import { useState, type ReactNode } from "react"
+import { useEffect, useState, type ReactNode } from "react"
 import {
   Dialog,
   DialogClose,
@@ -129,6 +129,12 @@ export function RegisterTable() {
     setInitialRegisters(editingValues!.map((v) => Number(v) & MASK_32))
   }
 
+  useEffect(() => {
+    if (simulation != undefined) {
+      setEditingValues(undefined)
+    }
+  }, [simulation])
+
   return (
     <>
       <div className="p-2 flex gap-2">
@@ -149,7 +155,12 @@ export function RegisterTable() {
             </Button>
           </>
         ) : (
-          <Button className="grow" variant="outline" onClick={startEditing}>
+          <Button
+            className="grow"
+            variant="outline"
+            onClick={startEditing}
+            disabled={!!simulation}
+          >
             <Edit />
             Edit
           </Button>
