@@ -1,4 +1,5 @@
 import type { EditorInterface } from "@/components/EditorPanel"
+import { NUM_REGISTERS } from "@/constants"
 import { assemble } from "@/lib/assembler"
 import { singleCycle } from "@/logic/blueprints/singleCycle"
 import {
@@ -45,6 +46,9 @@ type Context = {
   initialPC: string
   setInitialPC: React.Dispatch<React.SetStateAction<string>>
 
+  initialRegisters: number[]
+  setInitialRegisters: React.Dispatch<React.SetStateAction<number[]>>
+
   prevPc: number | undefined
 
   rightTabValue: "IDE" | "debugger"
@@ -68,6 +72,8 @@ type Props = {
 
 const SimulationContext = createContext<Context>(undefined!)
 
+const zeroRegisters = Array.from({ length: NUM_REGISTERS }, () => 0)
+
 export function SimulationContextProvider({ children }: Props) {
   const [runningState, setRunningState] = useState<RunningState | undefined>()
   const [initialPC, setInitialPC] = useState<string>("0x00400000")
@@ -76,6 +82,8 @@ export function SimulationContextProvider({ children }: Props) {
     { code?: number; line: number; msg: string } | undefined
   >(undefined)
   const [rightTabValue, setRightTabValue] = useState<"IDE" | "debugger">("IDE")
+  const [initialRegisters, setInitialRegisters] =
+    useState<number[]>(zeroRegisters)
   const editorRef = useRef<EditorInterface | undefined>(undefined)
 
   const startSimulation = () => {
@@ -104,6 +112,7 @@ export function SimulationContextProvider({ children }: Props) {
             r.data,
             Number(initialPC),
             r.executionInfo,
+            initialRegisters,
           ),
         ],
       })
@@ -166,6 +175,8 @@ export function SimulationContextProvider({ children }: Props) {
         error,
         initialPC,
         setInitialPC,
+        initialRegisters,
+        setInitialRegisters,
         prevPc,
         editorRef,
       }}

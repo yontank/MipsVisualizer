@@ -8,10 +8,11 @@ import {
 } from "@/components/ui/table"
 import { int2hex } from "@/lib/utils"
 import { useSimulationContext } from "@/context/SimulationContext"
-import { registerNames } from "@/constants"
+import { NUM_REGISTERS, registerNames } from "@/constants"
 import type { Simulation } from "@/logic/simulation"
 import { Button } from "./ui/button"
-import { Edit } from "lucide-react"
+import { Check, Edit } from "lucide-react"
+import { useState } from "react"
 
 /**
  * An array of each register row, where each row contains:
@@ -37,18 +38,43 @@ const registers: {
 
 const titles = ["Name", "Number", "Value"]
 
+const MASK_32 = 0xffffffff
+
 function Index() {
-  const { simulation } = useSimulationContext()
+  const { simulation, initialRegisters, setInitialRegisters } =
+    useSimulationContext()
+  const [editingValues, setEditingValues] = useState<string[]>()
 
   const regChange = simulation?.lastChanges.find((c) => c.type == "regset")
+
+  const startEditing = () => {
+    setEditingValues(
+      initialRegisters?.map((r) => int2hex(r)) ??
+        Array.from({ length: NUM_REGISTERS }, () => "0x00000000"),
+    )
+  }
+
+  const stopEditing = () => {
+    setEditingValues(undefined)
+    setInitialRegisters(editingValues!.map((v) => Number(v) & MASK_32))
+  }
 
   return (
     <>
       <div className="p-2">
-        <Button variant="outline" className="w-full">
-          <Edit />
-          Edit
-        </Button>
+        {editingValues ? (
+          <>
+            <Button variant="outline" onClick={stopEditing}>
+              <Check />
+              Done
+            </Button>
+          </>
+        ) : (
+          <Button variant="outline" onClick={startEditing}>
+            <Edit />
+            Edit
+          </Button>
+        )}
       </div>
       <Table>
         <TableHeader>
@@ -74,7 +100,23 @@ function Index() {
               <TableCell>{r.name}</TableCell>
               <TableCell>{r.number}</TableCell>
               <TableCell>
-                {simulation ? int2hex(r.value(simulation)) : "0x00000000"}
+                {editingValues && r.number !== undefined ? (
+                  <input
+                    className="outline rounded-sm focus-visible:ring-ring/50 focus-visible:ring-[3px]"
+                    value={editingValues[r.number]}
+                    onChange={(e) =>
+                      setEditingValues(
+                        editingValues.map((v, i) =>
+                          i == r.number ? e.target.value : v,
+                        ),
+                      )
+                    }
+                  />
+                ) : simulation ? (
+                  int2hex(r.value(simulation))
+                ) : (
+                  int2hex(r.number ? initialRegisters[r.number] : 0)
+                )}
               </TableCell>
             </TableRow>
           ))}

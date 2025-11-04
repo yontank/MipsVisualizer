@@ -270,19 +270,16 @@ const nodeTarget = (
  * @param blueprint The blueprint that the simulation should be based on.
  * @param instructionMemory The words for the instruction data.
  * @param initialPC The address where the instruction memory should start from.
+ * @param executionInfo The execution info table returned from `assemble`.
+ * @param initialRegisters Initial values for the registers.
  */
 export function newSimulation(
   blueprint: Blueprint,
   instructionMemory: number[],
   initialPC: number,
   executionInfo: ExecutionRow[],
+  initialRegisters?: number[],
 ): Simulation {
-  const registers: number[] = []
-
-  for (let i = 0; i < NUM_REGISTERS; i++) {
-    registers.push(0)
-  }
-
   const nodes: Record<string, Node> = {}
   const cycleBorderNodes: string[] = []
   for (const nodeId in blueprint.nodes) {
@@ -313,7 +310,8 @@ export function newSimulation(
     pc: initialPC,
     executionInfo,
     memory,
-    registers,
+    registers:
+      initialRegisters ?? Array.from({ length: NUM_REGISTERS }, () => 0),
     nodes,
     cycleBorderNodes,
     inputValues: {},
