@@ -11,8 +11,22 @@ import { useSimulationContext } from "@/context/SimulationContext"
 import { NUM_REGISTERS, registerNames } from "@/constants"
 import type { Simulation } from "@/logic/simulation"
 import { Button } from "./ui/button"
-import { Check, Edit } from "lucide-react"
-import { useState } from "react"
+import { Asterisk, Check, Edit } from "lucide-react"
+import { useState, type ReactNode } from "react"
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogFooter,
+  DialogHeader,
+  DialogTrigger,
+} from "./ui/dialog"
+import { Label } from "./ui/label"
+import { Input } from "./ui/input"
+import { RadioGroup, RadioGroupItem } from "./ui/radio-group"
+import { DialogTitle } from "@radix-ui/react-dialog"
+
+type RegisterSetMode = "set" | "multiply"
 
 /**
  * An array of each register row, where each row contains:
@@ -40,7 +54,63 @@ const titles = ["Name", "Number", "Value"]
 
 const MASK_32 = 0xffffffff
 
-function Index() {
+function SetRegistersDialog(props: {
+  trigger: ReactNode
+  setEditingValues: (s: string[]) => void
+}) {
+  const [regMultiplier, setRegMultiplier] = useState("1")
+  const [changeMode, setChangeMode] = useState<RegisterSetMode>("set")
+
+  const setValues = () => {
+    const value = Number(regMultiplier)
+    props.setEditingValues(
+      Array.from({ length: NUM_REGISTERS }, (_, i) => {
+        return int2hex(changeMode == "set" ? value : i * value)
+      }),
+    )
+  }
+
+  return (
+    <Dialog>
+      <DialogTrigger asChild>{props.trigger}</DialogTrigger>
+      <DialogContent className="sm:max-w-md">
+        <DialogHeader>
+          <DialogTitle>Set Registers</DialogTitle>
+        </DialogHeader>
+        <RadioGroup
+          value={changeMode}
+          onValueChange={(v: RegisterSetMode) => setChangeMode(v)}
+        >
+          <div className="flex gap-2">
+            <RadioGroupItem id="registerValueSet" value="set" />
+            <Label htmlFor="registerValueSet">
+              Set each register's value to this
+            </Label>
+          </div>
+          <div className="flex gap-2">
+            <RadioGroupItem id="registerValueMultiply" value="multiply" />
+            <Label htmlFor="registerValueMultiply">
+              Multiply each register's index by this
+            </Label>
+          </div>
+        </RadioGroup>
+        <Input
+          value={regMultiplier}
+          onChange={(e) => setRegMultiplier(e.target.value)}
+        />
+        <DialogFooter>
+          <DialogClose asChild>
+            <Button variant="outline" onClick={setValues}>
+              Set
+            </Button>
+          </DialogClose>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+export function RegisterTable() {
   const { simulation, initialRegisters, setInitialRegisters } =
     useSimulationContext()
   const [editingValues, setEditingValues] = useState<string[]>()
@@ -61,16 +131,25 @@ function Index() {
 
   return (
     <>
-      <div className="p-2">
+      <div className="p-2 flex gap-2">
         {editingValues ? (
           <>
-            <Button variant="outline" onClick={stopEditing}>
+            <SetRegistersDialog
+              setEditingValues={setEditingValues}
+              trigger={
+                <Button className="grow" variant="outline">
+                  <Asterisk />
+                  Set All...
+                </Button>
+              }
+            />
+            <Button className="grow" variant="outline" onClick={stopEditing}>
               <Check />
               Done
             </Button>
           </>
         ) : (
-          <Button variant="outline" onClick={startEditing}>
+          <Button className="grow" variant="outline" onClick={startEditing}>
             <Edit />
             Edit
           </Button>
@@ -125,5 +204,3 @@ function Index() {
     </>
   )
 }
-
-export default Index

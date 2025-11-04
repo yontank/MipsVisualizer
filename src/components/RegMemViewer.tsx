@@ -1,7 +1,7 @@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 
 import { MemoryTable } from "./MemoryTable"
-import RegisterTable from "./RegisterTable"
+import { RegisterTable } from "./RegisterTable"
 
 function RegMemViewer() {
   return (
