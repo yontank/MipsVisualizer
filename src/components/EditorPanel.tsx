@@ -1,6 +1,6 @@
 import Editor, { useMonaco, type OnMount } from "@monaco-editor/react"
 import { editor } from "monaco-editor"
-import { useImperativeHandle, useState, type Ref } from "react"
+import { useEffect, useImperativeHandle, useState, type Ref } from "react"
 import { Input } from "./ui/input"
 import { Label } from "@radix-ui/react-label"
 import { parseHex } from "@/lib/utils"
@@ -13,6 +13,8 @@ import { toast, useSonner } from "sonner"
 export interface EditorInterface {
   getValue: () => string
 }
+
+const LOCAL_STORAGE_EDITOR_KEY = "editorText"
 
 export function EditorPanel(props: { editorInterface: Ref<EditorInterface> }) {
   const { toasts } = useSonner()
@@ -28,11 +30,33 @@ export function EditorPanel(props: { editorInterface: Ref<EditorInterface> }) {
     getValue: () => editorRef.current!.getValue(),
   }))
 
+  useEffect(() => {
+    const onBeforeUnload = () => {
+      const { current } = editorRef
+      if (current == undefined || current.getValue() == "")
+        localStorage.removeItem(LOCAL_STORAGE_EDITOR_KEY)
+      else localStorage.setItem(LOCAL_STORAGE_EDITOR_KEY, current.getValue())
+    }
+
+    addEventListener("beforeunload", onBeforeUnload )
+
+    return () => {
+      window.removeEventListener("beforeunload", onBeforeUnload)
+    }
+  }, [])
+
   const handleEditorDidMount: OnMount = (editor) => {
     editorRef.current = editor
 
-    editor.setPosition({ lineNumber: 2, column: 1 })
+    const editorValue = localStorage.getItem(LOCAL_STORAGE_EDITOR_KEY)
+
+    if (editorValue == null) {
+      editor.setPosition({ lineNumber: 2, column: 1 })
+    } else {
+      editor.getModel()?.setValue(editorValue)
+    }
     editor.focus()
+
     setDecorations(editor.createDecorationsCollection())
   }
 
@@ -53,6 +77,12 @@ export function EditorPanel(props: { editorInterface: Ref<EditorInterface> }) {
         },
       },
     ])
+  }
+
+  const handleChange = () => {
+    // When the user is editing his code, we should dismiss the error line \ toast.
+    toasts.forEach((t) => toast.dismiss(t.id))
+    decorations?.clear()
   }
 
   return (
@@ -77,10 +107,7 @@ export function EditorPanel(props: { editorInterface: Ref<EditorInterface> }) {
           defaultLanguage="mips"
           defaultValue={"# Write your code here.\n"}
           theme="vs-dark"
-          onChange={() => {
-            toasts.forEach((t) => toast.dismiss(t.id))
-            decorations?.clear()
-          }}
+          onChange={handleChange}
           onMount={handleEditorDidMount}
           options={{
             readOnly: !!simulation,
