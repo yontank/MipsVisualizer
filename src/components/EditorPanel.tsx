@@ -87,18 +87,18 @@ export function EditorPanel(props: { editorInterface: Ref<EditorInterface> }) {
 
   return (
     <>
-      <div>
-        <Label className="p-1">Initial PC:</Label>
+      <Label className="pl-2 pb-2 flex flex-row gap-2 items-baseline">
+        Initial PC:
         <Input
           maxLength={10}
-          className="m-1 "
+          className="flex-1"
           placeholder="e.g 0x12345678"
           value={initialPC}
           onChange={(e) => {
             setInitialPC(parseHex(e.currentTarget.value))
           }}
         />
-      </div>
+      </Label>
 
       <div>
         <Editor
