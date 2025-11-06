@@ -1,4 +1,5 @@
 # MIPS Visualizer
+[**Live Website**](https://yontank.github.io/MipsVisualizer/)
 
 This is a web app made with React and TypeScript that visualizes a MIPS processor.  
 It lets you write a MIPS assembly program, run it, and inspect the values of each wire and component in the CPU as it's running.
