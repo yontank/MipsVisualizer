@@ -58,7 +58,7 @@ type Context = {
    */
   prevPc: number | undefined
   /**
-   * Right Tab value for Editor\Execiton.
+   * Right Tab value for Editor\Execution.
    */
   rightTabValue: "IDE" | "debugger"
   /**
