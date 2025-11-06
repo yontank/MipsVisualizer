@@ -45,14 +45,34 @@ type Context = {
    */
   initialPC: string
   setInitialPC: React.Dispatch<React.SetStateAction<string>>
-
+  /**
+   * Initial Registers before starting a simulation.
+   */
   initialRegisters: number[]
+  /**
+   * Sets the initial registers as a state.
+   */
   setInitialRegisters: React.Dispatch<React.SetStateAction<number[]>>
-
+  /**
+   * Gets the previous PC.
+   */
   prevPc: number | undefined
-
+  /**
+   * Right Tab value for Editor\Execiton.
+   */
   rightTabValue: "IDE" | "debugger"
+  /**
+   * Setter for Editor Tabs (Right side)
+   */
   setRightTabValue: React.Dispatch<React.SetStateAction<"IDE" | "debugger">>
+  /**
+   * Error line controller for toasts, editor highlight
+   */
+  setError : React.Dispatch<React.SetStateAction<{
+    code?: number;
+    line: number;
+    msg: string;
+} | undefined>>
 }
 
 type RunningState = {
@@ -179,6 +199,7 @@ export function SimulationContextProvider({ children }: Props) {
         setInitialRegisters,
         prevPc,
         editorRef,
+        setError
       }}
     >
       {children}
