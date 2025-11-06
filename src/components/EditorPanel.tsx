@@ -23,7 +23,7 @@ export function EditorPanel(props: { editorInterface: Ref<EditorInterface> }) {
     editor.IEditorDecorationsCollection | undefined
   >(undefined)
   const monaco = useMonaco()
-  const { initialPC, setInitialPC, editorRef, error, simulation } =
+  const { initialPC, setInitialPC, editorRef, error, simulation, setError } =
     useSimulationContext()
 
   useImperativeHandle(props.editorInterface, () => ({
@@ -38,7 +38,7 @@ export function EditorPanel(props: { editorInterface: Ref<EditorInterface> }) {
       else localStorage.setItem(LOCAL_STORAGE_EDITOR_KEY, current.getValue())
     }
 
-    addEventListener("beforeunload", onBeforeUnload )
+    addEventListener("beforeunload", onBeforeUnload)
 
     return () => {
       window.removeEventListener("beforeunload", onBeforeUnload)
@@ -70,7 +70,7 @@ export function EditorPanel(props: { editorInterface: Ref<EditorInterface> }) {
         options: {
           isWholeLine: true,
           blockClassName: "errorVscode",
-          blockPadding: [error.line, 0, error.line, 55],
+          blockPadding: [0, 55, 0, 85],
           shouldFillLineOnLineBreak: true,
           stickiness:
             monaco.editor.TrackedRangeStickiness.NeverGrowsWhenTypingAtEdges,
@@ -81,8 +81,8 @@ export function EditorPanel(props: { editorInterface: Ref<EditorInterface> }) {
 
   const handleChange = () => {
     // When the user is editing his code, we should dismiss the error line \ toast.
+    if (error) setError(undefined)
     toasts.forEach((t) => toast.dismiss(t.id))
-    decorations?.clear()
   }
 
   return (
