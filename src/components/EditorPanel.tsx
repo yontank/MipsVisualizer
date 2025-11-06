@@ -86,7 +86,7 @@ export function EditorPanel(props: { editorInterface: Ref<EditorInterface> }) {
   }
 
   return (
-    <>
+    <div className="flex flex-col h-full">
       <Label className="pl-2 pb-2 flex flex-row gap-2 items-baseline">
         Initial PC:
         <Input
@@ -100,27 +100,24 @@ export function EditorPanel(props: { editorInterface: Ref<EditorInterface> }) {
         />
       </Label>
 
-      <div>
-        <Editor
-          height={"calc(100vh - 112px)"}
-          width={"375px"}
-          defaultLanguage="mips"
-          defaultValue={"# Write your code here.\n"}
-          theme="vs-dark"
-          onChange={handleChange}
-          onMount={handleEditorDidMount}
-          options={{
-            readOnly: !!simulation,
-            minimap: { enabled: false },
-            overviewRulerLanes: 0,
-            scrollbar: {
-              vertical: "hidden",
-              horizontal: "hidden",
-              handleMouseWheel: false,
-            },
-          }}
-        />
-      </div>
-    </>
+      <Editor
+        defaultLanguage="mips"
+        defaultValue={"# Write your code here.\n"}
+        theme="vs-dark"
+        onChange={handleChange}
+        onMount={handleEditorDidMount}
+        options={{
+          automaticLayout: true,
+          readOnly: !!simulation,
+          minimap: { enabled: false },
+          overviewRulerLanes: 0,
+          scrollbar: {
+            vertical: "hidden",
+            horizontal: "hidden",
+            handleMouseWheel: false,
+          },
+        }}
+      />
+    </div>
   )
 }

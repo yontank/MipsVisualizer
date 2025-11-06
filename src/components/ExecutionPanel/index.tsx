@@ -11,7 +11,7 @@ export default function ExecutionPanel() {
    */
   if (!simulation)
     return (
-      <div className="container mx-auto py-15 w-[375px]">
+      <div className="container mx-auto py-15">
         <div>
           <h2 className="scroll-m-20 text-center text-2xl font-bold tracking-tight text-balance">
             Not Running
@@ -26,7 +26,7 @@ export default function ExecutionPanel() {
    * Simulation Exists, lets render the commands and each step
    */
   return (
-    <div className="container mx-auto py-10 w-[375px]">
+    <div className="container mx-auto py-10">
       <DataTable
         columns={columns}
         data={simulation.executionInfo}

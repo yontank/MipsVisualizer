@@ -25,7 +25,7 @@ function App() {
       </div>
 
       <div className="flex h-screen">
-        <Tabs defaultValue="IDE" value={rightTabValue}>
+        <Tabs defaultValue="IDE" value={rightTabValue} className="w-sidebar">
           <TabsList className="w-full">
             <TabsTrigger
               className="w-1/2 text-center"
@@ -42,6 +42,7 @@ function App() {
               Execution
             </TabsTrigger>
           </TabsList>
+
           <TabsContent value="IDE">
             <EditorPanel editorInterface={editorInterface} />
           </TabsContent>
@@ -50,12 +51,14 @@ function App() {
             <ExecutionPanel />
           </TabsContent>
         </Tabs>
+
         <div className="flex-1 flex justify-center items-center overflow-auto min-w-36">
           <Diagram svg={TestDiagram} simulation={simulation} />
         </div>
+
         <RegMemViewer />
       </div>
-      <Toaster  richColors visibleToasts={1} duration={10000} closeButton />
+      <Toaster richColors visibleToasts={1} duration={10000} closeButton />
     </>
   )
 }
