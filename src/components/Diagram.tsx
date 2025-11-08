@@ -1,7 +1,11 @@
+/// <reference types="vite-plugin-svgr/client" />
+
 import type { Simulation } from "@/logic/simulation"
-import { useEffect, useRef, useState } from "react"
+import { useContext, useEffect, useRef, useState } from "react"
 import { MouseTooltip } from "./MouseTooltip"
 import { int2hex } from "@/lib/utils"
+import ShiftComponent from "@/assets/shift.svg?react"
+import { MousePositionContext } from "@/context/MousePositionContext"
 
 /**
  * The stroke width of the duplicate wires for interaction, in pixels.
@@ -9,6 +13,25 @@ import { int2hex } from "@/lib/utils"
 const INTERACTION_STROKE_WIDTH = 6
 
 const strokeCSSVariable = (node: string, input: string) => `--${node}-${input}`
+
+function MouseNode(props: {
+  svg: React.FunctionComponent<React.SVGProps<SVGSVGElement>>
+  placeable: boolean
+}) {
+  const mousePos = useContext(MousePositionContext)
+
+  return (
+    <props.svg
+      className="absolute pointer-events-none"
+      style={{
+        left: mousePos.x,
+        top: mousePos.y,
+        translate: "-50% -50%",
+        opacity: props.placeable ? 1 : 0.4,
+      }}
+    />
+  )
+}
 
 export function Diagram(props: {
   simulation?: Simulation
@@ -18,6 +41,7 @@ export function Diagram(props: {
   const [hoveredWire, setHoveredWire] = useState<
     { nodeId: string; inputId: string; bits: number } | undefined
   >(undefined)
+  const [placingNode, setPlacingNode] = useState(true)
 
   useEffect(() => {
     if (!svgRef.current) {
@@ -62,28 +86,30 @@ export function Diagram(props: {
     }
   }, [])
 
-  const hoveredWireValue =
-    hoveredWire &&
-    props.simulation &&
-    props.simulation.inputValues[hoveredWire.nodeId]?.[hoveredWire.inputId]
-  const tooltipContent =
-    hoveredWireValue != undefined &&
-    int2hex(hoveredWireValue, Math.ceil(hoveredWire!.bits / 4))
+  let tooltipContent: string | undefined
+
+  if (hoveredWire && props.simulation) {
+    const hoveredWireValue =
+      props.simulation.inputValues[hoveredWire.nodeId]?.[hoveredWire.inputId]
+    tooltipContent = int2hex(hoveredWireValue, Math.ceil(hoveredWire.bits / 4))
+  }
 
   return (
     <>
       <props.svg
         ref={svgRef}
         style={
-          (props.simulation &&
-            hoveredWire &&
-            tooltipContent && {
-              [strokeCSSVariable(hoveredWire.nodeId, hoveredWire.inputId)]:
-                "2px",
-            }) ||
-          undefined
+          hoveredWire && ((props.simulation && tooltipContent) || placingNode)
+            ? {
+                [strokeCSSVariable(hoveredWire.nodeId, hoveredWire.inputId)]:
+                  "2px",
+              }
+            : undefined
         }
       />
+      {placingNode && (
+        <MouseNode svg={ShiftComponent} placeable={!!hoveredWire} />
+      )}
       <MouseTooltip show={!!tooltipContent}>{tooltipContent}</MouseTooltip>
     </>
   )
