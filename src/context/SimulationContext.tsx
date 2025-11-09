@@ -5,6 +5,7 @@ import { singleCycle } from "@/logic/blueprints/singleCycle"
 import {
   newSimulation,
   simulationStep,
+  type NodeType,
   type Simulation,
 } from "@/logic/simulation"
 import {
@@ -15,6 +16,29 @@ import {
   type RefObject,
 } from "react"
 import { toast } from "sonner"
+
+type PlacedNode = {
+  /**
+   * The ID of the node whose input this node was placed on.
+   */
+  nodeId: string
+  /**
+   * The ID of the input that this node was placed on.
+   */
+  inputId: string
+  /**
+   * The X coordinate of the node on the diagram.
+   */
+  x: number
+  /**
+   * The Y coordinate of the node on the diagram.
+   */
+  y: number
+  /**
+   * The node type that was placed.
+   */
+  nodeType: NodeType
+}
 
 type Context = {
   simulation?: Simulation
@@ -57,6 +81,14 @@ type Context = {
    * Gets the previous PC.
    */
   prevPc: number | undefined
+
+  /**
+   * Map that stores nodes that were placed by the user.
+   * Key is node + input ID, and value is the node that's placed on it.
+   */
+  placedNodes: PlacedNode[]
+  setPlacedNodes: (nodes: PlacedNode[]) => void
+
   /**
    * Right Tab value for Editor\Execution.
    */
@@ -68,11 +100,16 @@ type Context = {
   /**
    * Error line controller for toasts, editor highlight
    */
-  setError : React.Dispatch<React.SetStateAction<{
-    code?: number;
-    line: number;
-    msg: string;
-} | undefined>>
+  setError: React.Dispatch<
+    React.SetStateAction<
+      | {
+          code?: number
+          line: number
+          msg: string
+        }
+      | undefined
+    >
+  >
 }
 
 type RunningState = {
@@ -104,6 +141,7 @@ export function SimulationContextProvider({ children }: Props) {
   const [rightTabValue, setRightTabValue] = useState<"IDE" | "debugger">("IDE")
   const [initialRegisters, setInitialRegisters] =
     useState<number[]>(zeroRegisters)
+  const [placedNodes, setPlacedNodes] = useState<PlacedNode[]>([])
   const editorRef = useRef<EditorInterface | undefined>(undefined)
 
   const startSimulation = () => {
@@ -199,7 +237,9 @@ export function SimulationContextProvider({ children }: Props) {
         setInitialRegisters,
         prevPc,
         editorRef,
-        setError
+        setError,
+        placedNodes,
+        setPlacedNodes,
       }}
     >
       {children}

@@ -6,6 +6,8 @@ import { MouseTooltip } from "./MouseTooltip"
 import { int2hex } from "@/lib/utils"
 import ShiftComponent from "@/assets/shift.svg?react"
 import { MousePositionContext } from "@/context/MousePositionContext"
+import { useSimulationContext } from "@/context/SimulationContext"
+import { makeShifter } from "@/logic/nodeTypes/shift"
 
 /**
  * The stroke width of the duplicate wires for interaction, in pixels.
@@ -37,11 +39,12 @@ export function Diagram(props: {
   simulation?: Simulation
   svg: React.FunctionComponent<React.SVGProps<SVGSVGElement>>
 }) {
+  const { placedNodes, setPlacedNodes } = useSimulationContext()
   const svgRef = useRef<SVGSVGElement | null>(null)
   const [hoveredWire, setHoveredWire] = useState<
     { nodeId: string; inputId: string; bits: number } | undefined
   >(undefined)
-  const [placingNode, setPlacingNode] = useState(true)
+  const [isPlacingNode, setIsPlacingNode] = useState(true)
 
   useEffect(() => {
     if (!svgRef.current) {
@@ -86,6 +89,23 @@ export function Diagram(props: {
     }
   }, [])
 
+  const onDiagramClick: React.MouseEventHandler<SVGSVGElement> = (e) => {
+    if (hoveredWire && isPlacingNode && svgRef.current) {
+      const { left, top } = svgRef.current.getBoundingClientRect()
+      setPlacedNodes([
+        ...placedNodes,
+        {
+          nodeId: hoveredWire.nodeId,
+          inputId: hoveredWire.inputId,
+          x: e.clientX - left,
+          y: e.clientY - top,
+          nodeType: makeShifter("left", 2),
+        },
+      ])
+      setIsPlacingNode(false)
+    }
+  }
+
   let tooltipContent: string | undefined
 
   if (hoveredWire && props.simulation) {
@@ -96,18 +116,29 @@ export function Diagram(props: {
 
   return (
     <>
-      <props.svg
-        ref={svgRef}
-        style={
-          hoveredWire && ((props.simulation && tooltipContent) || placingNode)
-            ? {
-                [strokeCSSVariable(hoveredWire.nodeId, hoveredWire.inputId)]:
-                  "2px",
-              }
-            : undefined
-        }
-      />
-      {placingNode && (
+      <div className="relative">
+        <props.svg
+          ref={svgRef}
+          style={
+            hoveredWire &&
+            ((props.simulation && tooltipContent) || isPlacingNode)
+              ? {
+                  [strokeCSSVariable(hoveredWire.nodeId, hoveredWire.inputId)]:
+                    "2px",
+                }
+              : undefined
+          }
+          onClick={onDiagramClick}
+        />
+        {Object.values(placedNodes).map((n) => (
+          <ShiftComponent
+            key={`${n.nodeId}-${n.inputId}`}
+            className="absolute pointer-events-none"
+            style={{ left: n.x, top: n.y, translate: "-50% -50%" }}
+          />
+        ))}
+      </div>
+      {isPlacingNode && (
         <MouseNode svg={ShiftComponent} placeable={!!hoveredWire} />
       )}
       {tooltipContent && <MouseTooltip>{tooltipContent}</MouseTooltip>}
