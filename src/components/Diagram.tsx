@@ -110,7 +110,7 @@ export function Diagram(props: {
       {placingNode && (
         <MouseNode svg={ShiftComponent} placeable={!!hoveredWire} />
       )}
-      <MouseTooltip show={!!tooltipContent}>{tooltipContent}</MouseTooltip>
+      {tooltipContent && <MouseTooltip>{tooltipContent}</MouseTooltip>}
     </>
   )
 }
