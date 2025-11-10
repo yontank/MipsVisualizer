@@ -268,6 +268,10 @@ export function breakIID(id: InputID): [nodeId: string, inputId: string] {
   return id.split("-") as [string, string]
 }
 
+export function placedNodeId(iid: string) {
+  return `[placed]-${iid}`
+}
+
 /**
  * Returns the actual nodeId and inputId based on a NodeInputTarget.
  */

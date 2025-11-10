@@ -7,6 +7,7 @@ import {
   getNodeTarget,
   makeIID,
   newSimulation,
+  placedNodeId,
   simulationStep,
   type InputID,
   type NodeType,
@@ -126,10 +127,6 @@ type Props = {
 const SimulationContext = createContext<Context>(undefined!)
 
 const zeroRegisters = Array.from({ length: NUM_REGISTERS }, () => 0)
-
-function placedNodeId(iid: string) {
-  return `[placed]-${iid}`
-}
 
 export function SimulationContextProvider({ children }: Props) {
   const [runningState, setRunningState] = useState<RunningState | undefined>()

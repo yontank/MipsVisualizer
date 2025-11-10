@@ -1,6 +1,6 @@
 /// <reference types="vite-plugin-svgr/client" />
 
-import { makeIID } from "@/logic/simulation"
+import { makeIID, placedNodeId } from "@/logic/simulation"
 import { useContext, useEffect, useRef, useState } from "react"
 import { MouseTooltip } from "./MouseTooltip"
 import { int2hex } from "@/lib/utils"
@@ -108,7 +108,7 @@ export function Diagram(props: {
     }
   }
 
-  let tooltipContent: string | undefined
+  let tooltipContent: React.ReactNode | undefined
 
   if (hoveredWire && simulation) {
     const hoveredWireValue = simulation.inputValues[hoveredWire.nodeId]?.[
@@ -120,6 +120,20 @@ export function Diagram(props: {
         hoveredWireValue,
         Math.ceil(hoveredWire.bits / 4),
       )
+      const iid = makeIID(hoveredWire.nodeId, hoveredWire.inputId)
+      if (placedNodes.has(iid)) {
+        tooltipContent = (
+          <div className="grid grid-cols-[auto_auto] grid-rows-2 gap-x-2 items-baseline">
+            <span className="text-sm text-muted-foreground">Before: </span>
+            {int2hex(
+              simulation.inputValues[placedNodeId(iid)].in,
+              Math.ceil(hoveredWire.bits / 4),
+            )}
+            <span className="text-sm text-muted-foreground">After: </span>
+            {tooltipContent}
+          </div>
+        )
+      }
     }
   }
 
