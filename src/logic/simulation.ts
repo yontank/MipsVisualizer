@@ -255,15 +255,30 @@ export type Simulation = {
  */
 export type Blueprint = { nodes: Record<string, NodeDef> }
 
+export type InputID = `${string}-${string}`
+
+/**
+ * Returns a string that uniquely identifies the input in the node.
+ */
+export function makeIID(nodeId: string, inputId: string): InputID {
+  return `${nodeId}-${inputId}`
+}
+
+export function breakIID(id: InputID): [nodeId: string, inputId: string] {
+  return id.split("-") as [string, string]
+}
+
 /**
  * Returns the actual nodeId and inputId based on a NodeInputTarget.
  */
-const nodeTarget = (
+export function getNodeTarget(
   target: NodeInputTarget,
-): [nodeId: string, inputId: string] => [
-  typeof target == "string" ? target : target.nodeId,
-  typeof target == "string" ? "in" : target.inputId,
-]
+): [nodeId: string, inputId: string] {
+  return [
+    typeof target == "string" ? target : target.nodeId,
+    typeof target == "string" ? "in" : target.inputId,
+  ]
+}
 
 /**
  * Creates a new simulation and returns it.
@@ -296,7 +311,7 @@ export function newSimulation(
   // Update the `inputs` map for all the nodes.
   for (const nodeId in nodes) {
     for (const [outputId, target] of Object.entries(nodes[nodeId].outputs)) {
-      const [nodeId, inputId] = nodeTarget(target)
+      const [nodeId, inputId] = getNodeTarget(target)
       nodes[nodeId].inputs[inputId] = { nodeId, outputId }
     }
   }
@@ -363,7 +378,7 @@ export function simulationStep(simulation: Simulation): Simulation {
         const outputs = node.type.executeRising(simulation, inputValues)
         for (const outputId in outputs) {
           // Forward each output value to its target input.
-          const [targetNodeId, targetInputId] = nodeTarget(
+          const [targetNodeId, targetInputId] = getNodeTarget(
             node.outputs[outputId],
           )
           const value = outputs[outputId]

@@ -1,6 +1,6 @@
 /// <reference types="vite-plugin-svgr/client" />
 
-import type { Simulation } from "@/logic/simulation"
+import { makeIID, type Simulation } from "@/logic/simulation"
 import { useContext, useEffect, useRef, useState } from "react"
 import { MouseTooltip } from "./MouseTooltip"
 import { int2hex } from "@/lib/utils"
@@ -92,16 +92,19 @@ export function Diagram(props: {
   const onDiagramClick: React.MouseEventHandler<SVGSVGElement> = (e) => {
     if (hoveredWire && isPlacingNode && svgRef.current) {
       const { left, top } = svgRef.current.getBoundingClientRect()
-      setPlacedNodes([
-        ...placedNodes,
-        {
-          nodeId: hoveredWire.nodeId,
-          inputId: hoveredWire.inputId,
-          x: e.clientX - left,
-          y: e.clientY - top,
-          nodeType: makeShifter("left", 2),
-        },
-      ])
+      setPlacedNodes(
+        new Map([
+          ...placedNodes,
+          [
+            makeIID(hoveredWire.nodeId, hoveredWire.inputId),
+            {
+              x: e.clientX - left,
+              y: e.clientY - top,
+              nodeType: makeShifter("left", 2),
+            },
+          ],
+        ]),
+      )
       setIsPlacingNode(false)
     }
   }
@@ -130,9 +133,9 @@ export function Diagram(props: {
           }
           onClick={onDiagramClick}
         />
-        {Object.values(placedNodes).map((n) => (
+        {[...placedNodes.entries()].map(([id, n]) => (
           <ShiftComponent
-            key={`${n.nodeId}-${n.inputId}`}
+            key={id}
             className="absolute pointer-events-none"
             style={{ left: n.x, top: n.y, translate: "-50% -50%" }}
           />

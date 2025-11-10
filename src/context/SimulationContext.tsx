@@ -3,8 +3,12 @@ import { NUM_REGISTERS } from "@/constants"
 import { assemble } from "@/lib/assembler"
 import { singleCycle } from "@/logic/blueprints/singleCycle"
 import {
+  breakIID,
+  getNodeTarget,
+  makeIID,
   newSimulation,
   simulationStep,
+  type InputID,
   type NodeType,
   type Simulation,
 } from "@/logic/simulation"
@@ -18,14 +22,6 @@ import {
 import { toast } from "sonner"
 
 type PlacedNode = {
-  /**
-   * The ID of the node whose input this node was placed on.
-   */
-  nodeId: string
-  /**
-   * The ID of the input that this node was placed on.
-   */
-  inputId: string
   /**
    * The X coordinate of the node on the diagram.
    */
@@ -86,8 +82,8 @@ type Context = {
    * Map that stores nodes that were placed by the user.
    * Key is node + input ID, and value is the node that's placed on it.
    */
-  placedNodes: PlacedNode[]
-  setPlacedNodes: (nodes: PlacedNode[]) => void
+  placedNodes: Map<InputID, PlacedNode>
+  setPlacedNodes: (nodes: Map<InputID, PlacedNode>) => void
 
   /**
    * Right Tab value for Editor\Execution.
@@ -131,6 +127,10 @@ const SimulationContext = createContext<Context>(undefined!)
 
 const zeroRegisters = Array.from({ length: NUM_REGISTERS }, () => 0)
 
+function placedNodeId(iid: string) {
+  return `[placed]-${iid}`
+}
+
 export function SimulationContextProvider({ children }: Props) {
   const [runningState, setRunningState] = useState<RunningState | undefined>()
   const [initialPC, setInitialPC] = useState<string>("0x00400000")
@@ -141,7 +141,9 @@ export function SimulationContextProvider({ children }: Props) {
   const [rightTabValue, setRightTabValue] = useState<"IDE" | "debugger">("IDE")
   const [initialRegisters, setInitialRegisters] =
     useState<number[]>(zeroRegisters)
-  const [placedNodes, setPlacedNodes] = useState<PlacedNode[]>([])
+  const [placedNodes, setPlacedNodes] = useState<Map<InputID, PlacedNode>>(
+    new Map(),
+  )
   const editorRef = useRef<EditorInterface | undefined>(undefined)
 
   const startSimulation = () => {
@@ -162,11 +164,52 @@ export function SimulationContextProvider({ children }: Props) {
       setError(undefined)
       setRightTabValue("debugger")
       setPrevPc(undefined)
+
+      let blueprint = singleCycle
+      if (placedNodes.size > 0) {
+        // Make a copy of the blueprint, which will contain new and modified nodes.
+        blueprint = { nodes: { ...blueprint.nodes } }
+
+        // Iterate over every output of every node in the blueprint.
+        for (const [sourceNodeId, sourceNode] of Object.entries(
+          blueprint.nodes,
+        )) {
+          for (const [outputId, target] of Object.entries(sourceNode.outputs)) {
+            const iid = makeIID(...getNodeTarget(target))
+            if (placedNodes.has(iid)) {
+              // If the user placed a node on the input that this output is connected to,
+              // we change this node so that it will output to the newly placed node.
+              blueprint.nodes[sourceNodeId] = {
+                ...sourceNode,
+                outputs: {
+                  ...sourceNode.outputs,
+                  [outputId]: placedNodeId(iid),
+                },
+              }
+            }
+          }
+        }
+
+        // Add the placed nodes into the blueprint.
+        for (const [iid, node] of placedNodes) {
+          const [targetNodeId, targetInputId] = breakIID(iid)
+          blueprint.nodes[placedNodeId(iid)] = {
+            type: node.nodeType,
+            outputs: {
+              out: {
+                nodeId: targetNodeId,
+                inputId: targetInputId,
+              },
+            },
+          }
+        }
+      }
+
       setRunningState({
         index: 0,
         simulations: [
           newSimulation(
-            singleCycle,
+            blueprint,
             r.data,
             Number(initialPC),
             r.executionInfo,
