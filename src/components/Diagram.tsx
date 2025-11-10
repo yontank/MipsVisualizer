@@ -1,6 +1,6 @@
 /// <reference types="vite-plugin-svgr/client" />
 
-import { makeIID, type Simulation } from "@/logic/simulation"
+import { makeIID } from "@/logic/simulation"
 import { useContext, useEffect, useRef, useState } from "react"
 import { MouseTooltip } from "./MouseTooltip"
 import { int2hex } from "@/lib/utils"
@@ -36,10 +36,9 @@ function MouseNode(props: {
 }
 
 export function Diagram(props: {
-  simulation?: Simulation
   svg: React.FunctionComponent<React.SVGProps<SVGSVGElement>>
 }) {
-  const { placedNodes, setPlacedNodes } = useSimulationContext()
+  const { placedNodes, setPlacedNodes, simulation } = useSimulationContext()
   const svgRef = useRef<SVGSVGElement | null>(null)
   const [hoveredWire, setHoveredWire] = useState<
     { nodeId: string; inputId: string; bits: number } | undefined
@@ -111,10 +110,17 @@ export function Diagram(props: {
 
   let tooltipContent: string | undefined
 
-  if (hoveredWire && props.simulation) {
-    const hoveredWireValue =
-      props.simulation.inputValues[hoveredWire.nodeId]?.[hoveredWire.inputId]
-    tooltipContent = int2hex(hoveredWireValue, Math.ceil(hoveredWire.bits / 4))
+  if (hoveredWire && simulation) {
+    const hoveredWireValue = simulation.inputValues[hoveredWire.nodeId]?.[
+      hoveredWire.inputId
+    ] as number | undefined
+
+    if (hoveredWireValue != undefined) {
+      tooltipContent = int2hex(
+        hoveredWireValue,
+        Math.ceil(hoveredWire.bits / 4),
+      )
+    }
   }
 
   return (
@@ -123,8 +129,7 @@ export function Diagram(props: {
         <props.svg
           ref={svgRef}
           style={
-            hoveredWire &&
-            ((props.simulation && tooltipContent) || isPlacingNode)
+            hoveredWire && ((simulation && tooltipContent) || isPlacingNode)
               ? {
                   [strokeCSSVariable(hoveredWire.nodeId, hoveredWire.inputId)]:
                     "2px",

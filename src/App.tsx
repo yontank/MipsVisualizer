@@ -15,7 +15,7 @@ import { Toaster } from "./components/ui/sonner"
 import { useSimulationContext } from "./context/SimulationContext"
 
 function App() {
-  const { rightTabValue, setRightTabValue, simulation } = useSimulationContext()
+  const { rightTabValue, setRightTabValue } = useSimulationContext()
   const editorInterface = useRef<EditorInterface>({ getValue: () => "" })
 
   return (
@@ -53,7 +53,7 @@ function App() {
         </Tabs>
 
         <div className="flex-1 flex justify-center items-center overflow-auto min-w-36">
-          <Diagram svg={TestDiagram} simulation={simulation} />
+          <Diagram svg={TestDiagram} />
         </div>
 
         <RegMemViewer />
