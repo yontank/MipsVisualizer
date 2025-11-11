@@ -1,4 +1,10 @@
-import { BugPlayIcon, PlayIcon, SquareIcon, Undo2Icon } from "lucide-react"
+import {
+  BugPlayIcon,
+  PlayIcon,
+  PlusIcon,
+  SquareIcon,
+  Undo2Icon,
+} from "lucide-react"
 
 import { Button } from "@/components/ui/button"
 import { ButtonGroup } from "@/components/ui/button-group"
@@ -9,10 +15,18 @@ import {
   TooltipContent,
 } from "./ui/tooltip"
 import { useSimulationContext } from "@/context/SimulationContext"
+import type { JSX } from "react"
+import { Input } from "@/components/ui/input"
+import { Label } from "@/components/ui/label"
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover"
 
 /**
  * A Component that Contains Buttons to Start, Stop, the compilation of the program
- * The Component will probably sbbe at the top of the screen.
+ * The Component will probably be at the top of the screen.
  * @returns
  */
 function DebugUI() {
@@ -39,6 +53,90 @@ function DebugUI() {
     )
   }
 
+  const AddNodeOnWritePopUp = (): JSX.Element => {
+    return (
+      <Popover>
+        <PopoverTrigger asChild>
+          <Button variant="outline">
+            <PlusIcon />
+          </Button>
+        </PopoverTrigger>
+        <PopoverContent className="w-80">
+          <div className="grid gap-4">
+            <div className="space-y-2">
+              <h4 className="leading-none font-medium">Nodes</h4>
+              <p className="text-muted-foreground text-sm">
+                Choose a node to place into a wire.
+              </p>
+            </div>
+
+            <div className="flex items-center justify-around">
+              <div className="h-fit w-fit p-4 rounded-full border-gray-800 border-2 text-lg cursor-pointer ">
+                Not
+              </div>
+              <div className="h-fit w-fit p-4 rounded-full border-gray-800 border-2 text-lg">
+                Shift
+              </div>
+            </div>
+
+            <div>
+              <h2 className="font-bold">Params:</h2>
+              <div className="flex items-end w-full">
+                <p>Direction:</p>
+                <ButtonGroup>
+                  <Button>Left</Button>
+                  <Button>Right</Button>
+                </ButtonGroup>
+              </div>
+            </div>
+
+            <div className="flex w-full justify-center">
+              <p>Amount:</p>
+              <Input type="number" max={32} min={0} />
+            </div>
+
+            <Button>Add</Button>
+
+            {/* <div className="grid gap-2">
+              <div className="grid grid-cols-3 items-center gap-4">
+                <Label htmlFor="width">Width</Label>
+                <Input
+                  id="width"
+                  defaultValue="100%"
+                  className="col-span-2 h-8"
+                />
+              </div>
+              <div className="grid grid-cols-3 items-center gap-4">
+                <Label htmlFor="maxWidth">Max. width</Label>
+                <Input
+                  id="maxWidth"
+                  defaultValue="300px"
+                  className="col-span-2 h-8"
+                />
+              </div>
+              <div className="grid grid-cols-3 items-center gap-4">
+                <Label htmlFor="height">Height</Label>
+                <Input
+                  id="height"
+                  defaultValue="25px"
+                  className="col-span-2 h-8"
+                />
+              </div>
+              <div className="grid grid-cols-3 items-center gap-4">
+                <Label htmlFor="maxHeight">Max. height</Label>
+                <Input
+                  id="maxHeight"
+                  defaultValue="none"
+                  className="col-span-2 h-8"
+                />
+              </div>
+            </div> */}
+          </div>
+        </PopoverContent>
+      </Popover>
+    )
+  }
+
   return (
     <div className="absolute my-2.5 flex justify-center">
       <ButtonGroup className="cursor-pointer">
@@ -56,9 +154,19 @@ function DebugUI() {
                 >
                   <BugPlayIcon />
                 </Button>
+                <AddNodeOnWritePopUp />
+                {/* <Button
+                  variant="outline"
+                  size="icon"
+                  aria-label="Go Back"
+                  className="hover:text-emerald-600 cursor-pointer"
+                  disabled={!!simulation}
+                  // onClick={startSimulation}
+                >
+                  <PlusIcon /> 
+                </Button>*/}
               </ButtonGroup>
             </TooltipTrigger>
-
             <TooltipContent>
               <p>Compile</p>
             </TooltipContent>
