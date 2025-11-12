@@ -126,6 +126,10 @@ function encodeJType(opcode: number, immediate: number) {
 }
 
 const instructions: Record<string, Instruction> = {
+  nop: {
+    syntax: [],
+    encode: () => 0,
+  },
   add: {
     syntax: ["register", "comma", "register", "comma", "register"],
     encode: (operands) =>
