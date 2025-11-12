@@ -8,23 +8,32 @@ const inputs = [
 
 type Outputs = ["out"]
 
-export type ShiftDirection = "left" | "right"
+export type ShiftKind = "left" | "right" | "rightLogical"
+
+const shiftFuncs: Record<ShiftKind, (a: number, b: number) => number> = {
+  left: (a, b) => a << b,
+  right: (a, b) => a >> b,
+  rightLogical: (a, b) => a >>> b,
+}
+
+const shiftLabels: Record<ShiftKind, string> = {
+  left: "Shift\nleft",
+  right: "Shift\nright",
+  rightLogical: "SRL",
+}
 
 /**
  * Creates a node type that shifts its input.
- * @param dir The direction to shift into.
+ * @param kind The kind of shift to perform.
  * @param bits The number of bits to shift by.
  */
-export function makeShifter(
-  dir: ShiftDirection,
-  bits: number,
-): NodeType<Outputs> {
+export function makeShifter(kind: ShiftKind, bits: number): NodeType<Outputs> {
   return nodeType(
     inputs,
     (_, inputs) => ({
-      out: dir == "left" ? inputs.in << bits : inputs.in >> bits,
+      out: shiftFuncs[kind](inputs.in, bits),
     }),
     undefined,
-    `Shift\n${dir} ${bits}`,
+    `${shiftLabels[kind]} ${bits}`,
   )
 }

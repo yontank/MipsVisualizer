@@ -23,7 +23,7 @@ import {
   PopoverTrigger,
 } from "@/components/ui/popover"
 import { ToggleGroup, ToggleGroupItem } from "./ui/toggle-group"
-import { makeShifter, type ShiftDirection } from "@/logic/nodeTypes/shift"
+import { makeShifter, type ShiftKind } from "@/logic/nodeTypes/shift"
 import { neg } from "@/logic/nodeTypes/neg"
 import type { NodeType } from "@/logic/simulation"
 
@@ -34,7 +34,7 @@ type NodeInfo = {
 }
 
 type NodeCreationParams = {
-  dir: ShiftDirection
+  kind: ShiftKind
   bits: number
 }
 
@@ -50,13 +50,13 @@ const placeableNodes: NodeInfo[] = [
   {
     name: "Shift",
     params: true,
-    node: (params) => makeShifter(params.dir, params.bits),
+    node: (params) => makeShifter(params.kind, params.bits),
   },
 ]
 
 function AddNodePopup(props: { trigger: ReactNode }) {
   const [selectedNode, setSelectedNode] = useState<NodeInfo | undefined>()
-  const [shiftDir, setShiftDir] = useState<ShiftDirection>("left")
+  const [shiftKind, setShiftKind] = useState<ShiftKind>("left")
   const [shiftBits, setShiftBits] = useState("1")
 
   return (
@@ -98,11 +98,14 @@ function AddNodePopup(props: { trigger: ReactNode }) {
                   id="shift-direction"
                   type="single"
                   variant="outline"
-                  value={shiftDir}
-                  onValueChange={(v: ShiftDirection) => setShiftDir(v)}
+                  value={shiftKind}
+                  onValueChange={(v: ShiftKind) => setShiftKind(v)}
                 >
                   <ToggleGroupItem value="left">Left</ToggleGroupItem>
                   <ToggleGroupItem value="right">Right</ToggleGroupItem>
+                  <ToggleGroupItem value="rightLogical">
+                    Right Logical
+                  </ToggleGroupItem>
                 </ToggleGroup>
               </div>
 
