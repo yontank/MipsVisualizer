@@ -8,13 +8,15 @@ const inputs = [
 
 type Outputs = ["out"]
 
+export type ShiftDirection = "left" | "right"
+
 /**
  * Creates a node type that shifts its input.
  * @param dir The direction to shift into.
  * @param bits The number of bits to shift by.
  */
 export function makeShifter(
-  dir: "left" | "right",
+  dir: ShiftDirection,
   bits: number,
 ): NodeType<Outputs> {
   return nodeType(inputs, (_, inputs) => ({

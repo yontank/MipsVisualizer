@@ -43,7 +43,7 @@ export function Diagram(props: {
   const [hoveredWire, setHoveredWire] = useState<
     { nodeId: string; inputId: string; bits: number } | undefined
   >(undefined)
-  const [isPlacingNode, setIsPlacingNode] = useState(true)
+  const [isPlacingNode, setIsPlacingNode] = useState(false)
 
   useEffect(() => {
     if (!svgRef.current) {

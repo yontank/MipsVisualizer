@@ -15,14 +15,112 @@ import {
   TooltipContent,
 } from "./ui/tooltip"
 import { useSimulationContext } from "@/context/SimulationContext"
-import type { JSX } from "react"
+import { useState, type ReactNode } from "react"
 import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
 } from "@/components/ui/popover"
+import { ToggleGroup, ToggleGroupItem } from "./ui/toggle-group"
+import { makeShifter, type ShiftDirection } from "@/logic/nodeTypes/shift"
+import { neg } from "@/logic/nodeTypes/neg"
+import type { NodeType } from "@/logic/simulation"
+
+type NodeInfo = {
+  name: string
+  node: (params: NodeCreationParams) => NodeType
+  params?: boolean
+}
+
+type NodeCreationParams = {
+  dir: ShiftDirection
+  bits: number
+}
+
+const placeableNodes: NodeInfo[] = [
+  {
+    name: "Neg",
+    node: () => neg,
+  },
+  {
+    name: "Shift",
+    params: true,
+    node: (params) => makeShifter(params.dir, params.bits),
+  },
+]
+
+function AddNodePopup(props: { trigger: ReactNode }) {
+  const [selectedNode, setSelectedNode] = useState<NodeInfo | undefined>()
+  const [shiftDir, setShiftDir] = useState<ShiftDirection>("left")
+  const [shiftBits, setShiftBits] = useState("1")
+
+  return (
+    <Popover>
+      <PopoverTrigger asChild>{props.trigger}</PopoverTrigger>
+      <PopoverContent className="w-80">
+        <div className="grid gap-4">
+          <div className="space-y-2">
+            <h2 className="leading-none font-medium">Add Component</h2>
+            <p className="text-muted-foreground text-sm">
+              Choose a component to place on a wire.
+            </p>
+          </div>
+
+          <div className="flex items-center justify-around">
+            {placeableNodes.map((n) => (
+              <div
+                key={n.name}
+                className={
+                  "h-fit w-fit p-3 rounded-full outline-solid outline-black text-lg cursor-pointer box-content " +
+                  (selectedNode == n ? "outline-4 font-bold" : "outline-2")
+                }
+                onClick={() => setSelectedNode(n)}
+              >
+                {n.name}
+              </div>
+            ))}
+          </div>
+
+          {selectedNode && selectedNode.params && (
+            <form>
+              <h3 className="font-bold">Params:</h3>
+              <div className="flex mb-2 items-baseline gap-2">
+                Shift direction:
+                <ToggleGroup
+                  id="shift-direction"
+                  type="single"
+                  variant="outline"
+                  value={shiftDir}
+                  onValueChange={(v: ShiftDirection) => setShiftDir(v)}
+                >
+                  <ToggleGroupItem value="left">Left</ToggleGroupItem>
+                  <ToggleGroupItem value="right">Right</ToggleGroupItem>
+                </ToggleGroup>
+              </div>
+
+              <div className="flex items-baseline gap-2">
+                Shift amount:
+                <Input
+                  id="shift-num-bits"
+                  type="number"
+                  max={31}
+                  min={1}
+                  className="w-[6em]"
+                  value={shiftBits}
+                  onChange={(e) => setShiftBits(e.target.value)}
+                  onBlur={() => setShiftBits(Number(shiftBits).toString())}
+                />
+              </div>
+            </form>
+          )}
+
+          <Button disabled={!selectedNode}>Add</Button>
+        </div>
+      </PopoverContent>
+    </Popover>
+  )
+}
 
 /**
  * A Component that Contains Buttons to Start, Stop, the compilation of the program
@@ -53,127 +151,49 @@ function DebugUI() {
     )
   }
 
-  const AddNodeOnWritePopUp = (): JSX.Element => {
-    return (
-      <Popover>
-        <PopoverTrigger asChild>
-          <Button variant="outline">
-            <PlusIcon />
-          </Button>
-        </PopoverTrigger>
-        <PopoverContent className="w-80">
-          <div className="grid gap-4">
-            <div className="space-y-2">
-              <h4 className="leading-none font-medium">Nodes</h4>
-              <p className="text-muted-foreground text-sm">
-                Choose a node to place into a wire.
-              </p>
-            </div>
-
-            <div className="flex items-center justify-around">
-              <div className="h-fit w-fit p-4 rounded-full border-gray-800 border-2 text-lg cursor-pointer ">
-                Not
-              </div>
-              <div className="h-fit w-fit p-4 rounded-full border-gray-800 border-2 text-lg">
-                Shift
-              </div>
-            </div>
-
-            <div>
-              <h2 className="font-bold">Params:</h2>
-              <div className="flex items-end w-full">
-                <p>Direction:</p>
-                <ButtonGroup>
-                  <Button>Left</Button>
-                  <Button>Right</Button>
-                </ButtonGroup>
-              </div>
-            </div>
-
-            <div className="flex w-full justify-center">
-              <p>Amount:</p>
-              <Input type="number" max={32} min={0} />
-            </div>
-
-            <Button>Add</Button>
-
-            {/* <div className="grid gap-2">
-              <div className="grid grid-cols-3 items-center gap-4">
-                <Label htmlFor="width">Width</Label>
-                <Input
-                  id="width"
-                  defaultValue="100%"
-                  className="col-span-2 h-8"
-                />
-              </div>
-              <div className="grid grid-cols-3 items-center gap-4">
-                <Label htmlFor="maxWidth">Max. width</Label>
-                <Input
-                  id="maxWidth"
-                  defaultValue="300px"
-                  className="col-span-2 h-8"
-                />
-              </div>
-              <div className="grid grid-cols-3 items-center gap-4">
-                <Label htmlFor="height">Height</Label>
-                <Input
-                  id="height"
-                  defaultValue="25px"
-                  className="col-span-2 h-8"
-                />
-              </div>
-              <div className="grid grid-cols-3 items-center gap-4">
-                <Label htmlFor="maxHeight">Max. height</Label>
-                <Input
-                  id="maxHeight"
-                  defaultValue="none"
-                  className="col-span-2 h-8"
-                />
-              </div>
-            </div> */}
-          </div>
-        </PopoverContent>
-      </Popover>
-    )
-  }
-
   return (
     <div className="absolute my-2.5 flex justify-center">
       <ButtonGroup className="cursor-pointer">
         <TooltipProvider>
-          <Tooltip delayDuration={800}>
-            <TooltipTrigger asChild>
-              <ButtonGroup className="">
+          <ButtonGroup className="">
+            <Tooltip delayDuration={500}>
+              <TooltipTrigger asChild>
                 <Button
                   variant="outline"
                   size="icon"
-                  aria-label="Go Back"
                   className="hover:text-blue-600 cursor-pointer"
                   disabled={!!simulation}
                   onClick={startSimulation}
                 >
                   <BugPlayIcon />
                 </Button>
-                <AddNodeOnWritePopUp />
-                {/* <Button
-                  variant="outline"
-                  size="icon"
-                  aria-label="Go Back"
-                  className="hover:text-emerald-600 cursor-pointer"
-                  disabled={!!simulation}
-                  // onClick={startSimulation}
-                >
-                  <PlusIcon /> 
-                </Button>*/}
-              </ButtonGroup>
-            </TooltipTrigger>
-            <TooltipContent>
-              <p>Compile</p>
-            </TooltipContent>
-          </Tooltip>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Compile</p>
+              </TooltipContent>
+            </Tooltip>
+            <Tooltip delayDuration={500}>
+              <AddNodePopup
+                trigger={
+                  <TooltipTrigger asChild>
+                    <Button
+                      variant="outline"
+                      className="hover:text-green-600 cursor-pointer"
+                      disabled={!!simulation}
+                    >
+                      <PlusIcon />
+                    </Button>
+                  </TooltipTrigger>
+                }
+              />
+              <TooltipContent>
+                <p>Add Component</p>
+              </TooltipContent>
+            </Tooltip>
+          </ButtonGroup>
 
           <ButtonGroup>
-            <Tooltip delayDuration={800}>
+            <Tooltip delayDuration={500}>
               <TooltipTrigger asChild>
                 <Button
                   variant="outline"
@@ -189,7 +209,7 @@ function DebugUI() {
               </TooltipContent>
             </Tooltip>
 
-            <Tooltip delayDuration={800}>
+            <Tooltip delayDuration={500}>
               <TooltipTrigger asChild>
                 <Button
                   variant="outline"
@@ -205,7 +225,7 @@ function DebugUI() {
               </TooltipContent>
             </Tooltip>
 
-            <Tooltip delayDuration={800}>
+            <Tooltip delayDuration={500}>
               <TooltipTrigger asChild>
                 <Button
                   variant={"outline"}
