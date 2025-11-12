@@ -62,7 +62,10 @@ function AddNodePopup(props: { trigger: ReactNode }) {
   return (
     <Popover>
       <PopoverTrigger asChild>{props.trigger}</PopoverTrigger>
-      <PopoverContent className="w-80">
+      <PopoverContent
+        onCloseAutoFocus={(e) => e.preventDefault()} // https://github.com/radix-ui/primitives/issues/2248#issuecomment-2037290498
+        className="w-80"
+      >
         <div className="grid gap-4">
           <div className="space-y-2">
             <h2 className="leading-none font-medium">Add Component</h2>
