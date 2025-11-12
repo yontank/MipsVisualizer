@@ -19,7 +19,12 @@ export function makeShifter(
   dir: ShiftDirection,
   bits: number,
 ): NodeType<Outputs> {
-  return nodeType(inputs, (_, inputs) => ({
-    out: dir == "left" ? inputs.in << bits : inputs.in >> bits,
-  }))
+  return nodeType(
+    inputs,
+    (_, inputs) => ({
+      out: dir == "left" ? inputs.in << bits : inputs.in >> bits,
+    }),
+    undefined,
+    `Shift\n${dir} ${bits}`,
+  )
 }

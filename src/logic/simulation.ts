@@ -89,6 +89,11 @@ export type NodeType<Outputs extends OutputList = OutputList> = {
    * @param inputs An object containing the values of all inputs.
    */
   executeFalling?: ExecuteFallingFunction
+
+  /**
+   * Text that this node should display. (Currently only set for placed nodes.)
+   */
+  label?: string
 }
 
 /**
@@ -111,11 +116,13 @@ export function nodeType<Outputs extends OutputList, Inputs extends InputList>(
     simulation: Simulation,
     inputs: InputObject<Inputs>,
   ) => SimulationChange | undefined,
+  label?: string,
 ): NodeType<Outputs> {
   return {
     inputs,
     executeRising: executeRising as ExecuteRisingFunction<Outputs>,
     executeFalling: executeFalling as ExecuteFallingFunction,
+    label,
   }
 }
 

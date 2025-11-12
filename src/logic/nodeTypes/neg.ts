@@ -14,4 +14,6 @@ export const neg: NodeType<Outputs> = nodeType(
   (_, inputs) => ({
     out: -inputs.in,
   }),
+  undefined,
+  "Neg",
 )
