@@ -73,6 +73,18 @@ const outputMap: Record<number, OutputObject<Outputs>> = {
     aluOp: 0b00,
     jump: 0,
   },
+  // ori
+  [13]: {
+    regDst: 0,
+    aluSrc: 1,
+    memToReg: 0,
+    regWrite: 1,
+    memRead: 0,
+    memWrite: 0,
+    branch: 0,
+    aluOp: 0b11, // Not standard. See note in aluControl.ts
+    jump: 0,
+  },
   // j
   [2]: {
     regDst: 0, // x

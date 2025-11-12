@@ -156,6 +156,11 @@ const instructions: Record<string, Instruction> = {
     encode: (operands) =>
       encodeIType(0x8, operands[1], operands[0], operands[2]),
   },
+  ori: {
+    syntax: ["register", "comma", "register", "comma", "number"],
+    encode: (operands) =>
+      encodeIType(0xd, operands[1], operands[0], operands[2]),
+  },
   beq: {
     syntax: ["register", "comma", "register", "comma", "number"],
     encode: (operands) =>
