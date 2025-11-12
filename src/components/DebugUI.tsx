@@ -44,6 +44,10 @@ const placeableNodes: NodeInfo[] = [
     node: () => neg,
   },
   {
+    name: "Not",
+    node: () => not,
+  },
+  {
     name: "Shift",
     params: true,
     node: (params) => makeShifter(params.dir, params.bits),
