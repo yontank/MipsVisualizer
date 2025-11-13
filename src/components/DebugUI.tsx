@@ -26,6 +26,8 @@ import { ToggleGroup, ToggleGroupItem } from "./ui/toggle-group"
 import { makeShifter, type ShiftKind } from "@/logic/nodeTypes/shift"
 import { neg } from "@/logic/nodeTypes/neg"
 import type { NodeType } from "@/logic/simulation"
+import { PopoverClose } from "@radix-ui/react-popover"
+import { not } from "@/logic/nodeTypes/not"
 
 type NodeInfo = {
   name: string
@@ -55,6 +57,7 @@ const placeableNodes: NodeInfo[] = [
 ]
 
 function AddNodePopup(props: { trigger: ReactNode }) {
+  const { setPlacingNode } = useSimulationContext()
   const [selectedNode, setSelectedNode] = useState<NodeInfo | undefined>()
   const [shiftKind, setShiftKind] = useState<ShiftKind>("left")
   const [shiftBits, setShiftBits] = useState("1")
@@ -64,7 +67,7 @@ function AddNodePopup(props: { trigger: ReactNode }) {
       <PopoverTrigger asChild>{props.trigger}</PopoverTrigger>
       <PopoverContent
         onCloseAutoFocus={(e) => e.preventDefault()} // https://github.com/radix-ui/primitives/issues/2248#issuecomment-2037290498
-        className="w-80"
+        className="w-[24em]"
       >
         <div className="grid gap-4">
           <div className="space-y-2">
@@ -80,7 +83,9 @@ function AddNodePopup(props: { trigger: ReactNode }) {
                 key={n.name}
                 className={
                   "h-fit w-fit p-3 rounded-full outline-solid outline-black text-lg cursor-pointer box-content " +
-                  (selectedNode == n ? "outline-4 font-bold" : "outline-2")
+                  (selectedNode == n
+                    ? "bg-gray-200 outline-4 font-bold"
+                    : "outline-2")
                 }
                 onClick={() => setSelectedNode(n)}
               >
@@ -90,12 +95,10 @@ function AddNodePopup(props: { trigger: ReactNode }) {
           </div>
 
           {selectedNode && selectedNode.params && (
-            <form>
-              <h3 className="font-bold">Params:</h3>
-              <div className="flex mb-2 items-baseline gap-2">
+            <>
+              <div className="flex items-baseline gap-2">
                 Shift direction:
                 <ToggleGroup
-                  id="shift-direction"
                   type="single"
                   variant="outline"
                   value={shiftKind}
@@ -112,7 +115,6 @@ function AddNodePopup(props: { trigger: ReactNode }) {
               <div className="flex items-baseline gap-2">
                 Shift amount:
                 <Input
-                  id="shift-num-bits"
                   type="number"
                   max={31}
                   min={1}
@@ -122,10 +124,26 @@ function AddNodePopup(props: { trigger: ReactNode }) {
                   onBlur={() => setShiftBits(Number(shiftBits).toString())}
                 />
               </div>
-            </form>
+            </>
           )}
 
-          <Button disabled={!selectedNode}>Add</Button>
+          <PopoverClose asChild>
+            <Button
+              disabled={!selectedNode}
+              onClick={() => {
+                if (selectedNode) {
+                  setPlacingNode(
+                    selectedNode.node({
+                      kind: shiftKind,
+                      bits: Number(shiftBits),
+                    }),
+                  )
+                }
+              }}
+            >
+              Add
+            </Button>
+          </PopoverClose>
         </div>
       </PopoverContent>
     </Popover>

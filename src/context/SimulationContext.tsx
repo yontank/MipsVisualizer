@@ -87,7 +87,13 @@ type Context = {
   setPlacedNodes: (nodes: Map<InputID, PlacedNode>) => void
 
   /**
-   * Right Tab value for Editor\Execution.
+   * The node type currently being placed by the user.
+   */
+  placingNode: NodeType | undefined
+  setPlacingNode: React.Dispatch<React.SetStateAction<NodeType | undefined>>
+
+  /**
+   * Right Tab value for Editor/Execution.
    */
   rightTabValue: "IDE" | "debugger"
   /**
@@ -141,6 +147,7 @@ export function SimulationContextProvider({ children }: Props) {
   const [placedNodes, setPlacedNodes] = useState<Map<InputID, PlacedNode>>(
     new Map(),
   )
+  const [placingNode, setPlacingNode] = useState<NodeType | undefined>()
   const editorRef = useRef<EditorInterface | undefined>(undefined)
 
   const startSimulation = () => {
@@ -280,6 +287,8 @@ export function SimulationContextProvider({ children }: Props) {
         setError,
         placedNodes,
         setPlacedNodes,
+        placingNode,
+        setPlacingNode,
       }}
     >
       {children}

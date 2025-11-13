@@ -1,13 +1,12 @@
 /// <reference types="vite-plugin-svgr/client" />
 
-import { makeIID, placedNodeId } from "@/logic/simulation"
-import { useContext, useEffect, useRef, useState } from "react"
+import { makeIID, placedNodeId, type NodeType } from "@/logic/simulation"
+import { useContext, useEffect, useRef, useState, type ReactNode } from "react"
 import { MouseTooltip } from "./MouseTooltip"
-import { int2hex } from "@/lib/utils"
-import ShiftComponent from "@/assets/shift.svg?react"
+import { cn, int2hex } from "@/lib/utils"
 import { MousePositionContext } from "@/context/MousePositionContext"
 import { useSimulationContext } from "@/context/SimulationContext"
-import { makeShifter } from "@/logic/nodeTypes/shift"
+import { X } from "lucide-react"
 
 /**
  * The stroke width of the duplicate wires for interaction, in pixels.
@@ -16,19 +15,38 @@ const INTERACTION_STROKE_WIDTH = 6
 
 const strokeCSSVariable = (node: string, input: string) => `--${node}-${input}`
 
-function MouseNode(props: {
-  svg: React.FunctionComponent<React.SVGProps<SVGSVGElement>>
-  placeable: boolean
+function PlacedNode(props: {
+  type: NodeType
+  className?: string
+  style: React.CSSProperties
+  children?: ReactNode
 }) {
+  return (
+    <div
+      className={cn(
+        "absolute p-2 font-bold bg-white border-[2px] border-black rounded-t-[50%_50%] rounded-b-[50%_50%] pointer-events-none select-none whitespace-pre-line",
+        props.className,
+      )}
+      style={{
+        translate: "-50% -50%",
+        ...props.style,
+      }}
+    >
+      {props.type.label}
+      {props.children}
+    </div>
+  )
+}
+
+function MouseNode(props: { type: NodeType; placeable: boolean }) {
   const mousePos = useContext(MousePositionContext)
 
   return (
-    <props.svg
-      className="absolute pointer-events-none"
+    <PlacedNode
+      type={props.type}
       style={{
         left: mousePos.x,
         top: mousePos.y,
-        translate: "-50% -50%",
         opacity: props.placeable ? 1 : 0.4,
       }}
     />
@@ -38,12 +56,17 @@ function MouseNode(props: {
 export function Diagram(props: {
   svg: React.FunctionComponent<React.SVGProps<SVGSVGElement>>
 }) {
-  const { placedNodes, setPlacedNodes, simulation } = useSimulationContext()
+  const {
+    placedNodes,
+    setPlacedNodes,
+    simulation,
+    placingNode,
+    setPlacingNode,
+  } = useSimulationContext()
   const svgRef = useRef<SVGSVGElement | null>(null)
   const [hoveredWire, setHoveredWire] = useState<
     { nodeId: string; inputId: string; bits: number } | undefined
   >(undefined)
-  const [isPlacingNode, setIsPlacingNode] = useState(false)
 
   useEffect(() => {
     if (!svgRef.current) {
@@ -89,7 +112,7 @@ export function Diagram(props: {
   }, [])
 
   const onDiagramClick: React.MouseEventHandler<SVGSVGElement> = (e) => {
-    if (hoveredWire && isPlacingNode && svgRef.current) {
+    if (hoveredWire && placingNode && svgRef.current) {
       const { left, top } = svgRef.current.getBoundingClientRect()
       setPlacedNodes(
         new Map([
@@ -99,12 +122,12 @@ export function Diagram(props: {
             {
               x: e.clientX - left,
               y: e.clientY - top,
-              nodeType: makeShifter("left", 2),
+              nodeType: placingNode,
             },
           ],
         ]),
       )
-      setIsPlacingNode(false)
+      setPlacingNode(undefined)
     }
   }
 
@@ -143,7 +166,7 @@ export function Diagram(props: {
         <props.svg
           ref={svgRef}
           style={
-            hoveredWire && ((simulation && tooltipContent) || isPlacingNode)
+            hoveredWire && ((simulation && tooltipContent) || placingNode)
               ? {
                   [strokeCSSVariable(hoveredWire.nodeId, hoveredWire.inputId)]:
                     "2px",
@@ -153,15 +176,28 @@ export function Diagram(props: {
           onClick={onDiagramClick}
         />
         {[...placedNodes.entries()].map(([id, n]) => (
-          <ShiftComponent
+          <PlacedNode
             key={id}
-            className="absolute pointer-events-none"
+            className={"group " + (simulation ? "" : "pointer-events-auto")}
+            type={n.nodeType}
             style={{ left: n.x, top: n.y, translate: "-50% -50%" }}
-          />
+          >
+            {!simulation && (
+              <X
+                size={16}
+                className="invisible group-hover:visible absolute bg-red-400 p-0.5 rounded-full text-white right-0 top-0 cursor-pointer"
+                onClick={() => {
+                  const newNodes = new Map(placedNodes)
+                  newNodes.delete(id)
+                  setPlacedNodes(newNodes)
+                }}
+              />
+            )}
+          </PlacedNode>
         ))}
       </div>
-      {isPlacingNode && (
-        <MouseNode svg={ShiftComponent} placeable={!!hoveredWire} />
+      {placingNode && (
+        <MouseNode type={placingNode} placeable={!!hoveredWire} />
       )}
       {tooltipContent && <MouseTooltip>{tooltipContent}</MouseTooltip>}
     </>
