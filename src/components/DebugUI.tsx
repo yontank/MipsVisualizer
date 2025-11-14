@@ -164,6 +164,7 @@ function DebugUI() {
     simulation,
     simulationIndex,
     initialPC,
+    placingNode,
   } = useSimulationContext()
 
   /** Checks if PC Address is outside the scope of the known commands inside executionInfo.
@@ -271,6 +272,15 @@ function DebugUI() {
           </ButtonGroup>
         </TooltipProvider>
       </ButtonGroup>
+      <div className="absolute top-10 text-muted-foreground text-nowrap pointer-events-none">
+        {placingNode
+          ? "Click on a wire to place the node on."
+          : simulationIndex != undefined
+            ? simulationIndex > 0
+              ? "Hover over a wire to see its value."
+              : "Go to the next cycle to execute the next instruction."
+            : ""}
+      </div>
     </div>
   )
 }
