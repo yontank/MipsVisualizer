@@ -41,10 +41,16 @@ export function makeSplitter(
       return values
     },
     undefined,
-    bitRanges &&
-      (() =>
-        Object.fromEntries(
-          bitRanges.map((r, i) => [`out${i}`, r[1] - r[0] + 1]),
-        )),
+    (get) =>
+      Object.fromEntries(
+        // If `bitRanges` is given, the bit width of each output will be calculated according to the bit range.
+        // Otherwise, it'll be the same width as the input.
+        bitRanges
+          ? bitRanges.map((r, i) => [`out${i}`, r[1] - r[0] + 1])
+          : Array.from({ length: numOutputs }, (_, i) => [
+              `out${i}`,
+              get("in"),
+            ]),
+      ),
   )
 }

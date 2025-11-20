@@ -444,10 +444,18 @@ export function simulationStep(simulation: Simulation): Simulation {
         const outputs = node.type.executeRising(simulation, inputValues)
         for (const outputId in outputs) {
           // Forward each output value to its target input.
+          let value = outputs[outputId]
+
+          if (node.outputBitWidths) {
+            const bitWidth = node.outputBitWidths[outputId]
+            if (bitWidth != 32) {
+              value = value & ((1 << bitWidth) - 1)
+            }
+          }
+
           const [targetNodeId, targetInputId] = getNodeTarget(
             node.outputs[outputId],
           )
-          const value = outputs[outputId]
           newInputValues[targetNodeId] = {
             ...newInputValues[targetNodeId],
             [targetInputId]: value,

@@ -201,7 +201,7 @@ export const singleCycle: Blueprint = {
     },
     splitterImmediateALUOp: {
       type: makeSplitter(2, [
-        [0, 31],
+        [0, 15],
         [0, 5],
       ]),
       outputs: {
