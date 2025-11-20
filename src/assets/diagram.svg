@@ -26,9 +26,9 @@
      inkscape:pagecheckerboard="0"
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="px"
-     inkscape:zoom="3.150148"
-     inkscape:cx="745.36181"
-     inkscape:cy="540.76825"
+     inkscape:zoom="17.819928"
+     inkscape:cx="790.01442"
+     inkscape:cy="190.8818"
      inkscape:window-width="1920"
      inkscape:window-height="1008"
      inkscape:window-x="0"
@@ -1422,7 +1422,7 @@
        data-node="branchImmediateAdder"
        data-input="in1"><path
          style="fill:none;fill-opacity:0"
-         d="m 306.50791,74.462234 h 8.56397"
+         d="m 308.90791,74.462234 h 6.16397"
          id="path67"
          sodipodi:nodetypes="cc" /><path
          sodipodi:type="star"
