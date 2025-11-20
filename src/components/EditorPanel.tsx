@@ -94,6 +94,7 @@ export function EditorPanel(props: { editorInterface: Ref<EditorInterface> }) {
           className="flex-1"
           placeholder="e.g 0x12345678"
           value={initialPC}
+          disabled={!!simulation}
           onChange={(e) => {
             setInitialPC(parseHex(e.currentTarget.value))
           }}
