@@ -27,8 +27,8 @@
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="px"
      inkscape:zoom="17.819928"
-     inkscape:cx="790.01442"
-     inkscape:cy="190.8818"
+     inkscape:cx="780.75512"
+     inkscape:cy="491.05137"
      inkscape:window-width="1920"
      inkscape:window-height="1008"
      inkscape:window-x="0"
@@ -1688,7 +1688,7 @@
        data-node="alu"
        data-input="in1"><path
          style="fill:none;fill-opacity:0"
-         d="m 318.20797,196.24215 h 6.40908"
+         d="m 320.60797,196.24215 h 4.00908"
          id="path70"
          sodipodi:nodetypes="cc" /><path
          sodipodi:type="star"
