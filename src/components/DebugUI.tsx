@@ -1,6 +1,5 @@
 import {
   BugPlayIcon,
-  FileQuestionMark,
   PlayIcon,
   PlusIcon,
   SquareIcon,
@@ -29,7 +28,6 @@ import { neg } from "@/logic/nodeTypes/neg"
 import type { NodeType } from "@/logic/simulation"
 import { PopoverClose } from "@radix-ui/react-popover"
 import { not } from "@/logic/nodeTypes/not"
-import { Dialog, DialogContent, DialogTrigger } from "./ui/dialog"
 
 type NodeInfo = {
   name: string
@@ -273,28 +271,6 @@ function DebugUI() {
             </Tooltip>
           </ButtonGroup>
         </TooltipProvider>
-
-        <ButtonGroup>
-          <Dialog>
-            <DialogTrigger>
-              <Tooltip delayDuration={500}>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant={"outline"}
-                    className="hover:text-gray-600 cursor-pointer"
-                  >
-                    <FileQuestionMark />
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  {/* TODO: Add Video Here */}
-                  <p>Help</p>
-                </TooltipContent>
-              </Tooltip>
-            </DialogTrigger>
-            <DialogContent>Help</DialogContent>
-          </Dialog>
-        </ButtonGroup>
       </ButtonGroup>
       <div className="absolute top-10 text-muted-foreground text-nowrap pointer-events-none">
         {placingNode
