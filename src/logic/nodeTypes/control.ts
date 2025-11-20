@@ -1,4 +1,4 @@
-import { nodeType, type OutputObject } from "../simulation"
+import { nodeType, type NodeType, type OutputObject } from "../simulation"
 
 type Outputs = [
   "regDst",
@@ -104,11 +104,23 @@ const outputMap: Record<number, OutputObject<Outputs>> = {
  *
  * Its input is expected to be just the 6 opcode bits of an instruction.
  */
-export const control = nodeType(
+export const control: NodeType<Outputs> = nodeType(
   [
     {
       id: "in",
     },
   ] as const,
   (_, inputs) => outputMap[inputs.in],
+  undefined,
+  () => ({
+    aluOp: 2,
+    aluSrc: 1,
+    branch: 1,
+    jump: 1,
+    memRead: 1,
+    memToReg: 1,
+    memWrite: 1,
+    regDst: 1,
+    regWrite: 1,
+  }),
 )

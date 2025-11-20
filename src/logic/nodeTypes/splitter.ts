@@ -26,16 +26,25 @@ function extractBits(n: number, start: number, end: number) {
  */
 export function makeSplitter(
   numOutputs: number,
-  bitRanges?: ([start: number, end: number] | undefined)[],
+  bitRanges?: [start: number, end: number][],
 ): NodeType<Outputs> {
-  return nodeType(inputs, (_, inputs) => {
-    const values: Record<OutTemplate, number> = {}
-    for (let i = 0; i < numOutputs; i++) {
-      const extractRange = bitRanges?.[i]
-      values[`out${i}`] = extractRange
-        ? extractBits(inputs.in, ...extractRange)
-        : inputs.in
-    }
-    return values
-  })
+  return nodeType(
+    inputs,
+    (_, inputs) => {
+      const values: Record<OutTemplate, number> = {}
+      for (let i = 0; i < numOutputs; i++) {
+        const extractRange = bitRanges?.[i]
+        values[`out${i}`] = extractRange
+          ? extractBits(inputs.in, ...extractRange)
+          : inputs.in
+      }
+      return values
+    },
+    undefined,
+    bitRanges &&
+      (() =>
+        Object.fromEntries(
+          bitRanges.map((r, i) => [`out${i}`, r[1] - r[0] + 1]),
+        )),
+  )
 }

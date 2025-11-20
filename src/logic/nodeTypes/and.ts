@@ -8,4 +8,6 @@ type Outputs = ["out"]
 export const and: NodeType<Outputs> = nodeType(
   [{ id: "in0" }, { id: "in1" }] as const,
   (_, inputs) => ({ out: inputs.in0 & inputs.in1 }),
+  undefined,
+  () => ({ out: 1 }),
 )

@@ -91,6 +91,11 @@ export type NodeType<Outputs extends OutputList = OutputList> = {
   executeFalling?: ExecuteFallingFunction
 
   /**
+   * An optional function that returns the bit widths of each output in this node type.
+   */
+  bitWidths?: (get: (input: string) => number) => Record<string, number>
+
+  /**
    * Text that this node should display. (Currently only set for placed nodes.)
    */
   label?: string
@@ -116,12 +121,19 @@ export function nodeType<Outputs extends OutputList, Inputs extends InputList>(
     simulation: Simulation,
     inputs: InputObject<Inputs>,
   ) => SimulationChange | undefined,
+  bitWidths?: (
+    /**
+     * Function that returns the bit width of an input, as received from the source node.
+     */
+    get: (input: Inputs[number]["id"]) => number,
+  ) => OutputObject<Outputs>,
   label?: string,
 ): NodeType<Outputs> {
   return {
     inputs,
     executeRising: executeRising as ExecuteRisingFunction<Outputs>,
     executeFalling: executeFalling as ExecuteFallingFunction,
+    bitWidths,
     label,
   }
 }
@@ -148,18 +160,18 @@ type NodeInputTarget =
 /**
  * A definition of a node that will be in a simulation.
  */
-export type NodeDef<Outputs extends OutputList = OutputList> = {
+export type NodeDef = {
   /**
    * This node's type.
    */
-  type: NodeType<Outputs>
+  type: NodeType
   /**
    * A map where the key is the node's output ID, and the value is where to output to.
    *
    * The input target can be an object describing a node and an input ID, or just a string,
    * in which case it'll output to that node with the inputID "in".
    */
-  outputs: Record<Outputs[number], NodeInputTarget>
+  outputs: Record<string, NodeInputTarget>
   /**
    * A map of constant values that should be fed into this node's inputs.
    */
@@ -178,15 +190,12 @@ export type NodeDef<Outputs extends OutputList = OutputList> = {
  *
  * It includes an `inputs` object which allows mapping an input to the output that's connected to it.
  */
-export type Node<
-  Inputs extends InputList = InputList,
-  Outputs extends OutputList = OutputList,
-> = NodeDef<Outputs> & {
+export type Node = NodeDef & {
   /**
    * A map where the key is the node's input ID, and the value is the node and output ID that it's connected to.
    */
   inputs: Record<
-    Inputs[number]["id"],
+    string,
     {
       /**
        * The ID of the node.
@@ -198,6 +207,14 @@ export type Node<
       outputId: string
     }
   >
+  /**
+   * A map of the bit width of each output.
+   */
+  outputBitWidths?: Record<string, number>
+  /**
+   * A map of the bit width of each input.
+   */
+  inputBitWidths?: Record<string, number>
 }
 
 /**
@@ -322,8 +339,46 @@ export function newSimulation(
   // Update the `inputs` map for all the nodes.
   for (const nodeId in nodes) {
     for (const [outputId, target] of Object.entries(nodes[nodeId].outputs)) {
-      const [nodeId, inputId] = getNodeTarget(target)
-      nodes[nodeId].inputs[inputId] = { nodeId, outputId }
+      const [targetNodeId, targetInputId] = getNodeTarget(target)
+      nodes[targetNodeId].inputs[targetInputId] = { nodeId, outputId }
+    }
+  }
+
+  {
+    // Set of node IDs that are yet to have their outputs' bit widths calculated.
+    const pendingBitWidths: Set<string> = new Set(Object.keys(blueprint.nodes))
+
+    const calculateBitWidth = (nodeId: string) => {
+      const node = nodes[nodeId]
+      if (pendingBitWidths.has(nodeId)) {
+        if (node.type.bitWidths) {
+          node.outputBitWidths = node.type.bitWidths((input) => {
+            const source = node.inputs[input]
+            calculateBitWidth(source.nodeId)
+            const sourceNode = nodes[source.nodeId]
+            return sourceNode.outputBitWidths
+              ? sourceNode.outputBitWidths[source.outputId]
+              : 32
+          })
+
+          for (const outputId in node.outputBitWidths) {
+            const [targetNodeId, targetInputId] = getNodeTarget(
+              node.outputs[outputId],
+            )
+            const targetNode = nodes[targetNodeId]
+            targetNode.inputBitWidths = targetNode.inputBitWidths ?? {}
+            targetNode.inputBitWidths[targetInputId] =
+              node.outputBitWidths[outputId]
+          }
+        }
+
+        pendingBitWidths.delete(nodeId)
+      }
+    }
+
+    while (pendingBitWidths.size > 0) {
+      const nodeId = pendingBitWidths.values().next().value!
+      calculateBitWidth(nodeId)
     }
   }
 

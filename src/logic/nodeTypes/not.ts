@@ -15,5 +15,6 @@ export const not: NodeType<Outputs> = nodeType(
     out: ~inputs.in,
   }),
   undefined,
+  (get) => ({ out: get("in") }),
   "Not",
 )

@@ -240,7 +240,7 @@
        r="1.6536458"
        data-node="splitterRT1"
        data-input="in"
-       data-bits="5" /><circle
+        /><circle
        style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.529167;stroke-dasharray:none;stroke-opacity:1;paint-order:fill markers stroke"
        id="SplitterBranch"
        cx="279.03543"
@@ -262,7 +262,7 @@
        r="1.6536458"
        data-node="splitterImmediateALUOp"
        data-input="in"
-       data-bits="16" /><circle
+        /><circle
        style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.529167;stroke-dasharray:none;stroke-opacity:1;paint-order:fill markers stroke"
        id="SplitterJump"
        cx="131.21393"
@@ -713,7 +713,7 @@
        sodipodi:nodetypes="cc"
        data-node="splitterRT1"
        data-input="in"
-       data-bits="5" /><path
+        /><path
        style="fill:none;fill-opacity:0;stroke:#000000;stroke-width:0.529167;stroke-dasharray:none;stroke-opacity:1"
        d="M 111.66836,180.77224 V 198.1036"
        id="SplitterRegFields-SplitterRDImmediate"
@@ -726,13 +726,13 @@
        sodipodi:nodetypes="ccc"
        data-node="splitterImmediateALUOp"
        data-input="in"
-       data-bits="16" /><g
+        /><g
        id="SplitterImmediateALUOp-SignExtend"
        style="stroke-width:0.529167;stroke-dasharray:none;stroke:#000000;stroke-opacity:0.92150199"
        transform="translate(-6.3986251,-0.24555384)"
        data-node="signExtend"
        data-input="in"
-       data-bits="16"><path
+       ><path
          sodipodi:type="star"
          style="fill:#000000;fill-opacity:1;stroke:none;stroke-width:5.52171;stroke-dasharray:none;stroke-opacity:0.92150199"
          id="path25-29"
@@ -900,83 +900,83 @@
        sodipodi:nodetypes="ccccc"
        data-input="control"
        data-node="muxJump"
-       data-bits="1" /><path
+        /><path
        style="opacity:1;fill:none;fill-opacity:0;stroke:#00a3de;stroke-width:0.529167;stroke-dasharray:none;stroke-opacity:1"
        d="m 187.7009,76.468705 h 9.38301 V 63.949637 H 105.48315 V 211.39675 h 67.03495 v -7.47425"
        id="Control.RegDst-MuxRegDst"
        sodipodi:nodetypes="ccccccc"
        data-node="muxRegDst"
        data-input="control"
-       data-bits="1" /><path
+        /><path
        style="opacity:1;fill:none;fill-opacity:0;stroke:#00a3de;stroke-width:0.529167;stroke-dasharray:none;stroke-opacity:1"
        d="m 194.66536,90.595322 h 143.28283 v -9.96683 h 19.99364"
        id="Branch"
        sodipodi:nodetypes="cccc"
        data-node="branchAnd"
        data-input="in0"
-       data-bits="1" /><path
+        /><path
        style="opacity:1;fill:none;fill-opacity:0;stroke:#00a3de;stroke-width:0.529167;stroke-dasharray:none;stroke-opacity:1"
        d="M 196.02753,98.270839 H 460.61937 V 244.19003 h -71.97082 v -11.44494"
        id="Control.MemRead-DataMemory.MemRead"
        sodipodi:nodetypes="ccccc"
        data-node="dataMemory"
        data-input="controlMemRead"
-       data-bits="1" /><path
+        /><path
        style="opacity:1;fill:none;fill-opacity:0;stroke:#00a3de;stroke-width:0.529167;stroke-dasharray:none;stroke-opacity:1"
        d="m 196.59845,107.14701 h 243.638 v 73.06032"
        id="MemToReg"
        sodipodi:nodetypes="ccc"
        data-node="muxMemToReg"
        data-input="control"
-       data-bits="1" /><path
+        /><path
        style="opacity:1;fill:none;fill-opacity:0;stroke:#00a3de;stroke-width:0.529167;stroke-dasharray:none;stroke-opacity:1"
        d="m 196.26809,113.87176 h 64.49019 v 164.76211 h 37.91895 v -15.88278"
        id="Control.ALUOp-ALUControl.ALUOp"
        sodipodi:nodetypes="ccccc"
        data-node="aluControl"
        data-input="control"
-       data-bits="2" /><path
+        /><path
        style="opacity:1;fill:none;fill-opacity:0;stroke:#00a3de;stroke-width:0.529167;stroke-dasharray:none;stroke-opacity:1"
        d="m 311.10323,244.3255 h 11.07225 v -45.38583"
        id="ALUControl-ALU"
        sodipodi:nodetypes="ccc"
        data-node="alu"
        data-input="control"
-       data-bits="4" /><path
+        /><path
        style="opacity:1;fill:none;fill-opacity:0;stroke:#00a3de;stroke-width:0.529167;stroke-dasharray:none;stroke-opacity:1"
        d="m 346.09202,172.26593 h 6.50882 V 89.318091 h 5.49127"
        id="Zero"
        data-node="branchAnd"
        data-input="in1"
-       data-bits="1" /><path
+        /><path
        style="opacity:1;fill:none;fill-opacity:0;stroke:#00a3de;stroke-width:0.529167;stroke-dasharray:none;stroke-opacity:1"
        d="m 217.97089,143.70806 v -5.77697 h -30.0347"
        id="Control.RegWrite-Registers.RegWrite"
        sodipodi:nodetypes="ccc"
        data-node="registers"
        data-input="controlRegWrite"
-       data-bits="1" /><path
+        /><path
        style="opacity:1;fill:none;fill-opacity:0;stroke:#00a3de;stroke-width:0.529167;stroke-dasharray:none;stroke-opacity:1"
        d="m 193.13819,129.53787 h 89.55323 v 52.46016"
        id="Control.ALUSrc-MuxALUSrc"
        sodipodi:nodetypes="ccc"
        data-node="muxALUSrc"
        data-input="control"
-       data-bits="1" /><path
+        /><path
        style="opacity:1;fill:none;fill-opacity:0;stroke:#00a3de;stroke-width:0.529167;stroke-dasharray:none;stroke-opacity:1"
        d="m 195.3049,122.17702 h 193.48478 v 45.20631"
        id="Control.MemWrite-DataMemory.MemWrite"
        sodipodi:nodetypes="ccc"
        data-node="dataMemory"
        data-input="controlMemWrite"
-       data-bits="1" /><path
+        /><path
        style="opacity:1;fill:none;fill-opacity:0;stroke:#00a3de;stroke-width:0.529167;stroke-dasharray:none;stroke-opacity:1"
        d="M 401.2537,63.861555 V 84.449668 H 378.83608"
        id="BranchTaken"
        sodipodi:nodetypes="ccc"
        data-node="muxBranchTaken"
        data-input="control"
-       data-bits="1" /><path
+        /><path
        style="opacity:1;fill:none;fill-opacity:0;stroke:#000000;stroke-width:0.529167;stroke-dasharray:none;stroke-opacity:1"
        d="m 237.11192,240.703 h 28.55404 v -33.89201"
        id="SignExtend-SplitterImmediate32bit"
@@ -1257,7 +1257,7 @@
        transform="translate(-10.102792)"
        data-node="muxRegDst"
        data-input="in0"
-       data-bits="5"><path
+       ><path
          style="fill:none;fill-opacity:0"
          d="m 156.46081,172.64575 v 7.04745 h 16.20793"
          id="path14"
@@ -1284,7 +1284,7 @@
        transform="translate(-10.102792)"
        data-node="muxRegDst"
        data-input="in1"
-       data-bits="5"><path
+       ><path
          style="fill:none;fill-opacity:0"
          d="m 122.94722,199.17097 50.10395,0"
          id="path21"
@@ -1311,7 +1311,7 @@
        transform="translate(-10.102792,-0.2820464)"
        data-node="registers"
        data-input="readRegister2"
-       data-bits="5"><path
+       ><path
          style="fill:none;fill-opacity:0"
          d="m 157.89219,171.4502 h 35.40882"
          id="path13"
@@ -1338,7 +1338,7 @@
        transform="translate(-10.102792)"
        data-node="registers"
        data-input="readRegister1"
-       data-bits="5"><path
+       ><path
          style="fill:none;fill-opacity:0"
          d="m 123.39057,152.94966 67.70113,0"
          id="path7"
@@ -1365,7 +1365,7 @@
        transform="translate(-10.102792)"
        data-input="in"
        data-node="control"
-       data-bits="6"><path
+       ><path
          style="fill:none;fill-opacity:0"
          d="m 121.77115,151.54045 v -44.78322 l 51.81835,0"
          id="path10"
@@ -1392,7 +1392,7 @@
        transform="translate(-10.102792)"
        data-node="jumpSL2"
        data-input="in"
-       data-bits="26"><path
+       ><path
          style="fill:none;fill-opacity:0;stroke:#000000;stroke-opacity:1"
          d="M 109.71178,177.71129 V 20.788037 l 46.90318,0"
          id="path68"
@@ -1577,7 +1577,7 @@
        transform="translate(-10.102792)"
        data-node="jumpAddressJoiner"
        data-input="in1"
-       data-bits="4" /><g
+        /><g
        id="MuxJump-PC"
        style="stroke-width:0.529167;stroke-dasharray:none;stroke:#000000;stroke-opacity:1"
        transform="translate(-10.102792)"
@@ -1635,7 +1635,7 @@
        transform="translate(-10.102792)"
        data-node="aluControl"
        data-input="in"
-       data-bits="6"><path
+       ><path
          style="fill:none;fill-opacity:0"
          d="m 195.54848,242.25484 v 31.469 h 86.23512 v -29.6626 h 9.29362"
          id="path24"
@@ -1870,7 +1870,7 @@
        transform="translate(-10.102792)"
        data-node="registers"
        data-input="writeRegister"
-       data-bits="5"><path
+       ><path
          style="opacity:1;fill:none;fill-opacity:0"
          d="m 189.38664,189.41 h 2.3979"
          id="path92"
@@ -2038,7 +2038,7 @@
        sodipodi:nodetypes="cc"
        data-node="jumpAddressJoiner"
        data-input="in0"
-       data-bits="28" /><path
+        /><path
        style="fill:none;fill-opacity:0;stroke:#000000;stroke-width:0.529167;stroke-dasharray:none;stroke-opacity:1"
        d="m 101.0679,179.12615 9.28329,0"
        id="SplitterInstruction-SplitterRegFields"

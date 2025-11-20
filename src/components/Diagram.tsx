@@ -65,7 +65,7 @@ export function Diagram(props: {
   } = useSimulationContext()
   const svgRef = useRef<SVGSVGElement | null>(null)
   const [hoveredWire, setHoveredWire] = useState<
-    { nodeId: string; inputId: string; bits: number } | undefined
+    { nodeId: string; inputId: string } | undefined
   >(undefined)
 
   useEffect(() => {
@@ -94,10 +94,8 @@ export function Diagram(props: {
       current.appendChild(clone)
       clones.push(clone)
 
-      const bits = Number(e.dataset.bits ?? "32")
-
       clone.addEventListener("mouseover", () => {
-        setHoveredWire({ nodeId, inputId, bits })
+        setHoveredWire({ nodeId, inputId })
       })
       clone.addEventListener("mouseleave", () => {
         setHoveredWire(undefined)
@@ -139,10 +137,11 @@ export function Diagram(props: {
     ] as number | undefined
 
     if (hoveredWireValue != undefined) {
-      tooltipContent = int2hex(
-        hoveredWireValue,
-        Math.ceil(hoveredWire.bits / 4),
-      )
+      const bits =
+        simulation.nodes[hoveredWire.nodeId].inputBitWidths?.[
+          hoveredWire.inputId
+        ] ?? 32
+      tooltipContent = int2hex(hoveredWireValue, Math.ceil(bits / 4))
       const iid = makeIID(hoveredWire.nodeId, hoveredWire.inputId)
       if (placedNodes.has(iid)) {
         tooltipContent = (
@@ -150,7 +149,7 @@ export function Diagram(props: {
             <span className="text-sm text-muted-foreground">Before: </span>
             {int2hex(
               simulation.inputValues[placedNodeId(iid)].in,
-              Math.ceil(hoveredWire.bits / 4),
+              Math.ceil(bits / 4),
             )}
             <span className="text-sm text-muted-foreground">After: </span>
             {tooltipContent}

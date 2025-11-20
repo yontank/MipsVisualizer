@@ -34,6 +34,7 @@ export function makeShifter(kind: ShiftKind, bits: number): NodeType<Outputs> {
       out: shiftFuncs[kind](inputs.in, bits),
     }),
     undefined,
+    undefined,
     `${shiftLabels[kind]} ${bits}`,
   )
 }

@@ -29,6 +29,9 @@ export function makeMux(numInputs: number): Mux {
     (_, inputs) => ({
       out: inputs[`in${inputs.control}`],
     }),
+    undefined,
+    // The bit widths of each input are assumed to be the same, so we simply return the first one's.
+    (get) => ({ out: get("in0") }),
   )
 
   cache[numInputs] = mux
