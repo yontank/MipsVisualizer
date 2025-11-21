@@ -118,6 +118,7 @@ export function EditorPanel(props: { editorInterface: Ref<EditorInterface> }) {
             }}
           />
         </Label>
+        <Label>Code:</Label>
       </div>
 
       <Editor
