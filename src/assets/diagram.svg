@@ -26,9 +26,9 @@
      inkscape:pagecheckerboard="0"
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="px"
-     inkscape:zoom="17.819928"
-     inkscape:cx="780.75512"
-     inkscape:cy="491.05137"
+     inkscape:zoom="5.6568542"
+     inkscape:cx="853.91983"
+     inkscape:cy="201.7906"
      inkscape:window-width="1920"
      inkscape:window-height="1008"
      inkscape:window-x="0"
@@ -297,7 +297,7 @@
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:24.189px;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;writing-mode:lr-tb;direction:ltr;white-space:pre;shape-inside:url(#rect43);display:inline;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:2;stroke-dasharray:none;stroke-opacity:1;paint-order:fill markers stroke"><tspan
            x="1412.4453"
            y="708.61053"
-           id="tspan1">Address</tspan></text><text
+           id="tspan2">Address</tspan></text><text
          xml:space="preserve"
          style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:6.4px;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-variant-east-asian:normal;text-align:start;writing-mode:lr-tb;direction:ltr;text-anchor:start;fill:#000000;fill-opacity:1;fill-rule:nonzero;stroke:none;stroke-width:0.529167;stroke-dasharray:none;stroke-opacity:1;paint-order:fill markers stroke"
          x="360.0079"
@@ -901,7 +901,7 @@
        data-node="muxRegDst"
        data-input="control" /><path
        style="opacity:1;fill:none;fill-opacity:0;stroke:#00a3de;stroke-width:0.529167;stroke-dasharray:none;stroke-opacity:1"
-       d="m 195.27318,90.59906 h 143.28283 v -9.96683 h 38.39364"
+       d="m 195.27318,90.59906 h 158.48283 v -9.96683 h 23.19364"
        id="Branch"
        sodipodi:nodetypes="cccc"
        data-node="branchAnd"
@@ -919,7 +919,7 @@
        data-node="muxMemToReg"
        data-input="control" /><path
        style="opacity:1;fill:none;fill-opacity:0;stroke:#00a3de;stroke-width:0.529167;stroke-dasharray:none;stroke-opacity:1"
-       d="m 196.87591,113.8755 h 85.7981 v 164.76211 h 35.01104 v -15.88278"
+       d="m 196.87591,113.8755 h 85.7981 v 159.16211 h 35.01104 v -10.28278"
        id="Control.ALUOp-ALUControl.ALUOp"
        sodipodi:nodetypes="ccccc"
        data-node="aluControl"
@@ -1500,7 +1500,7 @@
        data-node="muxBranchTaken"
        data-input="in1"><path
          style="opacity:1;fill:none;fill-opacity:0"
-         d="m 377.01417,58.246142 h 24.93179"
+         d="m 377.59589,58.246142 h 24.35007"
          id="path88"
          sodipodi:nodetypes="cc" /><path
          sodipodi:type="star"
@@ -1547,7 +1547,7 @@
          inkscape:transform-center-y="0.025789528"
          transform="matrix(0.13308819,0,0,0.0690078,471.49044,57.076553)" /></g><path
        style="opacity:1;fill:none;fill-opacity:0;stroke:#000000;stroke-width:0.529167;stroke-dasharray:none;stroke-opacity:1"
-       d="m 131.8151,41.563691 v -5.489186 h 71.10667 V 20.582573"
+       d="m 131.8151,41.563691 v -3.889186 h 71.10667 V 20.582573"
        id="path79"
        sodipodi:nodetypes="cccc"
        data-node="jumpAddressJoiner"
