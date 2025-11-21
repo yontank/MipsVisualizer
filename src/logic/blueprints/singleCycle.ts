@@ -131,7 +131,7 @@ export const singleCycle: Blueprint = {
       },
     },
     jumpSL2: {
-      type: makeShifter("left", 2),
+      type: makeShifter("left", 2, true),
       outputs: {
         out: {
           nodeId: "jumpAddressJoiner",

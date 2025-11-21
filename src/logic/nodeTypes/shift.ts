@@ -26,15 +26,20 @@ const shiftLabels: Record<ShiftKind, string> = {
  * Creates a node type that shifts its input.
  * @param kind The kind of shift to perform.
  * @param bits The number of bits to shift by.
+ * @param extend Whether to increase the bit width, if the shift kind is `left`.
  */
-export function makeShifter(kind: ShiftKind, bits: number): NodeType<Outputs> {
+export function makeShifter(
+  kind: ShiftKind,
+  bits: number,
+  extend?: boolean,
+): NodeType<Outputs> {
   return nodeType(
     inputs,
     (_, inputs) => ({
       out: shiftFuncs[kind](inputs.in, bits),
     }),
     undefined,
-    undefined,
+    (get) => ({ out: get("in") + (extend ? bits : 0) }),
     `${shiftLabels[kind]} ${bits}`,
   )
 }
