@@ -93,14 +93,6 @@ type Context = {
   setPlacingNode: React.Dispatch<React.SetStateAction<NodeType | undefined>>
 
   /**
-   * Right Tab value for Editor/Execution.
-   */
-  rightTabValue: "IDE" | "debugger"
-  /**
-   * Setter for Editor Tabs (Right side)
-   */
-  setRightTabValue: React.Dispatch<React.SetStateAction<"IDE" | "debugger">>
-  /**
    * Error line controller for toasts, editor highlight
    */
   setError: React.Dispatch<
@@ -141,7 +133,6 @@ export function SimulationContextProvider({ children }: Props) {
   const [error, setError] = useState<
     { code?: number; line: number; msg: string } | undefined
   >(undefined)
-  const [rightTabValue, setRightTabValue] = useState<"IDE" | "debugger">("IDE")
   const [initialRegisters, setInitialRegisters] =
     useState<number[]>(zeroRegisters)
   const [placedNodes, setPlacedNodes] = useState<Map<InputID, PlacedNode>>(
@@ -166,7 +157,6 @@ export function SimulationContextProvider({ children }: Props) {
       })
     } else if (r.kind == "result") {
       setError(undefined)
-      setRightTabValue("debugger")
       setPrevPc(undefined)
 
       let blueprint = singleCycle
@@ -269,8 +259,6 @@ export function SimulationContextProvider({ children }: Props) {
   return (
     <SimulationContext
       value={{
-        rightTabValue,
-        setRightTabValue,
         simulation: runningState?.simulations[runningState.index],
         simulationIndex: runningState?.index,
         startSimulation,

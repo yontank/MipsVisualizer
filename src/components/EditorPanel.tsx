@@ -6,6 +6,9 @@ import { Label } from "@radix-ui/react-label"
 import { parseHex } from "@/lib/utils"
 import { useSimulationContext } from "@/context/SimulationContext"
 import { toast, useSonner } from "sonner"
+import { Button } from "./ui/button"
+import { PlusIcon } from "lucide-react"
+import { AddNodePopup } from "./AddNodePopup"
 
 /**
  * A generic interface for getting the text of a code editor.
@@ -43,6 +46,7 @@ export function EditorPanel(props: { editorInterface: Ref<EditorInterface> }) {
     return () => {
       window.removeEventListener("beforeunload", onBeforeUnload)
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   const handleEditorDidMount: OnMount = (editor) => {
@@ -87,19 +91,34 @@ export function EditorPanel(props: { editorInterface: Ref<EditorInterface> }) {
 
   return (
     <div className="flex flex-col h-full">
-      <Label className="pl-2 pb-2 flex flex-row gap-2 items-baseline">
-        Initial PC:
-        <Input
-          maxLength={10}
-          className="flex-1"
-          placeholder="e.g 0x12345678"
-          value={initialPC}
-          disabled={!!simulation}
-          onChange={(e) => {
-            setInitialPC(parseHex(e.currentTarget.value))
-          }}
+      <div className="flex p-2 flex-col gap-2 w-full">
+        <AddNodePopup
+          side="right"
+          trigger={
+            <Button
+              variant="outline"
+              className="hover:text-blue-600 basis-0 grow cursor-pointer"
+              disabled={!!simulation}
+            >
+              <PlusIcon />
+              Add Component
+            </Button>
+          }
         />
-      </Label>
+        <Label className="flex flex-row gap-2 items-baseline">
+          Initial PC:
+          <Input
+            maxLength={10}
+            className="flex-1"
+            placeholder="e.g 0x12345678"
+            value={initialPC}
+            disabled={!!simulation}
+            onChange={(e) => {
+              setInitialPC(parseHex(e.currentTarget.value))
+            }}
+          />
+        </Label>
+      </div>
 
       <Editor
         defaultLanguage="mips"

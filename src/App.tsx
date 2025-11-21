@@ -1,12 +1,12 @@
 /// <reference types="vite-plugin-svgr/client" />
 
 import RegMemViewer from "./components/RegMemViewer"
-import DebugUI from "@/components/DebugUI"
+import { DebugUI } from "@/components/DebugUI"
 import { type EditorInterface, EditorPanel } from "@/components/EditorPanel"
 
 import TestDiagram from "@/assets/diagram.svg?react"
 
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "./components/ui/tabs"
+import { Tabs, TabsContent } from "./components/ui/tabs"
 import ExecutionPanel from "./components/ExecutionPanel"
 
 import { useRef } from "react"
@@ -15,39 +15,24 @@ import { Toaster } from "./components/ui/sonner"
 import { useSimulationContext } from "./context/SimulationContext"
 
 function App() {
-  const { rightTabValue, setRightTabValue } = useSimulationContext()
+  const { simulation } = useSimulationContext()
   const editorInterface = useRef<EditorInterface>({ getValue: () => "" })
 
   return (
     <>
-      <div className="absolute z-10 top-0 left-1/2 transform -translate-x-1/2">
-        <DebugUI />
-      </div>
+      <DebugUI />
 
       <div className="flex h-screen">
-        <Tabs defaultValue="IDE" value={rightTabValue} className="w-sidebar">
-          <TabsList className="w-full">
-            <TabsTrigger
-              className="w-1/2 text-center"
-              value="IDE"
-              onClick={() => setRightTabValue("IDE")}
-            >
-              Editor
-            </TabsTrigger>
-            <TabsTrigger
-              className="w-1/2 text-center"
-              value="debugger"
-              onClick={() => setRightTabValue("debugger")}
-            >
-              Execution
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="IDE">
+        <Tabs
+          defaultValue="editor"
+          value={simulation ? "execution" : "editor"}
+          className="w-sidebar"
+        >
+          <TabsContent value="editor">
             <EditorPanel editorInterface={editorInterface} />
           </TabsContent>
 
-          <TabsContent value="debugger">
+          <TabsContent value="execution">
             <ExecutionPanel />
           </TabsContent>
         </Tabs>

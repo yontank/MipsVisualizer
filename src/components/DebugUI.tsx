@@ -1,9 +1,8 @@
 import {
-  BugPlayIcon,
   PlayIcon,
-  PlusIcon,
   SquareIcon,
-  Undo2Icon,
+  StepBackIcon,
+  StepForwardIcon,
 } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -15,147 +14,13 @@ import {
   TooltipContent,
 } from "./ui/tooltip"
 import { useSimulationContext } from "@/context/SimulationContext"
-import { useState, type ReactNode } from "react"
-import { Input } from "@/components/ui/input"
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover"
-import { ToggleGroup, ToggleGroupItem } from "./ui/toggle-group"
-import { makeShifter, type ShiftKind } from "@/logic/nodeTypes/shift"
-import { neg } from "@/logic/nodeTypes/neg"
-import type { NodeType } from "@/logic/simulation"
-import { PopoverClose } from "@radix-ui/react-popover"
-import { not } from "@/logic/nodeTypes/not"
-
-type NodeInfo = {
-  name: string
-  node: (params: NodeCreationParams) => NodeType
-  params?: boolean
-}
-
-type NodeCreationParams = {
-  kind: ShiftKind
-  bits: number
-}
-
-const placeableNodes: NodeInfo[] = [
-  {
-    name: "Neg",
-    node: () => neg,
-  },
-  {
-    name: "Not",
-    node: () => not,
-  },
-  {
-    name: "Shift",
-    params: true,
-    node: (params) => makeShifter(params.kind, params.bits),
-  },
-]
-
-function AddNodePopup(props: { trigger: ReactNode }) {
-  const { setPlacingNode } = useSimulationContext()
-  const [selectedNode, setSelectedNode] = useState<NodeInfo | undefined>()
-  const [shiftKind, setShiftKind] = useState<ShiftKind>("left")
-  const [shiftBits, setShiftBits] = useState("1")
-
-  return (
-    <Popover>
-      <PopoverTrigger asChild>{props.trigger}</PopoverTrigger>
-      <PopoverContent
-        onCloseAutoFocus={(e) => e.preventDefault()} // https://github.com/radix-ui/primitives/issues/2248#issuecomment-2037290498
-        className="w-[24em]"
-      >
-        <div className="grid gap-4">
-          <div className="space-y-2">
-            <h2 className="leading-none font-medium">Add Component</h2>
-            <p className="text-muted-foreground text-sm">
-              Choose a component to place on a wire.
-            </p>
-          </div>
-
-          <div className="flex items-center justify-around">
-            {placeableNodes.map((n) => (
-              <div
-                key={n.name}
-                className={
-                  "h-fit w-fit p-3 rounded-full outline-solid outline-black text-lg cursor-pointer box-content " +
-                  (selectedNode == n
-                    ? "bg-gray-200 outline-4 font-bold"
-                    : "outline-2")
-                }
-                onClick={() => setSelectedNode(n)}
-              >
-                {n.name}
-              </div>
-            ))}
-          </div>
-
-          {selectedNode && selectedNode.params && (
-            <>
-              <div className="flex items-baseline gap-2">
-                Shift direction:
-                <ToggleGroup
-                  type="single"
-                  variant="outline"
-                  value={shiftKind}
-                  onValueChange={(v: ShiftKind) => setShiftKind(v)}
-                >
-                  <ToggleGroupItem value="left">Left</ToggleGroupItem>
-                  <ToggleGroupItem value="right">Right</ToggleGroupItem>
-                  <ToggleGroupItem value="rightLogical">
-                    Right Logical
-                  </ToggleGroupItem>
-                </ToggleGroup>
-              </div>
-
-              <div className="flex items-baseline gap-2">
-                Shift amount:
-                <Input
-                  type="number"
-                  max={31}
-                  min={1}
-                  className="w-[6em]"
-                  value={shiftBits}
-                  onChange={(e) => setShiftBits(e.target.value)}
-                  onBlur={() => setShiftBits(Number(shiftBits).toString())}
-                />
-              </div>
-            </>
-          )}
-
-          <PopoverClose asChild>
-            <Button
-              disabled={!selectedNode}
-              onClick={() => {
-                if (selectedNode) {
-                  setPlacingNode(
-                    selectedNode.node({
-                      kind: shiftKind,
-                      bits: Number(shiftBits),
-                    }),
-                  )
-                }
-              }}
-            >
-              Add
-            </Button>
-          </PopoverClose>
-        </div>
-      </PopoverContent>
-    </Popover>
-  )
-}
 
 /**
  * A Component that Contains Buttons to Start, Stop, the compilation of the program
  * The Component will probably be at the top of the screen.
  * @returns
  */
-function DebugUI() {
+export function DebugUI() {
   const {
     stopSimulation,
     startSimulation,
@@ -181,46 +46,9 @@ function DebugUI() {
   }
 
   return (
-    <div className="absolute my-2.5 flex justify-center">
-      <ButtonGroup className="cursor-pointer">
-        <TooltipProvider>
-          <ButtonGroup className="">
-            <Tooltip delayDuration={500}>
-              <TooltipTrigger asChild>
-                <Button
-                  variant="outline"
-                  size="icon"
-                  className="hover:text-blue-600 cursor-pointer"
-                  disabled={!!simulation}
-                  onClick={startSimulation}
-                >
-                  <BugPlayIcon />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Compile</p>
-              </TooltipContent>
-            </Tooltip>
-            <Tooltip delayDuration={500}>
-              <AddNodePopup
-                trigger={
-                  <TooltipTrigger asChild>
-                    <Button
-                      variant="outline"
-                      className="hover:text-green-600 cursor-pointer"
-                      disabled={!!simulation}
-                    >
-                      <PlusIcon />
-                    </Button>
-                  </TooltipTrigger>
-                }
-              />
-              <TooltipContent>
-                <p>Add Component</p>
-              </TooltipContent>
-            </Tooltip>
-          </ButtonGroup>
-
+    <div className="absolute left-[50vw] -translate-x-1/2 top-2.5 flex justify-center">
+      <TooltipProvider>
+        {simulation ? (
           <ButtonGroup>
             <Tooltip delayDuration={500}>
               <TooltipTrigger asChild>
@@ -241,37 +69,47 @@ function DebugUI() {
             <Tooltip delayDuration={500}>
               <TooltipTrigger asChild>
                 <Button
-                  variant="outline"
-                  className="hover:text-green-600 cursor-pointer"
-                  disabled={!simulation || !isPcAddressFinished()}
-                  onClick={cycleSimulation}
-                >
-                  <PlayIcon />
-                </Button>
-              </TooltipTrigger>
-              <TooltipContent>
-                <p>Next Cycle</p>
-              </TooltipContent>
-            </Tooltip>
-
-            <Tooltip delayDuration={500}>
-              <TooltipTrigger asChild>
-                <Button
                   variant={"outline"}
                   className="hover:text-red-600 cursor-pointer"
                   disabled={!simulation || simulationIndex == 0}
                   onClick={undoSimulation}
                 >
-                  <Undo2Icon />
+                  <StepBackIcon />
                 </Button>
               </TooltipTrigger>
               <TooltipContent>
                 <p>Previous Cycle</p>
               </TooltipContent>
             </Tooltip>
+
+            <Tooltip delayDuration={500}>
+              <TooltipTrigger asChild>
+                <Button
+                  variant="outline"
+                  className="hover:text-green-600 cursor-pointer"
+                  disabled={!simulation || !isPcAddressFinished()}
+                  onClick={cycleSimulation}
+                >
+                  <StepForwardIcon />
+                </Button>
+              </TooltipTrigger>
+              <TooltipContent>
+                <p>Next Cycle</p>
+              </TooltipContent>
+            </Tooltip>
           </ButtonGroup>
-        </TooltipProvider>
-      </ButtonGroup>
+        ) : (
+          <Button
+            variant="outline"
+            className="hover:text-blue-600 w-32 cursor-pointer"
+            disabled={!!simulation}
+            onClick={startSimulation}
+          >
+            <PlayIcon />
+            Start
+          </Button>
+        )}
+      </TooltipProvider>
       <div className="absolute top-10 text-muted-foreground text-nowrap pointer-events-none">
         {placingNode
           ? "Click on a wire to place the node on."
@@ -284,5 +122,3 @@ function DebugUI() {
     </div>
   )
 }
-
-export default DebugUI
