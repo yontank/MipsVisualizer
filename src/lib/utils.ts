@@ -1,9 +1,11 @@
 import { clsx, type ClassValue } from "clsx"
 import { twMerge } from "tailwind-merge"
-import { type Hexadecimal } from "@/../types"
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
+
+export type Hexadecimal = `0x${string}`
+
 /**
  *
  * @param number The given number you want to to show in base16
@@ -19,6 +21,7 @@ export function int2hex(number: number, numDigits: number = 8): Hexadecimal {
   const paddedHex = hexValue.padStart(numDigits, "0")
   return ("0x" + paddedHex) as Hexadecimal
 }
+
 /**
  * Converts Hex Into Integer
  * @param x Hexadecimal string number
