@@ -329,7 +329,7 @@ export function assemble(
     code,
     index: 0,
     line: 1,
-    reachedEnd: false,
+    reachedEnd: code.length == 0,
   }
 
   const data: number[] = []

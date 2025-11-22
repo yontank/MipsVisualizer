@@ -156,6 +156,14 @@ export function SimulationContextProvider({ children }: Props) {
         position: "bottom-left",
       })
     } else if (r.kind == "result") {
+      if (r.data.length == 0) {
+        toast.info("No code to run!", {
+          description: "Write some code, and then start the simulation.",
+          position: "bottom-left",
+        })
+        return
+      }
+
       setError(undefined)
       setPrevPc(undefined)
 
