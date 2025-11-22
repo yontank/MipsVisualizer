@@ -46,7 +46,7 @@ export function DebugUI() {
   }
 
   return (
-    <div className="absolute left-[50vw] -translate-x-1/2 top-2.5 flex justify-center">
+    <div className="absolute left-[50vw] -translate-x-1/2 top-2.5 flex justify-center z-30">
       <TooltipProvider>
         {simulation ? (
           <ButtonGroup>
