@@ -22,7 +22,7 @@ import {
 } from "react"
 import { toast } from "sonner"
 
-type PlacedNode = {
+export type PlacedNode = {
   /**
    * The X coordinate of the node on the diagram.
    */
@@ -144,6 +144,15 @@ export function SimulationContextProvider({ children }: Props) {
   const startSimulation = () => {
     if (editorRef.current == undefined)
       throw Error("Undefined Reference to the editor")
+
+    if (initialPC.length == 0 || initialPC === "0x") {
+      toast.error("Empty Initial PC", {
+        position: "bottom-left",
+        description: "Please enter a value inside the initial PC input bar.",
+      })
+      return
+    }
+
     const value = editorRef.current.getValue()
 
     const r = assemble(value, Number(initialPC))
