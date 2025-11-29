@@ -22,7 +22,7 @@ import {
 } from "react"
 import { toast } from "sonner"
 
-type PlacedNode = {
+export type PlacedNode = {
   /**
    * The X coordinate of the node on the diagram.
    */
