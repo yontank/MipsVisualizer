@@ -153,6 +153,15 @@ export function SimulationContextProvider({ children }: Props) {
       return
     }
 
+    if(parseInt(initialPC) % 4 != 0){
+      toast.error("PC Address must be divisible by 4", {
+        position: "bottom-left",
+        description: "all MIPS addresses must be divisible by 4.",
+      })
+
+      return;
+    }
+
     const value = editorRef.current.getValue()
 
     const r = assemble(value, Number(initialPC))
