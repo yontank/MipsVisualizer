@@ -152,7 +152,7 @@ export function SimulationContextProvider({ children }: Props) {
       })
       return
     }
-
+    
     if(parseInt(initialPC) % 4 != 0){
       toast.error("PC Address must be divisible by 4", {
         position: "bottom-left",
