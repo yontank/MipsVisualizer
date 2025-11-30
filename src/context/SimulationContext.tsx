@@ -145,7 +145,7 @@ export function SimulationContextProvider({ children }: Props) {
     if (editorRef.current == undefined)
       throw Error("Undefined Reference to the editor")
 
-    if (initialPC.length == 0 || initialPC === "0x") {
+    if (isNaN(parseInt(initialPC))) {
       toast.error("Empty Initial PC", {
         position: "bottom-left",
         description: "Please enter a value inside the initial PC input bar.",
