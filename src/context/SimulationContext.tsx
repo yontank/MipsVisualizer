@@ -22,7 +22,7 @@ import {
 } from "react"
 import { toast } from "sonner"
 
-type PlacedNode = {
+export type PlacedNode = {
   /**
    * The X coordinate of the node on the diagram.
    */
@@ -144,6 +144,24 @@ export function SimulationContextProvider({ children }: Props) {
   const startSimulation = () => {
     if (editorRef.current == undefined)
       throw Error("Undefined Reference to the editor")
+
+    if (isNaN(parseInt(initialPC))) {
+      toast.error("Empty Initial PC", {
+        position: "bottom-left",
+        description: "Please enter a value inside the initial PC input bar.",
+      })
+      return
+    }
+    
+    if(parseInt(initialPC) % 4 != 0){
+      toast.error("PC Address must be divisible by 4", {
+        position: "bottom-left",
+        description: "all MIPS addresses must be divisible by 4.",
+      })
+
+      return;
+    }
+
     const value = editorRef.current.getValue()
 
     const r = assemble(value, Number(initialPC))
